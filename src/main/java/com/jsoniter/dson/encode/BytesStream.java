@@ -43,6 +43,11 @@ public final class BytesStream implements Stream {
         EncodeBytes.$(this, val);
     }
 
+    @Override
+    public void write(byte b) {
+        builder.append(b);
+    }
+
     public void encodeBoolean(boolean val) {
         if (val) {
             builder.append('t', 'r', 'u', 'e');

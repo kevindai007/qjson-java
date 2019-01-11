@@ -8,4 +8,7 @@ public interface Iterator {
     double decodeDouble();
     String decodeString();
     byte[] decodeBytes();
+    byte next();
+    DsonDecodeException reportError(String errMsg);
+    DsonDecodeException reportError(String errMsg, Exception cause);
 }

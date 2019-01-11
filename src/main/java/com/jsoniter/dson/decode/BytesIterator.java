@@ -75,7 +75,7 @@ public class BytesIterator implements Iterator {
 
     void expect(char b1, char b2, char b3, char b4, char b5) {
         if (offset + 5 > size) {
-            throw new ArrayIndexOutOfBoundsException();
+            throw reportError("expect 5 more bytes");
         }
         boolean expected = buf[offset] == b1
                 && buf[offset + 1] == b2
@@ -90,7 +90,7 @@ public class BytesIterator implements Iterator {
 
     void expect(char b1, char b2, char b3) {
         if (offset + 3 > size) {
-            throw new ArrayIndexOutOfBoundsException();
+            throw reportError("expect 3 more bytes");
         }
         boolean expected = buf[offset] == b1 && buf[offset + 1] == b2 && buf[offset + 2] == b3;
         if (!expected) {
@@ -110,9 +110,13 @@ public class BytesIterator implements Iterator {
         throw new DsonDecodeException(errMsg);
     }
 
-    byte next() {
+    public DsonDecodeException reportError(String errMsg, Exception cause) {
+        throw new DsonDecodeException(errMsg, cause);
+    }
+
+    public byte next() {
         if (offset >= size) {
-            throw new ArrayIndexOutOfBoundsException();
+            throw reportError("expect more byte");
         }
         return buf[offset++];
     }
