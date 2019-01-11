@@ -1,4 +1,4 @@
-package com.jsoniter.dson.unmarshal;
+package com.jsoniter.dson.decode;
 
 public class DsonUnmarshalException extends RuntimeException {
 

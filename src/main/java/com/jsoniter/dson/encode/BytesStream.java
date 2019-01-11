@@ -1,4 +1,4 @@
-package com.jsoniter.dson.marshal;
+package com.jsoniter.dson.encode;
 
 import java.lang.reflect.Type;
 import java.util.function.Function;
@@ -6,10 +6,11 @@ import java.util.function.Function;
 public final class BytesStream implements Stream {
 
     private final Function<Type, Encoder> encoderProvider;
-    private BytesBuilder builder;
+    private final BytesBuilder builder;
 
     public BytesStream(Function<Type, Encoder> encoderProvider, BytesBuilder builder) {
         this.encoderProvider = encoderProvider;
+        this.builder = builder;
     }
 
     public BytesStream() {
@@ -17,11 +18,16 @@ public final class BytesStream implements Stream {
     }
 
     @Override
-    public void encodeInt(int val) {
-        int reminder = val % 0xFF;
+    public void encodeLong(long val) {
+        EncodeLong.$(builder, val);
     }
 
     public BytesBuilder bytesBuilder() {
         return builder;
+    }
+
+    @Override
+    public String toString() {
+        return builder.toString();
     }
 }

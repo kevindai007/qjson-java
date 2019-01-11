@@ -1,4 +1,4 @@
-package com.jsoniter.dson.marshal;
+package com.jsoniter.dson.encode;
 
 import org.junit.Assert;
 import org.junit.Test;

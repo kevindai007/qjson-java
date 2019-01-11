@@ -1,4 +1,4 @@
-package com.jsoniter.dson.marshal;
+package com.jsoniter.dson.encode;
 
 public class DsonMarshalException extends RuntimeException {
 

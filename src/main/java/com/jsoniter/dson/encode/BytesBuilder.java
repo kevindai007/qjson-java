@@ -1,4 +1,4 @@
-package com.jsoniter.dson.marshal;
+package com.jsoniter.dson.encode;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -20,6 +20,23 @@ public class BytesBuilder {
     public void append(byte b) {
         ensureCapacity(len + 1);
         buf[len++] = b;
+    }
+
+    public void append(char b) {
+        append((byte)b);
+    }
+
+    public void append(char b1, char b2) {
+        ensureCapacity(len + 2);
+        buf[len++] = (byte) b1;
+        buf[len++] = (byte) b2;
+    }
+
+    public void append(char b1, char b2, char b3) {
+        ensureCapacity(len + 3);
+        buf[len++] = (byte) b1;
+        buf[len++] = (byte) b2;
+        buf[len++] = (byte) b3;
     }
 
     public byte[] getBuffer() {
