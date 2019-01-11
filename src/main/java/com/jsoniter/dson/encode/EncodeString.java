@@ -37,7 +37,13 @@ interface EncodeString {
         byte[] temp = stream.borrowTemp(toEscapeLen);
         System.arraycopy(buf, escapePos, temp, 0, toEscapeLen);
         for (int i = 0; i < toEscapeLen; i++) {
-            EncodeBytes.escape(temp, i, builder);
+            byte b = temp[i];
+            boolean isControlCharacter = 0 <= b && b < 0x20;
+            if (isControlCharacter || b == '\\' || b == '/' || b == '"') {
+                builder.appendEscape(b);
+            } else {
+                builder.append(b);
+            }
         }
         stream.releaseTemp(temp);
         builder.append('"');
@@ -50,6 +56,8 @@ interface EncodeString {
             if (isControlCharacter || b == '\\' || b == '/' || b == '"') {
                 return i;
             }
+            // because the byte[] is converted from string
+            // we can assume it is valid unicode
         }
         return -1;
     }

@@ -27,6 +27,10 @@ public class BytesBuilder {
         buf[len++] = b;
     }
 
+    void appendEscape(byte b) {
+        append((byte) '\\', (byte) '/', (byte) ('A' + (b >>> 4)), (byte) ('A' + (b & 0xF)));
+    }
+
     public void append(char b) {
         append((byte) b);
     }
