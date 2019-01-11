@@ -12,8 +12,8 @@ JSON is slow for following reasons:
 DSON solve this problem by:
 
 * encode control character 0x00 as "\/AA", as "A" represents 0
-* encode 256 as "\b;C", as "\b" reinterpreted as uint64
-* encode 1.1 as "\f;;;;;;;;;;WZ>",as "\f" reinterpreted as float64
+* encode 256 as "\b;;;;;;;;;;;;C;", as "\b" reinterpreted as integer
+* encode 1.1 as "\f;>ZWGTNAGTNAGU",as "\f" reinterpreted as float
 * do not support whitespace
 
 Value encoded in DSON, can be decoded as JSON, then the string values need to be decoded again to original value.

@@ -12,17 +12,10 @@ interface DecodeLong {
         int i = iter.offset;
         for (; i < iter.size; i++) {
             if (iter.buf[i] == '"') {
-                break;
+                return val;
             }
-        }
-        int end = i;
-        if (end >= iter.size) {
-            throw iter.reportError("missing double quote");
-        }
-        for (i = end - 1; i >= iter.offset; i--) {
             val = (val << 5) + (iter.buf[i] - ';');
         }
-        iter.offset = end;
-        return val;
+        throw iter.reportError("missing double quote");
     }
 }

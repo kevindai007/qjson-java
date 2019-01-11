@@ -28,37 +28,72 @@ public class BytesBuilder {
     }
 
     public void append(char b) {
-        append((byte)b);
+        append((byte) b);
     }
 
     public void append(char b1, char b2) {
+        append((byte) b1, (byte) b2);
+    }
+
+    public void append(byte b1, byte b2) {
         ensureCapacity(len + 2);
-        buf[len++] = (byte) b1;
-        buf[len++] = (byte) b2;
+        buf[len++] = b1;
+        buf[len++] = b2;
     }
 
     public void append(char b1, char b2, char b3) {
+        append((byte) b1, (byte) b2, (byte) b3);
+    }
+
+    public void append(byte b1, byte b2, byte b3) {
         ensureCapacity(len + 3);
-        buf[len++] = (byte) b1;
-        buf[len++] = (byte) b2;
-        buf[len++] = (byte) b3;
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
     }
 
     public void append(char b1, char b2, char b3, char b4) {
+        append((byte) b1, (byte) b2, (byte) b3, (byte) b4);
+    }
+
+    public void append(byte b1, byte b2, byte b3, byte b4) {
         ensureCapacity(len + 4);
-        buf[len++] = (byte) b1;
-        buf[len++] = (byte) b2;
-        buf[len++] = (byte) b3;
-        buf[len++] = (byte) b4;
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
     }
 
     public void append(char b1, char b2, char b3, char b4, char b5) {
+        append((byte) b1, (byte) b2, (byte) b3, (byte) b4, (byte) b5);
+    }
+
+    public void append(byte b1, byte b2, byte b3, byte b4, byte b5) {
         ensureCapacity(len + 5);
-        buf[len++] = (byte) b1;
-        buf[len++] = (byte) b2;
-        buf[len++] = (byte) b3;
-        buf[len++] = (byte) b4;
-        buf[len++] = (byte) b5;
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
+        buf[len++] = b5;
+    }
+
+    public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7,
+                       byte b8, byte b9, byte b10, byte b11, byte b12, byte b13, byte b14) {
+        ensureCapacity(len + 14);
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
+        buf[len++] = b5;
+        buf[len++] = b6;
+        buf[len++] = b7;
+        buf[len++] = b8;
+        buf[len++] = b9;
+        buf[len++] = b10;
+        buf[len++] = b11;
+        buf[len++] = b12;
+        buf[len++] = b13;
+        buf[len++] = b14;
     }
 
     public byte[] getBuffer() {
