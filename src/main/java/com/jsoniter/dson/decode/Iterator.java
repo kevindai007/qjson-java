@@ -4,4 +4,6 @@ public interface Iterator {
     long decodeLong();
     double decodeDouble();
     String decodeString();
+    boolean decodeBoolean();
+    boolean decodeNull();
 }

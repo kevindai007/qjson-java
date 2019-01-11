@@ -52,6 +52,15 @@ public class BytesBuilder {
         buf[len++] = (byte) b4;
     }
 
+    public void append(char b1, char b2, char b3, char b4, char b5) {
+        ensureCapacity(len + 5);
+        buf[len++] = (byte) b1;
+        buf[len++] = (byte) b2;
+        buf[len++] = (byte) b3;
+        buf[len++] = (byte) b4;
+        buf[len++] = (byte) b5;
+    }
+
     public byte[] getBuffer() {
         return buf;
     }

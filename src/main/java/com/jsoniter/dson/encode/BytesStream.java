@@ -33,6 +33,19 @@ public final class BytesStream implements Stream {
         EncodeString.$(this, val);
     }
 
+    public void encodeBoolean(boolean val) {
+        if (val) {
+            builder.append('t', 'r', 'u', 'e');
+        } else {
+            builder.append('f', 'a', 'l', 's', 'e');
+        }
+    }
+
+    @Override
+    public void encodeNull() {
+        builder.append('n', 'u', 'l', 'l');
+    }
+
     @Override
     public DsonEncodeException reportError(String errMsg, Exception cause) {
         throw new DsonEncodeException(errMsg, cause);

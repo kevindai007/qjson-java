@@ -1,6 +1,7 @@
 package com.jsoniter.dson.decode;
 
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 public class BytesIterator implements Iterator {
@@ -15,6 +16,10 @@ public class BytesIterator implements Iterator {
         this.buf = buf;
         this.offset = offset;
         this.size = size;
+    }
+
+    public BytesIterator(String buf) {
+        this(buf.getBytes(StandardCharsets.UTF_8));
     }
 
     public BytesIterator(byte[] buf) {
@@ -37,8 +42,44 @@ public class BytesIterator implements Iterator {
         return DecodeString.$(this);
     }
 
+    public boolean decodeBoolean() {
+        if (offset + 4 > size) {
+            throw reportError("expect true or false");
+        }
+        boolean isTrue = buf[offset] == 't' && buf[offset + 1] == 'r' && buf[offset + 2] == 'u' && buf[offset + 3] == 'e';
+        if (isTrue) {
+            offset += 4;
+            return true;
+        }
+        expect('f', 'a', 'l', 's', 'e');
+        return false;
+    }
+
+    @Override
+    public boolean decodeNull() {
+        if (offset + 4 > size) {
+            return false;
+        }
+        return buf[offset] == 'n' && buf[offset + 1] == 'u' && buf[offset + 2] == 'l' && buf[offset + 3] == 'l';
+    }
+
+    void expect(char b1, char b2, char b3, char b4, char b5) {
+        if (offset + 5 > size) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        boolean expected = buf[offset] == b1
+                && buf[offset + 1] == b2
+                && buf[offset + 2] == b3
+                && buf[offset + 3] == b4
+                && buf[offset + 4] == b5;
+        if (!expected) {
+            throw reportError("expect " + new String(new char[]{b1, b2, b3, b4, b5}));
+        }
+        offset += 5;
+    }
+
     void expect(char b1, char b2, char b3) {
-        if (offset + 3 >= size) {
+        if (offset + 3 > size) {
             throw new ArrayIndexOutOfBoundsException();
         }
         boolean expected = buf[offset] == b1 && buf[offset + 1] == b2 && buf[offset + 2] == b3;
@@ -49,14 +90,10 @@ public class BytesIterator implements Iterator {
     }
 
     void expect(char b1) {
-        if (offset + 1 >= size) {
-            throw new ArrayIndexOutOfBoundsException();
-        }
-        boolean expected = buf[offset] == b1;
+        boolean expected = next() == b1;
         if (!expected) {
             throw reportError("expect " + new String(new char[]{b1}));
         }
-        offset += 1;
     }
 
     public DsonDecodeException reportError(String errMsg) {
