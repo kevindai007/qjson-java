@@ -27,6 +27,11 @@ public class BytesIterator implements Iterator {
     }
 
     @Override
+    public int decodeInt() {
+        return (int) decodeLong();
+    }
+
+    @Override
     public long decodeLong() {
         return DecodeLong.$(this);
     }

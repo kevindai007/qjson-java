@@ -11,6 +11,15 @@ import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
 public class DecodePrimitiveTest {
 
     @Test
+    public void type_int() {
+        for (List<String> row : testDataFromMySection().table().body) {
+            int expected = Integer.valueOf(stripQuote(row.get(0)));
+            int actual = new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeInt();
+            Assert.assertEquals(row.get(0), expected, actual);
+        }
+    }
+
+    @Test
     public void type_long() {
         for (List<String> row : testDataFromMySection().table().body) {
             long expected = Long.valueOf(stripQuote(row.get(0)));

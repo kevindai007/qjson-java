@@ -18,6 +18,11 @@ public final class BytesStream implements Stream {
     }
 
     @Override
+    public void encodeInt(int val) {
+        EncodeLong.$(this, val);
+    }
+
+    @Override
     public void encodeLong(long val) {
         EncodeLong.$(this, val);
     }
