@@ -23,7 +23,7 @@ public class BytesBuilder {
     }
 
     public void append(byte b) {
-        ensureCapacity(len + 1);
+        ensureCapacity(1);
         buf[len++] = b;
     }
 
@@ -36,7 +36,7 @@ public class BytesBuilder {
     }
 
     public void append(byte b1, byte b2) {
-        ensureCapacity(len + 2);
+        ensureCapacity(2);
         buf[len++] = b1;
         buf[len++] = b2;
     }
@@ -46,7 +46,7 @@ public class BytesBuilder {
     }
 
     public void append(byte b1, byte b2, byte b3) {
-        ensureCapacity(len + 3);
+        ensureCapacity(3);
         buf[len++] = b1;
         buf[len++] = b2;
         buf[len++] = b3;
@@ -57,7 +57,7 @@ public class BytesBuilder {
     }
 
     public void append(byte b1, byte b2, byte b3, byte b4) {
-        ensureCapacity(len + 4);
+        ensureCapacity(4);
         buf[len++] = b1;
         buf[len++] = b2;
         buf[len++] = b3;
@@ -69,7 +69,7 @@ public class BytesBuilder {
     }
 
     public void append(byte b1, byte b2, byte b3, byte b4, byte b5) {
-        ensureCapacity(len + 5);
+        ensureCapacity(5);
         buf[len++] = b1;
         buf[len++] = b2;
         buf[len++] = b3;
@@ -78,7 +78,7 @@ public class BytesBuilder {
     }
 
     public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7) {
-        ensureCapacity(len + 7);
+        ensureCapacity(7);
         buf[len++] = b1;
         buf[len++] = b2;
         buf[len++] = b3;
@@ -89,7 +89,7 @@ public class BytesBuilder {
     }
 
     public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7, byte b8) {
-        ensureCapacity(len + 8);
+        ensureCapacity(8);
         buf[len++] = b1;
         buf[len++] = b2;
         buf[len++] = b3;
@@ -102,7 +102,7 @@ public class BytesBuilder {
 
     public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7,
                        byte b8, byte b9, byte b10, byte b11, byte b12, byte b13, byte b14) {
-        ensureCapacity(len + 14);
+        ensureCapacity(14);
         buf[len++] = b1;
         buf[len++] = b2;
         buf[len++] = b3;
@@ -131,7 +131,11 @@ public class BytesBuilder {
         return len;
     }
 
-    public void ensureCapacity(int minimumCapacity) {
+    public void ensureCapacity(int remainingSize) {
+        internalEnsureCapacity(len + remainingSize);
+    }
+
+    private void internalEnsureCapacity(int minimumCapacity) {
         if (minimumCapacity - buf.length > 0) {
             buf = Arrays.copyOf(buf,
                     newCapacity(minimumCapacity));

@@ -50,4 +50,24 @@ public class EncodePrimitiveTest {
             Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
         }
     }
+
+    @Test
+    public void type_bytes() {
+        for (List<String> row : testDataFromMySection().table().body) {
+            BytesStream stream = new BytesStream();
+            String input = stripQuote(row.get(0));
+            input = input.substring(1, input.length() - 1);
+            String[] elems = input.split(" ");
+            if (input.isEmpty()) {
+                elems = new String[0];
+            }
+            byte[] bytes = new byte[elems.length];
+            for (int i = 0; i < elems.length; i++) {
+                String elem = elems[i];
+                bytes[i] = (byte) Long.parseLong(elem, 16);
+            }
+            stream.encodeBytes(bytes);
+            Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
+        }
+    }
 }

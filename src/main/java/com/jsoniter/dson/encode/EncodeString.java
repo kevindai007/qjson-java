@@ -5,12 +5,12 @@ import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 
-public class EncodeString {
+interface EncodeString {
 
     static void $(BytesStream stream, String val) {
         BytesBuilder builder = stream.bytesBuilder();
         builder.append('"');
-        int maxSize = 3 * val.length();
+        int maxSize = 8 * val.length();
         builder.ensureCapacity(maxSize);
         int offset = builder.getLength();
         byte[] buf = builder.getBuffer();
@@ -37,19 +37,13 @@ public class EncodeString {
         byte[] temp = stream.borrowTemp(toEscapeLen);
         System.arraycopy(buf, escapePos, temp, 0, toEscapeLen);
         for (int i = 0; i < toEscapeLen; i++) {
-            byte b = temp[i];
-            boolean isControlCharacter = 0 <= b && b < 0x20;
-            if (isControlCharacter || b == '\\' || b == '/' || b == '"') {
-                builder.append('\\', '/', (char) ('A' + (b >>> 4)), (char)('A' + (b & 0xF)));
-            } else {
-                builder.append(b);
-            }
+            EncodeBytes.escape(temp, i, builder);
         }
         stream.releaseTemp(temp);
         builder.append('"');
     }
 
-    private static int shouldEscape(byte[] buf, int offset, int end) {
+    static int shouldEscape(byte[] buf, int offset, int end) {
         for (int i = offset; i < end; i++) {
             byte b = buf[i];
             boolean isControlCharacter = 0 <= b && b < 0x20;
