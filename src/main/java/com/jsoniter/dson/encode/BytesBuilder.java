@@ -13,6 +13,11 @@ public class BytesBuilder {
         buf = new byte[capacity];
     }
 
+    public BytesBuilder(byte[] buf, int len) {
+        this.buf = buf;
+        this.len = len;
+    }
+
     public BytesBuilder() {
         this(16);
     }
@@ -39,6 +44,14 @@ public class BytesBuilder {
         buf[len++] = (byte) b3;
     }
 
+    public void append(char b1, char b2, char b3, char b4) {
+        ensureCapacity(len + 4);
+        buf[len++] = (byte) b1;
+        buf[len++] = (byte) b2;
+        buf[len++] = (byte) b3;
+        buf[len++] = (byte) b4;
+    }
+
     public byte[] getBuffer() {
         return buf;
     }
@@ -51,7 +64,7 @@ public class BytesBuilder {
         return len;
     }
 
-    private void ensureCapacity(int minimumCapacity) {
+    public void ensureCapacity(int minimumCapacity) {
         if (minimumCapacity - buf.length > 0) {
             buf = Arrays.copyOf(buf,
                     newCapacity(minimumCapacity));

@@ -19,13 +19,23 @@ public final class BytesStream implements Stream {
 
     @Override
     public void encodeLong(long val) {
-        EncodeLong.$(builder, val);
+        EncodeLong.$(this, val);
     }
 
     @Override
     public void encodeDouble(double val) {
         long l = Double.doubleToRawLongBits(val);
-        EncodeLong.$(builder, 'f', l);
+        EncodeLong.$(this, 'f', l);
+    }
+
+    @Override
+    public void encodeString(String val) {
+        EncodeString.$(this, val);
+    }
+
+    @Override
+    public DsonEncodeException reportError(String errMsg, Exception cause) {
+        throw new DsonEncodeException(errMsg, cause);
     }
 
     public BytesBuilder bytesBuilder() {
@@ -35,5 +45,12 @@ public final class BytesStream implements Stream {
     @Override
     public String toString() {
         return builder.toString();
+    }
+
+    public byte[] borrowTemp(int capacity) {
+        return new byte[capacity];
+    }
+
+    public void releaseTemp(byte[] temp) {
     }
 }

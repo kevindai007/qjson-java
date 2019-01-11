@@ -2,11 +2,12 @@ package com.jsoniter.dson.encode;
 
 class EncodeLong {
 
-    static void $(BytesBuilder builder, long val) {
-        EncodeLong.$(builder, 'b', val);
+    static void $(BytesStream stream, long val) {
+        EncodeLong.$(stream, 'b', val);
     }
 
-    static void $(BytesBuilder builder, char type, long val) {
+    static void $(BytesStream stream, char type, long val) {
+        BytesBuilder builder = stream.bytesBuilder();
         int mask = (1 << 5) - 1;
         builder.append('"', '\\', type);
         do {
@@ -17,6 +18,6 @@ class EncodeLong {
         builder.append('"');
     }
 
-    static void $(StringBuilder builder, long val) {
+    static void $(StringStream stream, long val) {
     }
 }

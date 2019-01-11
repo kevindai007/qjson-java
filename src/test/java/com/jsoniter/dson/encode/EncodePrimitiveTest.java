@@ -27,4 +27,18 @@ public class EncodePrimitiveTest {
             Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
         }
     }
+
+    @Test
+    public void type_string() {
+        for (List<String> row : testDataFromMySection().table().body) {
+            BytesStream stream = new BytesStream();
+            String input = stripQuote(row.get(0));
+            if (input.startsWith("0x")) {
+                char c = (char) Long.parseLong(input.substring(2), 16);
+                input = new String(new char[]{c});
+            }
+            stream.encodeString(input);
+            Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
+        }
+    }
 }

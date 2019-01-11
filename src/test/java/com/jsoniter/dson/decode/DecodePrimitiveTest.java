@@ -27,4 +27,17 @@ public class DecodePrimitiveTest {
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
+
+    @Test
+    public void type_string() {
+        for (List<String> row : testDataFromMySection().table().body) {
+            String expected = stripQuote(row.get(0));
+            if (expected.startsWith("0x")) {
+                char c = (char) Long.parseLong(expected.substring(2), 16);
+                expected = new String(new char[]{c});
+            }
+            String actual = new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeString();
+            Assert.assertEquals(row.get(0), expected, actual);
+        }
+    }
 }
