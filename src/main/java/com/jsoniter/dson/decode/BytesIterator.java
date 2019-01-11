@@ -47,6 +47,11 @@ public class BytesIterator implements Iterator {
         return DecodeString.$(this);
     }
 
+    @Override
+    public byte[] decodeBytes() {
+        return DecodeBytes.$(this);
+    }
+
     public boolean decodeBoolean() {
         if (offset + 4 > size) {
             throw reportError("expect true or false");

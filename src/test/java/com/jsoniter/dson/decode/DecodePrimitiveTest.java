@@ -49,4 +49,23 @@ public class DecodePrimitiveTest {
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
+
+    @Test
+    public void type_bytes() {
+        for (List<String> row : testDataFromMySection().table().body) {
+            String input = stripQuote(row.get(0));
+            input = input.substring(1, input.length() - 1);
+            String[] elems = input.split(" ");
+            if (input.isEmpty()) {
+                elems = new String[0];
+            }
+            byte[] expected = new byte[elems.length];
+            for (int i = 0; i < elems.length; i++) {
+                String elem = elems[i];
+                expected[i] = (byte) Long.parseLong(elem, 16);
+            }
+            byte[] actual = new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeBytes();
+            Assert.assertArrayEquals(row.get(0), expected, actual);
+        }
+    }
 }

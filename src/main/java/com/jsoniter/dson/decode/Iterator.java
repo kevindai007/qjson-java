@@ -7,4 +7,5 @@ public interface Iterator {
     long decodeLong();
     double decodeDouble();
     String decodeString();
+    byte[] decodeBytes();
 }

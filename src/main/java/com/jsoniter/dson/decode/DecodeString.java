@@ -4,7 +4,7 @@ import com.jsoniter.dson.encode.BytesBuilder;
 
 import java.nio.charset.StandardCharsets;
 
-public interface DecodeString {
+interface DecodeString {
 
     static String $(BytesIterator iter) {
         iter.expect('"');
@@ -37,7 +37,7 @@ public interface DecodeString {
             }
         }
         String decoded = builder.toString();
-        iter.releaseTemp(temp);
+        iter.releaseTemp(builder.getBuffer());
         return decoded;
     }
 
