@@ -26,6 +26,12 @@ public class BytesIterator implements Iterator {
         return DecodeLong.$(this);
     }
 
+    @Override
+    public double decodeDouble() {
+        long l = DecodeLong.$(this, 'f');
+        return Double.longBitsToDouble(l);
+    }
+
     void expect(char b1, char b2, char b3) {
         if (offset + 3 >= size) {
             throw new ArrayIndexOutOfBoundsException();

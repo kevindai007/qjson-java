@@ -3,7 +3,11 @@ package com.jsoniter.dson.decode;
 interface DecodeLong {
 
     static long $(BytesIterator iter) {
-        iter.expect('"', '\\', 'b');
+        return DecodeLong.$(iter, 'b');
+    }
+
+    static long $(BytesIterator iter, char type) {
+        iter.expect('"', '\\', type);
         long val = 0;
         int i = iter.offset;
         for (; i < iter.size; i++) {

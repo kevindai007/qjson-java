@@ -18,4 +18,13 @@ public class EncodePrimitiveTest {
             Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
         }
     }
+
+    @Test
+    public void type_double() {
+        for (List<String> row : testDataFromMySection().table().body) {
+            BytesStream stream = new BytesStream();
+            stream.encodeDouble(Double.valueOf(stripQuote(row.get(0))));
+            Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
+        }
+    }
 }

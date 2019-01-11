@@ -18,4 +18,13 @@ public class DecodePrimitiveTest {
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
+
+    @Test
+    public void type_double() {
+        for (List<String> row : testDataFromMySection().table().body) {
+            String expected = stripQuote(row.get(0));
+            String actual = String.valueOf(new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeDouble());
+            Assert.assertEquals(row.get(0), expected, actual);
+        }
+    }
 }

@@ -22,6 +22,12 @@ public final class BytesStream implements Stream {
         EncodeLong.$(builder, val);
     }
 
+    @Override
+    public void encodeDouble(double val) {
+        long l = Double.doubleToRawLongBits(val);
+        EncodeLong.$(builder, 'f', l);
+    }
+
     public BytesBuilder bytesBuilder() {
         return builder;
     }
