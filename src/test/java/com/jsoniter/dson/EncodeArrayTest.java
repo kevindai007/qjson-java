@@ -23,7 +23,7 @@ public class EncodeArrayTest {
     }
 
     @Test
-    public void one_element() {
+    public void simple_elements() {
         FluentAPI testData = testDataFromMySection();
         for (Row row : testData.table().body) {
             String source = "" +
