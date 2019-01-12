@@ -3,18 +3,17 @@ package com.jsoniter.dson.decode;
 import com.jsoniter.dson.spi.Decoder;
 import com.jsoniter.dson.spi.DecoderSource;
 
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 public class BytesDecoderSource implements DecoderSource {
 
-    private final Function<Type, Decoder> decoderProvider;
+    private final Function<Class, Decoder> decoderProvider;
     final byte[] buf;
     int offset;
     final int size;
 
-    public BytesDecoderSource(Function<Type, Decoder> decoderProvider, byte[] buf, int offset, int size) {
+    public BytesDecoderSource(Function<Class, Decoder> decoderProvider, byte[] buf, int offset, int size) {
         this.decoderProvider = decoderProvider;
         this.buf = buf;
         this.offset = offset;
@@ -51,8 +50,31 @@ public class BytesDecoderSource implements DecoderSource {
     }
 
     @Override
+    public Object decodeStringOrNumber() {
+        if (offset + 2 < size && buf[offset + 1] == '\\') {
+            byte type = buf[offset + 2];
+            if (type == 'b') {
+                return decodeLong();
+            } else if (type == 'f') {
+                return decodeDouble();
+            } else {
+                throw reportError("expect \\b or \\f");
+            }
+        }
+        return decodeString();
+    }
+
+    @Override
     public byte[] decodeBytes() {
         return DecodeBytes.$(this);
+    }
+
+    @Override
+    public <T> T decodeObject(Class<T> clazz) {
+        if (decodeNull()) {
+            return null;
+        }
+        return (T) decoderProvider.apply(clazz).decode(this);
     }
 
     public boolean decodeBoolean() {
@@ -73,7 +95,11 @@ public class BytesDecoderSource implements DecoderSource {
         if (offset + 4 > size) {
             return false;
         }
-        return buf[offset] == 'n' && buf[offset + 1] == 'u' && buf[offset + 2] == 'l' && buf[offset + 3] == 'l';
+        boolean isNull = buf[offset] == 'n' && buf[offset + 1] == 'u' && buf[offset + 2] == 'l' && buf[offset + 3] == 'l';
+        if (isNull) {
+            offset += 4;
+        }
+        return isNull;
     }
 
     void expect(char b1, char b2, char b3, char b4, char b5) {
@@ -103,10 +129,14 @@ public class BytesDecoderSource implements DecoderSource {
     }
 
     void expect(char b1) {
-        boolean expected = next() == b1;
+        if (offset >= size) {
+            throw reportError("expect more bytes");
+        }
+        boolean expected = buf[offset] == b1;
         if (!expected) {
             throw reportError("expect " + new String(new char[]{b1}));
         }
+        offset ++;
     }
 
     public DsonDecodeException reportError(String errMsg) {
@@ -117,11 +147,15 @@ public class BytesDecoderSource implements DecoderSource {
         throw new DsonDecodeException(errMsg, cause);
     }
 
-    public byte next() {
+    public byte peek() {
         if (offset >= size) {
             throw reportError("expect more byte");
         }
-        return buf[offset++];
+        return buf[offset];
+    }
+
+    public void next() {
+        offset++;
     }
 
     public byte[] borrowTemp(int capacity) {

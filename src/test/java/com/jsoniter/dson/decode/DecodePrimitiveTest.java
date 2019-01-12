@@ -23,7 +23,7 @@ public class DecodePrimitiveTest {
     public void type_long() {
         for (List<String> row : testDataFromMySection().table().body) {
             long expected = Long.valueOf(stripQuote(row.get(0)));
-            long actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeLong();
+            long actual = (Long)new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeStringOrNumber();
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -32,7 +32,7 @@ public class DecodePrimitiveTest {
     public void type_double() {
         for (List<String> row : testDataFromMySection().table().body) {
             String expected = stripQuote(row.get(0));
-            String actual = String.valueOf(new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeDouble());
+            String actual = String.valueOf(new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeStringOrNumber());
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }

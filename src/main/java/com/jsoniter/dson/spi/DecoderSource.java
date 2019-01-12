@@ -9,8 +9,11 @@ public interface DecoderSource {
     long decodeLong();
     double decodeDouble();
     String decodeString();
+    Object decodeStringOrNumber();
     byte[] decodeBytes();
-    byte next();
+    <T> T decodeObject(Class<T> clazz);
+    byte peek();
+    void next();
     DsonDecodeException reportError(String errMsg);
     DsonDecodeException reportError(String errMsg, Exception cause);
 }

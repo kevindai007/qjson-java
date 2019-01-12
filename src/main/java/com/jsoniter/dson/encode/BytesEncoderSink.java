@@ -51,7 +51,8 @@ public final class BytesEncoderSink implements EncoderSink {
             encodeNull();
             return;
         }
-        encoderProvider.apply(val.getClass()).encode(this, val);
+        Encoder encoder = encoderProvider.apply(val.getClass());
+        encoder.encode(this, val);
     }
 
     @Override

@@ -1,11 +1,15 @@
 package com.jsoniter.dson;
 
+import com.jsoniter.dson.spi.Encoder;
 import com.jsoniter.dson.spi.EncoderSink;
 
 import java.util.Map;
 
-interface EncodeMap {
-    static void $(EncoderSink sink, Map<Object, Object> map) {
+class MapEncoder implements Encoder {
+
+    @Override
+    public void encode(EncoderSink sink, Object val) {
+        Map<Object, Object> map = (Map<Object, Object>) val;
         sink.write('{');
         boolean isFirst = true;
         for (Map.Entry<Object, Object> entry : map.entrySet()) {
