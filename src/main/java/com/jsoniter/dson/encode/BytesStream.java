@@ -1,14 +1,13 @@
 package com.jsoniter.dson.encode;
 
-import java.lang.reflect.Type;
 import java.util.function.Function;
 
 public final class BytesStream implements Stream {
 
-    private final Function<Type, Encoder> encoderProvider;
+    private final Function<Class, Encoder> encoderProvider;
     private final BytesBuilder builder;
 
-    public BytesStream(Function<Type, Encoder> encoderProvider, BytesBuilder builder) {
+    public BytesStream(Function<Class, Encoder> encoderProvider, BytesBuilder builder) {
         this.encoderProvider = encoderProvider;
         this.builder = builder;
     }
@@ -41,6 +40,14 @@ public final class BytesStream implements Stream {
     @Override
     public void encodeBytes(byte[] val) {
         EncodeBytes.$(this, val);
+    }
+
+    @Override
+    public void encodeObject(Object val) {
+        if (val == null) {
+            encodeNull();
+            return;
+        }
     }
 
     @Override
