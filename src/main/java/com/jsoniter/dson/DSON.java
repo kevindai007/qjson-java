@@ -4,11 +4,16 @@ import com.jsoniter.dson.any.AnyList;
 import com.jsoniter.dson.any.AnyMap;
 import com.jsoniter.dson.codegen.Codegen;
 import com.jsoniter.dson.decode.BytesDecoderSource;
+import com.jsoniter.dson.decode.DsonDecodeException;
 import com.jsoniter.dson.encode.BytesBuilder;
 import com.jsoniter.dson.encode.BytesEncoderSink;
 import com.jsoniter.dson.spi.Decoder;
+import com.jsoniter.dson.spi.DecoderSource;
 import com.jsoniter.dson.spi.Encoder;
+import org.mdkt.compiler.InMemoryJavaCompiler;
 
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,10 +22,8 @@ import java.util.function.Function;
 
 public class DSON {
 
-    public static class Config {
-        public Codegen codegen;
-        public Function<Class, Class> chooseImpl;
-        public BiFunction<DSON, Class, Decoder> decoderProvider;
+    public static class Config extends Codegen.Config {
+        public BiFunction<DSON, Type, Decoder> decoderProvider;
         public BiFunction<DSON, Class, Encoder> encoderProvider;
     }
 
@@ -38,16 +41,18 @@ public class DSON {
         put(Map.class, new MapEncoder());
         put(Iterable.class, new IterableEncoder());
     }};
-    private final Map<Class, Decoder> builtinDecoders = new HashMap<Class, Decoder>() {{
-
+    private final Map<Type, Decoder> builtinDecoders = new HashMap<Type, Decoder>() {{
+        put(Boolean.class, DecoderSource::decodeBoolean);
+        put(String.class, DecoderSource::decodeString);
     }};
     private final Map<Class, Encoder> encoderCache = new ConcurrentHashMap<>();
-    private final Map<Class, Decoder> decoderCache = new ConcurrentHashMap<>();
-    private final Config config;
+    private final Map<Type, Decoder> decoderCache = new ConcurrentHashMap<>();
+    private final Config cfg;
+    private final Codegen codegen;
 
-    public DSON(Config config) {
-        if (config.codegen == null) {
-            config.codegen = new Codegen();
+    public DSON(Config cfg) {
+        if (cfg.compiler == null) {
+            cfg.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
         }
         Map<Class, Class> implMap = new HashMap<Class, Class>() {{
             put(Map.class, AnyMap.class);
@@ -56,22 +61,30 @@ public class DSON {
             put(List.class, AnyList.class);
             put(Set.class, HashSet.class);
         }};
-        if (config.chooseImpl == null) {
-            config.chooseImpl = implMap::get;
+        Function<Class, Class> defaultChooseImpl = clazz -> {
+            if (!(Modifier.isAbstract(clazz.getModifiers()) || clazz.isInterface())) {
+                return clazz;
+            }
+            Class impl = implMap.get(clazz);
+            if (impl == null) {
+                throw new DsonDecodeException("can not determine implementation class to decode: " + clazz);
+            }
+            return impl;
+        };
+        if (cfg.chooseImpl == null) {
+            cfg.chooseImpl = defaultChooseImpl;
         } else {
-            Function<Class, Class> userChooseImpl = config.chooseImpl;
-            config.chooseImpl = clazz -> {
+            Function<Class, Class> userChooseImpl = cfg.chooseImpl;
+            cfg.chooseImpl = clazz -> {
                 Class impl = userChooseImpl.apply(clazz);
                 if (impl != null) {
                     return impl;
                 }
-                return implMap.get(clazz);
+                return defaultChooseImpl.apply(clazz);
             };
         }
-        this.config = config;
-        builtinDecoders.put(Object.class, new ObjectDecoder(
-                decoderOf(config.chooseImpl.apply(List.class)),
-                decoderOf(config.chooseImpl.apply(Map.class))));
+        this.cfg = cfg;
+        codegen = new Codegen(cfg, this::decoderOf);
     }
 
     public DSON() {
@@ -93,19 +106,31 @@ public class DSON {
         if (Iterable.class.isAssignableFrom(clazz)) {
             return builtinEncoders.get(Iterable.class);
         }
-        return config.codegen.generateEncoder(clazz);
+        return codegen.generateEncoder(clazz);
     }
 
-    public Decoder decoderOf(Class clazz) {
-        return decoderCache.computeIfAbsent(clazz, this::generateDecoder);
+    public Decoder decoderOf(Type type) {
+        Decoder decoder = decoderCache.get(type);
+        if (decoder == null) {
+            // placeholder to avoid infinite loop
+            decoderCache.put(type, source -> decoderOf(type).decode(source));
+            decoder = generateDecoder(type);
+            decoderCache.put(type, decoder);
+        }
+        return decoder;
     }
 
-    private Decoder generateDecoder(Class clazz) {
-        Decoder decoder = builtinDecoders.get(clazz);
+    private Decoder generateDecoder(Type type) {
+        Decoder decoder = builtinDecoders.get(type);
         if (decoder != null) {
             return decoder;
         }
-        return config.codegen.generateDecoder(clazz);
+        if (Object.class.equals(type)) {
+            return new ObjectDecoder(
+                    decoderOf(cfg.chooseImpl.apply(List.class)),
+                    decoderOf(cfg.chooseImpl.apply(Map.class)));
+        }
+        return codegen.generateDecoder(type);
     }
 
     public String encode(Object val) {
@@ -128,7 +153,11 @@ public class DSON {
     }
 
     public <T> T decode(Class<T> clazz, byte[] encoded, int offset, int size) {
+        return (T) decode((Type) clazz, encoded, offset, size);
+    }
+
+    public Object decode(Type type, byte[] encoded, int offset, int size) {
         BytesDecoderSource source = new BytesDecoderSource(this::decoderOf, encoded, offset, size);
-        return source.decodeObject(clazz);
+        return source.decodeObject(type);
     }
 }

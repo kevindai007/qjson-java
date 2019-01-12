@@ -2,8 +2,8 @@ package com.jsoniter.dson;
 
 import com.dexscript.test.framework.FluentAPI;
 import com.dexscript.test.framework.Row;
-import com.jsoniter.dson.codegen.Codegen;
 import org.junit.Assert;
+import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -27,9 +27,8 @@ public interface TestEncode {
             try {
                 Class clazz = LoadClass.$(tempDir, "testdata.TestObject");
                 Object testObject = clazz.getMethod("create").invoke(null);
-                Codegen codegen = new Codegen();
                 DSON.Config config = new DSON.Config();
-                config.codegen = codegen;
+                config.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
                 DSON dson = new DSON(config);
                 Assert.assertEquals(stripQuote(row.get(1)), dson.encode(testObject));
             } catch (RuntimeException e) {

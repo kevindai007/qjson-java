@@ -3,17 +3,18 @@ package com.jsoniter.dson.decode;
 import com.jsoniter.dson.spi.Decoder;
 import com.jsoniter.dson.spi.DecoderSource;
 
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 public class BytesDecoderSource implements DecoderSource {
 
-    private final Function<Class, Decoder> decoderProvider;
+    private final Function<Type, Decoder> decoderProvider;
     final byte[] buf;
     int offset;
     final int size;
 
-    public BytesDecoderSource(Function<Class, Decoder> decoderProvider, byte[] buf, int offset, int size) {
+    public BytesDecoderSource(Function<Type, Decoder> decoderProvider, byte[] buf, int offset, int size) {
         this.decoderProvider = decoderProvider;
         this.buf = buf;
         this.offset = offset;
@@ -70,11 +71,18 @@ public class BytesDecoderSource implements DecoderSource {
     }
 
     @Override
-    public <T> T decodeObject(Class<T> clazz) {
+    public Object decodeObject(Type type) {
         if (decodeNull()) {
             return null;
         }
-        return (T) decoderProvider.apply(clazz).decode(this);
+        return decoderProvider.apply(type).decode(this);
+    }
+
+    @Override
+    public byte read() {
+        byte b = peek();
+        next();
+        return b;
     }
 
     public boolean decodeBoolean() {

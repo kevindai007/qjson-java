@@ -17,6 +17,15 @@
 | `new Object[]{1.1D}` | `["\f;>ZWGTNAGTNAGU"]` |
 | `new Object[]{new byte[]{1,2,3}}` | `["\/AB\/AC\/AD"]` |
 
+# string_array
+
+| value | encoded |
+| ---   | ---     |
+| `null` | `null` |
+| `new String[]{"hello"}` | `["hello"]` |
+| `new String[]{"a","b"}` | `["a","b"]` |
+| `new String[]{"a","b","c","d","e"}` | `["a","b","c","d","e"]` |
+
 # primitive_array
 
 | value | encoded |

@@ -2,6 +2,8 @@ package com.jsoniter.dson.spi;
 
 import com.jsoniter.dson.decode.DsonDecodeException;
 
+import java.lang.reflect.Type;
+
 public interface DecoderSource {
     boolean decodeNull();
     boolean decodeBoolean();
@@ -11,7 +13,8 @@ public interface DecoderSource {
     String decodeString();
     Object decodeStringOrNumber();
     byte[] decodeBytes();
-    <T> T decodeObject(Class<T> clazz);
+    Object decodeObject(Type type);
+    byte read();
     byte peek();
     void next();
     DsonDecodeException reportError(String errMsg);
