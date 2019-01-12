@@ -22,6 +22,10 @@ public class DSON {
         put(Float.class, (sink, val) -> sink.encodeDouble((Float) val));
         put(Double.class, (sink, val) -> sink.encodeDouble((Double) val));
         put(byte[].class, (sink, val) -> sink.encodeBytes((byte[]) val));
+        put(Map.class, (sink, val) -> {
+            Map<Object, Object> map = (Map<Object, Object>) val;
+            EncodeMap.$(sink, map);
+        });
     }};
     private final Map<Class, Encoder> encoderCache = new ConcurrentHashMap<>();
     private final Codegen codegen;
@@ -42,6 +46,9 @@ public class DSON {
         Encoder encoder = builtinEncoders.get(clazz);
         if (encoder != null) {
             return encoder;
+        }
+        if (Map.class.isAssignableFrom(clazz)) {
+            return builtinEncoders.get(Map.class);
         }
         return codegen.generateEncoder(clazz);
     }

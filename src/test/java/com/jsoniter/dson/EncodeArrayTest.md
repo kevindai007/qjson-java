@@ -1,7 +1,8 @@
-# simple_elements
+# object_array
 
 | value | encoded |
 | ---   | ---     |
+| `null` | `null` |
 | `new Object[0]` | `[]` |
 | `new Object[1]` | `[null]` |
 | `new Object[]{"hello"}` | `["hello"]` |
@@ -15,3 +16,11 @@
 | `new Object[]{1.1F}` | `["\f;>ZWGTNAK;;;;;"]` |
 | `new Object[]{1.1D}` | `["\f;>ZWGTNAGTNAGU"]` |
 | `new Object[]{new byte[]{1,2,3}}` | `["\/AB\/AC\/AD"]` |
+
+# primitive_array
+
+| value | encoded |
+| ---   | ---     |
+| `new int[]{1}` | `["\b;;;;;;<"]` |
+| `new byte[]{1}` | `"\/AB"` |
+| `new long[]{1}` | `["\b;;;;;;;;;;;;;<"]` |

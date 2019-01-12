@@ -9,6 +9,8 @@ import com.jsoniter.dson.spi.Encoder;
 import com.jsoniter.dson.spi.EncoderSink;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
+import java.util.Map;
+
 public class Codegen {
 
     private final InMemoryJavaCompiler compiler;
@@ -28,35 +30,37 @@ public class Codegen {
     }
 
     public synchronized Encoder generateEncoder(Class clazz) {
-        if (clazz.isArray()) {
-            String className = "GeneratedEncoder" + (counter++);
-            Gen g = new Gen();
-            g.__(new Line("package gen;"));
-            g.__("public class "
-            ).__(className
-            ).__(" implements "
-            ).__(Encoder.class.getCanonicalName()
-            ).__(" {"
+        String className = "GeneratedEncoder" + (counter++);
+        Gen g = new Gen();
+        g.__(new Line("package gen;"));
+        g.__("public class "
+        ).__(className
+        ).__(" implements "
+        ).__(Encoder.class.getCanonicalName()
+        ).__(" {"
+        ).__(new Indent(() -> {
+            g.__("public void encode("
+            ).__(EncoderSink.class.getCanonicalName()
+            ).__(" sink, Object val) {"
             ).__(new Indent(() -> {
-                g.__("public void encode("
-                ).__(EncoderSink.class.getCanonicalName()
-                ).__(" sink, Object val) {"
-                ).__(new Indent(() -> ArrayEncoder.$(g, clazz))
-                ).__(new Line("}"));
-            })).__(new Line("}"));
-            String src = g.toString();
-            try {
-                if ("true".equals(System.getProperty("DSON_DEBUG"))) {
-                    System.out.println(src);
+                if (clazz.isArray()) {
+                    ArrayEncoder.$(g, clazz);
+                } else {
+                    throw new UnsupportedOperationException("not implemented: " + clazz);
                 }
-                Class<?> encoderClass = compiler.compile("gen." + className, src);
-                return (Encoder) encoderClass.newInstance();
-            } catch (RuntimeException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new DsonEncodeException(e);
+            })).__(new Line("}"));
+        })).__(new Line("}"));
+        String src = g.toString();
+        try {
+            if ("true".equals(System.getProperty("DSON_DEBUG"))) {
+                System.out.println(src);
             }
+            Class<?> encoderClass = compiler.compile("gen." + className, src);
+            return (Encoder) encoderClass.newInstance();
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new DsonEncodeException(e);
         }
-        throw new UnsupportedOperationException("not implemented: " + clazz);
     }
 }
