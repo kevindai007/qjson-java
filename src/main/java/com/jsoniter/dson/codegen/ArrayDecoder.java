@@ -46,18 +46,28 @@ public interface ArrayDecoder {
         }));
         GenDecoder.method(g, new Indent(() -> {
             g.__(Helper.class.getCanonicalName()).__(new Line(".expectArrayHead(source);"));
+            // if array is []
             g.__(new Line("byte b = source.peek();"));
             g.__("if (b == ']') { "
             ).__(new Indent(() -> {
                 g.__(new Line("source.next();"));
                 g.__("return new "
-                ).__(clazz.getComponentType().getCanonicalName()
-                ).__("[0];");
+                ).__(clazz.getCanonicalName()
+                ).__("{};");
             })).__(new Line("}"));
-            g.__(clazz.getCanonicalName()
-            ).__(" arr = new "
-            ).__(clazz.getComponentType().getCanonicalName()
-            ).__(new Line("[4];"));
+            // init arr
+            if (clazz.getComponentType().isPrimitive()) {
+                g.__(clazz.getCanonicalName()
+                ).__(" arr = new "
+                ).__(clazz.getComponentType().getCanonicalName()
+                ).__(new Line("[4];"));
+            } else {
+                g.__(clazz.getCanonicalName()
+                ).__(" arr = new "
+                ).__(clazz.getCanonicalName()
+                ).__(new Line("{null,null,null,null};"));
+            }
+            // loop to read
             g.__(new Line("int i = 0;"));
             g.__("do {"
             ).__(new Indent(() -> {

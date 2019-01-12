@@ -5,7 +5,7 @@ import org.junit.Test;
 public class EncodeArrayTest {
 
     @Test
-    public void object_array() {
+    public void typed_array() {
         TestEncode.$();
     }
 

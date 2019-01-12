@@ -38,12 +38,42 @@ public class DSON {
         put(Float.class, (sink, val) -> sink.encodeDouble((Float) val));
         put(Double.class, (sink, val) -> sink.encodeDouble((Double) val));
         put(byte[].class, (sink, val) -> sink.encodeBytes((byte[]) val));
+        put(Byte[].class, (sink, val) -> {
+            Byte[] boxed = (Byte[]) val;
+            byte[] bytes = new byte[boxed.length];
+            for (int i = 0; i < boxed.length; i++) {
+                bytes[i] = boxed[i];
+            }
+            sink.encodeBytes(bytes);
+        });
         put(Map.class, new MapEncoder());
         put(Iterable.class, new IterableEncoder());
     }};
     private final Map<Type, Decoder> builtinDecoders = new HashMap<Type, Decoder>() {{
+        put(boolean.class, DecoderSource::decodeBoolean);
         put(Boolean.class, DecoderSource::decodeBoolean);
+        put(byte.class, source -> (byte)source.decodeInt());
+        put(Byte.class, source -> (byte)source.decodeInt());
+        put(short.class, source -> (short)source.decodeInt());
+        put(Short.class, source -> (short)source.decodeInt());
+        put(int.class, DecoderSource::decodeInt);
+        put(Integer.class, DecoderSource::decodeInt);
+        put(long.class, DecoderSource::decodeLong);
+        put(Long.class, DecoderSource::decodeLong);
+        put(float.class, source -> (float)source.decodeDouble());
+        put(Float.class, source -> (float)source.decodeDouble());
+        put(double.class, DecoderSource::decodeDouble);
+        put(Double.class, DecoderSource::decodeDouble);
         put(String.class, DecoderSource::decodeString);
+        put(byte[].class, DecoderSource::decodeBytes);
+        put(Byte[].class, source -> {
+            byte[] bytes = source.decodeBytes();
+            Byte[] boxed = new Byte[bytes.length];
+            for (int i = 0; i < bytes.length; i++) {
+                boxed[i] = bytes[i];
+            }
+            return boxed;
+        });
     }};
     private final Map<Class, Encoder> encoderCache = new ConcurrentHashMap<>();
     private final Map<Type, Decoder> decoderCache = new ConcurrentHashMap<>();
@@ -62,6 +92,9 @@ public class DSON {
             put(Set.class, HashSet.class);
         }};
         Function<Class, Class> defaultChooseImpl = clazz -> {
+            if (clazz.isPrimitive() || clazz.isArray()) {
+                return clazz;
+            }
             if (!(Modifier.isAbstract(clazz.getModifiers()) || clazz.isInterface())) {
                 return clazz;
             }

@@ -12,6 +12,7 @@ interface DecodeLong {
         int i = iter.offset;
         for (; i < iter.size; i++) {
             if (iter.buf[i] == '"') {
+                iter.offset = i + 1;
                 return val;
             }
             val = (val << 5) + (iter.buf[i] - ';');

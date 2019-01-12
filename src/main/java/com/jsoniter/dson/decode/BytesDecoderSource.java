@@ -144,7 +144,7 @@ public class BytesDecoderSource implements DecoderSource {
         if (!expected) {
             throw reportError("expect " + new String(new char[]{b1}));
         }
-        offset ++;
+        offset++;
     }
 
     public DsonDecodeException reportError(String errMsg) {

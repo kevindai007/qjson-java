@@ -6,7 +6,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -18,16 +17,11 @@ import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
 public class DecodeArrayTest {
 
     @Test
-    public void object_array() {
-        testDecode(Object[].class);
+    public void typed_array() {
+        testDecode();
     }
 
-    @Test
-    public void string_array() {
-        testDecode(String[].class);
-    }
-
-    private void testDecode(Type type) {
+    private void testDecode() {
         FluentAPI testData = testDataFromMySection();
         for (Row row : testData.table().body) {
             String source = "" +
@@ -46,7 +40,7 @@ public class DecodeArrayTest {
                 config.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
                 DSON dson = new DSON(config);
                 byte[] bytes = stripQuote(row.get(1)).getBytes(StandardCharsets.UTF_8);
-                Object decoded = dson.decode(type, bytes, 0, bytes.length);
+                Object decoded = dson.decode(testObject.getClass(), bytes, 0, bytes.length);
                 Assert.assertTrue(Objects.deepEquals(testObject, decoded));
             } catch (RuntimeException e) {
                 throw e;
