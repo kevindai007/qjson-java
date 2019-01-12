@@ -1,18 +1,21 @@
 package com.jsoniter.dson.encode;
 
+import com.jsoniter.dson.spi.Encoder;
+import com.jsoniter.dson.spi.EncoderSink;
+
 import java.util.function.Function;
 
-public final class BytesStream implements Stream {
+public final class BytesEncoderSink implements EncoderSink {
 
     private final Function<Class, Encoder> encoderProvider;
     private final BytesBuilder builder;
 
-    public BytesStream(Function<Class, Encoder> encoderProvider, BytesBuilder builder) {
+    public BytesEncoderSink(Function<Class, Encoder> encoderProvider, BytesBuilder builder) {
         this.encoderProvider = encoderProvider;
         this.builder = builder;
     }
 
-    public BytesStream() {
+    public BytesEncoderSink() {
         this(type -> null, new BytesBuilder());
     }
 
@@ -48,10 +51,11 @@ public final class BytesStream implements Stream {
             encodeNull();
             return;
         }
+        encoderProvider.apply(val.getClass()).encode(this, val);
     }
 
     @Override
-    public void write(byte b) {
+    public void write(char b) {
         builder.append(b);
     }
 

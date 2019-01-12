@@ -3,21 +3,21 @@ package com.jsoniter.dson.decode;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BytesIteratorTest {
+public class BytesDecoderSourceTest {
 
     @Test
     public void decode_boolean() {
-        BytesIterator iter = new BytesIterator("true");
+        BytesDecoderSource iter = new BytesDecoderSource("true");
         Assert.assertTrue(iter.decodeBoolean());
-        iter = new BytesIterator("false");
+        iter = new BytesDecoderSource("false");
         Assert.assertFalse(iter.decodeBoolean());
     }
 
     @Test
     public void decode_null() {
-        BytesIterator iter = new BytesIterator("\"\"");
+        BytesDecoderSource iter = new BytesDecoderSource("\"\"");
         Assert.assertFalse(iter.decodeNull());
-        iter = new BytesIterator("null");
+        iter = new BytesDecoderSource("null");
         Assert.assertTrue(iter.decodeNull());
     }
 }

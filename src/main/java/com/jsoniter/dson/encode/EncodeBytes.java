@@ -2,7 +2,7 @@ package com.jsoniter.dson.encode;
 
 interface EncodeBytes {
 
-    static void $(BytesStream stream, byte[] val) {
+    static void $(BytesEncoderSink stream, byte[] val) {
         BytesBuilder builder = stream.bytesBuilder();
         builder.append('"');
         int escapePos = shouldEscape(val);

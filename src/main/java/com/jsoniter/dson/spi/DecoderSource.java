@@ -1,6 +1,8 @@
-package com.jsoniter.dson.decode;
+package com.jsoniter.dson.spi;
 
-public interface Iterator {
+import com.jsoniter.dson.decode.DsonDecodeException;
+
+public interface DecoderSource {
     boolean decodeNull();
     boolean decodeBoolean();
     int decodeInt();

@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 
 interface EncodeString {
 
-    static void $(BytesStream stream, String val) {
+    static void $(BytesEncoderSink stream, String val) {
         BytesBuilder builder = stream.bytesBuilder();
         builder.append('"');
         int maxSize = 8 * val.length();

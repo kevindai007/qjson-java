@@ -2,11 +2,11 @@ package com.jsoniter.dson.decode;
 
 interface DecodeLong {
 
-    static long $(BytesIterator iter) {
+    static long $(BytesDecoderSource iter) {
         return DecodeLong.$(iter, 'b');
     }
 
-    static long $(BytesIterator iter, char type) {
+    static long $(BytesDecoderSource iter, char type) {
         iter.expect('"', '\\', type);
         long val = 0;
         int i = iter.offset;

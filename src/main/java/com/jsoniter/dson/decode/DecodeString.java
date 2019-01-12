@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 interface DecodeString {
 
-    static String $(BytesIterator iter) {
+    static String $(BytesDecoderSource iter) {
         iter.expect('"');
         int i = iter.offset;
         for (; i < iter.size; i++) {
@@ -41,7 +41,7 @@ interface DecodeString {
         return decoded;
     }
 
-    static boolean readEscaped(BytesIterator iter, BytesBuilder builder) {
+    static boolean readEscaped(BytesDecoderSource iter, BytesBuilder builder) {
         for (int i = iter.offset; i < iter.size; ) {
             byte b = iter.buf[i];
             if (b == '"') {
@@ -65,7 +65,7 @@ interface DecodeString {
         throw iter.reportError("missing double quote");
     }
 
-    static boolean readRaw(BytesIterator iter, BytesBuilder builder) {
+    static boolean readRaw(BytesDecoderSource iter, BytesBuilder builder) {
         for (int i = iter.offset; i < iter.size; i++) {
             byte b = iter.buf[i];
             if (b == '"') {

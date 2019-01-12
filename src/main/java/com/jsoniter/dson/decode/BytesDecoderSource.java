@@ -1,28 +1,31 @@
 package com.jsoniter.dson.decode;
 
+import com.jsoniter.dson.spi.Decoder;
+import com.jsoniter.dson.spi.DecoderSource;
+
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
-public class BytesIterator implements Iterator {
+public class BytesDecoderSource implements DecoderSource {
 
     private final Function<Type, Decoder> decoderProvider;
     final byte[] buf;
     int offset;
     final int size;
 
-    public BytesIterator(Function<Type, Decoder> decoderProvider, byte[] buf, int offset, int size) {
+    public BytesDecoderSource(Function<Type, Decoder> decoderProvider, byte[] buf, int offset, int size) {
         this.decoderProvider = decoderProvider;
         this.buf = buf;
         this.offset = offset;
         this.size = size;
     }
 
-    public BytesIterator(String buf) {
+    public BytesDecoderSource(String buf) {
         this(buf.getBytes(StandardCharsets.UTF_8));
     }
 
-    public BytesIterator(byte[] buf) {
+    public BytesDecoderSource(byte[] buf) {
         this(type -> null, buf, 0, buf.length);
     }
 

@@ -1,4 +1,4 @@
-package com.jsoniter.dson.codegen;
+package com.jsoniter.dson;
 
 import org.mdkt.compiler.CompilationException;
 import org.mdkt.compiler.SourceCode;

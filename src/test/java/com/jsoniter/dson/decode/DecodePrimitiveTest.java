@@ -14,7 +14,7 @@ public class DecodePrimitiveTest {
     public void type_int() {
         for (List<String> row : testDataFromMySection().table().body) {
             int expected = Integer.valueOf(stripQuote(row.get(0)));
-            int actual = new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeInt();
+            int actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeInt();
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -23,7 +23,7 @@ public class DecodePrimitiveTest {
     public void type_long() {
         for (List<String> row : testDataFromMySection().table().body) {
             long expected = Long.valueOf(stripQuote(row.get(0)));
-            long actual = new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeLong();
+            long actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeLong();
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -32,7 +32,7 @@ public class DecodePrimitiveTest {
     public void type_double() {
         for (List<String> row : testDataFromMySection().table().body) {
             String expected = stripQuote(row.get(0));
-            String actual = String.valueOf(new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeDouble());
+            String actual = String.valueOf(new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeDouble());
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -45,7 +45,7 @@ public class DecodePrimitiveTest {
                 char c = (char) Long.parseLong(expected.substring(2), 16);
                 expected = new String(new char[]{c});
             }
-            String actual = new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeString();
+            String actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeString();
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -64,7 +64,7 @@ public class DecodePrimitiveTest {
                 String elem = elems[i];
                 expected[i] = (byte) Long.parseLong(elem, 16);
             }
-            byte[] actual = new BytesIterator(stripQuote(row.get(1)).getBytes()).decodeBytes();
+            byte[] actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeBytes();
             Assert.assertArrayEquals(row.get(0), expected, actual);
         }
     }

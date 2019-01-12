@@ -4,7 +4,7 @@ import com.jsoniter.dson.encode.BytesBuilder;
 
 interface DecodeBytes {
 
-    static byte[] $(BytesIterator iter) {
+    static byte[] $(BytesDecoderSource iter) {
         iter.expect('"');
         int i = iter.offset;
         for (; i < iter.size; i++) {

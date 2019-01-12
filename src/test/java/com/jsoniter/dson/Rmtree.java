@@ -1,4 +1,4 @@
-package com.jsoniter.dson.codegen;
+package com.jsoniter.dson;
 
 import java.io.File;
 import java.io.IOException;
