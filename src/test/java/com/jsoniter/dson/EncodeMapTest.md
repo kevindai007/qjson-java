@@ -1,7 +1,7 @@
 # type_map
 
-| value | encoded |
-| ---   | ---     |
-| `null` | `null` |
-| `new AnyMap("a","b")` | `{"a":"b"}` |
-| `new AnyMap(null,"b")` | `{"null":"b"}` |
+| type | value | encoded |
+| ---  | ---   | ---     |
+| `AnyMap<String,String>` | `null` | `null` |
+| `AnyMap<String,String>` | `new AnyMap("a","b")` | `{"a":"b"}` |
+| `AnyMap<String,String>` |`new AnyMap(null,"b")` | `{"null":"b"}` |

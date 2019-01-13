@@ -61,7 +61,7 @@ public class Codegen {
             } else if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
                 CollectionDecoder.$(g, decoderClassName, clazz);
             } else if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
-                MapDecoder.$(g, clazz, typeArgs);
+                MapDecoder.$(g, decoderClassName, clazz);
             } else {
                 throw new UnsupportedOperationException("not implemented: " + clazz);
             }

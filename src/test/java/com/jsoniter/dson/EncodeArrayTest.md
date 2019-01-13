@@ -5,6 +5,7 @@
 | `new String[]{"hello"}` | `["hello"]` |
 | `new String[]{"a","b"}` | `["a","b"]` |
 | `new String[]{"a","b","c","d","e"}` | `["a","b","c","d","e"]` |
+| `new String[]{null}` | `[null]` |
 | `new byte[][]{new byte[]{1,2,3}}` | `["\/AB\/AC\/AD"]` |
 | `new boolean[]{true}` | `[true]` |
 | `new Boolean[]{true}` | `[true]` |

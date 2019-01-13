@@ -2,6 +2,8 @@
 
 | type | value | encoded |
 | ---  | ---   | ---  |
-| `AnyList<String>` | `new AnyList<String>()` | `[]` |
-| `AnyList<String>` | `new AnyList<String>("hello")` | `["hello"]` |
-| `AnyList<Integer>` | `new AnyList<Integer>(100)` | `["\b;;;;;>?"]` |
+| `AnyList<String>` | `null` | `null` |
+| `AnyList<String>` | `new AnyList()` | `[]` |
+| `AnyList<String>` | `new AnyList("hello")` | `["hello"]` |
+| `AnyList<String>` | `new AnyList(null)` | `[null]` |
+| `AnyList<Integer>` | `new AnyList(100)` | `["\b;;;;;>?"]` |

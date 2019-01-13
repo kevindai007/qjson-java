@@ -6,6 +6,7 @@ import com.dexscript.test.framework.Table;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -43,8 +44,13 @@ public interface TestDecode {
                 config.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
                 DSON dson = new DSON(config);
                 byte[] bytes = stripQuote(row.get(hasType ? 2 : 1)).getBytes(StandardCharsets.UTF_8);
-                Object decoded = dson.decode(testObjectType, bytes, 0, bytes.length);
-                Assert.assertTrue(row.get(hasType ? 1 : 0), Objects.deepEquals(testObject, decoded));
+                if (hasType) {
+                    Object decoded = dson.decode(testObjectType, bytes, 0, bytes.length);
+                    Assert.assertTrue(row.get(hasType ? 1 : 0), Objects.deepEquals(testObject, decoded));
+                } else {
+                    Object decoded = dson.decode(testObject.getClass(), bytes, 0, bytes.length);
+                    Assert.assertTrue(row.get(hasType ? 1 : 0), Objects.deepEquals(testObject, decoded));
+                }
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
