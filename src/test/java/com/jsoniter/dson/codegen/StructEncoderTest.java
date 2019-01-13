@@ -17,7 +17,8 @@ public class StructEncoderTest {
 
     @Test
     public void fields_over_getters() {
-        List<StructDescriptor.Prop> props = StructEncoder.getProperties(new Codegen.Config(), MyClass.class);
+        List<StructDescriptor.Prop> props = StructEncoder.Helper.getProperties(
+                new Codegen.Config(), null, MyClass.class);
         Assert.assertEquals(1, props.size());
         Assert.assertNotNull(props.get(0).field);
     }

@@ -5,10 +5,7 @@ import com.jsoniter.dson.codegen.gen.Indent;
 import com.jsoniter.dson.codegen.gen.Line;
 import com.jsoniter.dson.decode.DsonDecodeException;
 import com.jsoniter.dson.encode.DsonEncodeException;
-import com.jsoniter.dson.spi.Decoder;
-import com.jsoniter.dson.spi.Encoder;
-import com.jsoniter.dson.spi.EncoderSink;
-import com.jsoniter.dson.spi.StructDescriptor;
+import com.jsoniter.dson.spi.*;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.lang.reflect.Constructor;
@@ -17,24 +14,24 @@ import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class Codegen {
 
     private final Config cfg;
-    private final Function<Type, Decoder> decoderProvider;
+    private final DsonSpi spi;
     private int counter;
 
     public static class Config {
         public InMemoryJavaCompiler compiler;
         public Function<Class, Class> chooseImpl;
-        public Consumer<StructDescriptor> customizeStruct;
+        public BiFunction<DsonSpi, StructDescriptor, StructDescriptor> customizeStruct;
     }
 
-    public Codegen(Config cfg, Function<Type, Decoder> decoderProvider) {
+    public Codegen(Config cfg, DsonSpi spi) {
         this.cfg = cfg;
-        this.decoderProvider = decoderProvider;
+        this.spi = spi;
     }
 
     public synchronized Decoder generateDecoder(Type type) {
@@ -71,8 +68,8 @@ public class Codegen {
         try {
             printSourceCode(clazz, src);
             Class<?> decoderClass = cfg.compiler.compile("gen." + decoderClassName, src);
-            Constructor<?> ctor = decoderClass.getConstructor(Codegen.Config.class, Function.class, Class.class, Map.class);
-            return (Decoder) ctor.newInstance(cfg, decoderProvider, clazz, typeArgs);
+            Constructor<?> ctor = decoderClass.getConstructor(Codegen.Config.class, DsonSpi.class, Class.class, Map.class);
+            return (Decoder) ctor.newInstance(cfg, spi, clazz, typeArgs);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -96,11 +93,10 @@ public class Codegen {
             ).__(new Indent(() -> {
                 g.__("try {"
                 ).__(new Indent(() -> {
-
                     if (clazz.isArray()) {
                         ArrayEncoder.$(g, clazz);
                     } else {
-                        StructEncoder.$(g, cfg, clazz);
+                        StructEncoder.$(g, cfg, spi, clazz);
                     }
                 })).__("} catch (RuntimeException e) {"
                 ).__(new Indent(() -> {

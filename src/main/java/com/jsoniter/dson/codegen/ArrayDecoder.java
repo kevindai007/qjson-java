@@ -5,16 +5,14 @@ import com.jsoniter.dson.codegen.gen.Indent;
 import com.jsoniter.dson.codegen.gen.Line;
 import com.jsoniter.dson.spi.Decoder;
 import com.jsoniter.dson.spi.DecoderSource;
-
-import java.lang.reflect.Type;
-import java.util.function.Function;
+import com.jsoniter.dson.spi.DsonSpi;
 
 public interface ArrayDecoder {
 
     interface Helper {
 
-        static Decoder getElemDecoder(Function<Type, Decoder> decoderProvider, Class clazz) {
-            Decoder decoder = decoderProvider.apply(clazz.getComponentType());
+        static Decoder getElemDecoder(DsonSpi spi, Class clazz) {
+            Decoder decoder = spi.decoderOf(clazz.getComponentType());
             return decoder;
         }
 
@@ -40,7 +38,7 @@ public interface ArrayDecoder {
         GenDecoder.ctor(g, decoderClassName, new Indent(() -> {
             g.__("this.elemDecoder = "
             ).__(Helper.class.getCanonicalName()
-            ).__(new Line(".getElemDecoder(decoderProvider, clazz);"));
+            ).__(new Line(".getElemDecoder(spi, clazz);"));
         }));
         GenDecoder.method(g, new Indent(() -> {
             g.__(Helper.class.getCanonicalName()).__(new Line(".expectArrayHead(source);"));

@@ -3,17 +3,16 @@ package com.jsoniter.dson.codegen;
 import com.jsoniter.dson.codegen.gen.Gen;
 import com.jsoniter.dson.codegen.gen.Indent;
 import com.jsoniter.dson.codegen.gen.Line;
-import com.jsoniter.dson.decode.DsonDecodeException;
 import com.jsoniter.dson.encode.DsonEncodeException;
 import com.jsoniter.dson.spi.Decoder;
-import com.jsoniter.dson.spi.DecoderSource;
 import com.jsoniter.dson.spi.DsonSpi;
+import com.jsoniter.dson.spi.EncoderSink;
 
-interface GenDecoder {
+public class GenEncoder {
 
-    static void ctor(Gen g, String decoderClassName, Indent indent) {
+    static void ctor(Gen g, String encoderClassName, Indent indent) {
         g.__("public "
-        ).__(decoderClassName
+        ).__(encoderClassName
         ).__("("
         ).__(Codegen.Config.class.getCanonicalName()
         ).__(" cfg, "
@@ -23,9 +22,9 @@ interface GenDecoder {
     }
 
     static void method(Gen g, Indent indent) {
-        g.__("public Object decode("
-        ).__(DecoderSource.class.getCanonicalName()
-        ).__(" source) {"
+        g.__("public void encode("
+        ).__(EncoderSink.class.getCanonicalName()
+        ).__(" sink, Object val) {"
         ).__(new Indent(() -> {
             g.__("try {"
             ).__(indent
@@ -35,9 +34,9 @@ interface GenDecoder {
             })).__("} catch (Exception e) {"
             ).__(new Indent(() -> {
                 g.__("throw new "
-                ).__(DsonDecodeException.class.getCanonicalName()
+                ).__(DsonEncodeException.class.getCanonicalName()
                 ).__("(e);");
             })).__(new Line("}"));
-        })).__(new Line("}"));
+        }));
     }
 }

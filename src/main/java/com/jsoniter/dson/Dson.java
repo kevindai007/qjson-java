@@ -10,6 +10,7 @@ import com.jsoniter.dson.encode.BytesBuilder;
 import com.jsoniter.dson.encode.BytesEncoderSink;
 import com.jsoniter.dson.spi.Decoder;
 import com.jsoniter.dson.spi.DecoderSource;
+import com.jsoniter.dson.spi.DsonSpi;
 import com.jsoniter.dson.spi.Encoder;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
@@ -21,13 +22,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Dson {
+public class Dson implements DsonSpi {
 
     public static Dson $ = new Dson();
 
     public static class Config extends Codegen.Config {
-        public BiFunction<Dson, Type, Decoder> chooseDecoder;
-        public BiFunction<Dson, Class, Encoder> chooseEncoder;
+        public BiFunction<DsonSpi, Type, Decoder> chooseDecoder;
+        public BiFunction<DsonSpi, Class, Encoder> chooseEncoder;
     }
 
     private final Map<Class, Encoder> builtinEncoders = new HashMap<Class, Encoder>() {{
@@ -120,7 +121,7 @@ public class Dson {
             };
         }
         this.cfg = cfg;
-        codegen = new Codegen(cfg, this::decoderOf);
+        codegen = new Codegen(cfg, this);
     }
 
     public Dson() {

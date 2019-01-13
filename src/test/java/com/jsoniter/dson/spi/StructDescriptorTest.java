@@ -28,7 +28,7 @@ public class StructDescriptorTest {
 
     @Test
     public void ignore_transient() {
-        StructDescriptor struct = new StructDescriptor(MyClass.class);
+        StructDescriptor struct = StructDescriptor.create(MyClass.class);
         StructDescriptor.Prop field1 = struct.fields.get("field1");
         Assert.assertTrue(field1.getAnnotation(DsonProperty.class).ignore());
         StructDescriptor.Prop field2 = struct.fields.get("field2");
@@ -41,8 +41,7 @@ public class StructDescriptorTest {
 
     @Test
     public void copy_dson_property_into_descriptor() {
-        StructDescriptor struct = new StructDescriptor(MyClass.class);
-        struct.customize(null);
+        StructDescriptor struct = StructDescriptor.create(MyClass.class);
         StructDescriptor.Prop field1 = struct.fields.get("field1");
         Assert.assertTrue(field1.ignore);
     }

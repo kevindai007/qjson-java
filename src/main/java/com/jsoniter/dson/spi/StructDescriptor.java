@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -21,7 +22,7 @@ public class StructDescriptor {
     // sort the properties in order to encode
     public Function<List<Prop>, List<Prop>> sortProperties;
 
-    public StructDescriptor(Class clazz) {
+    private StructDescriptor(Class clazz) {
         this.clazz = clazz;
         for (Field field : clazz.getFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -54,23 +55,31 @@ public class StructDescriptor {
         }
     }
 
-    public void customize(Consumer<StructDescriptor> customizeStruct) {
+    public static StructDescriptor create(Class clazz) {
+        return create(clazz, null, null);
+    }
+
+    public static StructDescriptor create(Class clazz, DsonSpi spi,
+                                          BiFunction<DsonSpi, StructDescriptor, StructDescriptor> customizeStruct) {
+        StructDescriptor struct = new StructDescriptor(clazz);
         if (customizeStruct != null) {
-            customizeStruct.accept(this);
+            struct = customizeStruct.apply(spi, struct);
         }
-        for (Prop value : fields.values()) {
+        for (Prop value : struct.fields.values()) {
             moveDsonPropertyValue(value);
         }
-        for (List<Prop> values : methods.values()) {
+        for (List<Prop> values : struct.methods.values()) {
             for (Prop value : values) {
                 moveDsonPropertyValue(value);
             }
         }
+        return struct;
     }
 
     private static void moveDsonPropertyValue(Prop prop) {
         DsonProperty annotation = prop.getAnnotation(DsonProperty.class);
         if (annotation == null) {
+            prop.name = "";
             prop.ignore = false;
             return;
         }

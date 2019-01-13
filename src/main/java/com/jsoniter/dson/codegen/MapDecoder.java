@@ -6,13 +6,13 @@ import com.jsoniter.dson.codegen.gen.Line;
 import com.jsoniter.dson.decode.BytesDecoderSource;
 import com.jsoniter.dson.spi.Decoder;
 import com.jsoniter.dson.spi.DecoderSource;
+import com.jsoniter.dson.spi.DsonSpi;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 public interface MapDecoder {
 
@@ -30,27 +30,27 @@ public interface MapDecoder {
 
     interface Helper {
 
-        static Decoder getKeyDecoder(Function<Type, Decoder> decoderProvider, Map<TypeVariable, Type> typeArgs) {
+        static Decoder getKeyDecoder(DsonSpi spi, Map<TypeVariable, Type> typeArgs) {
             TypeVariable typeParam = Map.class.getTypeParameters()[0];
             Type keyType = SubstituteTypeVariable.$(typeParam, typeArgs);
             if (Object.class.equals(keyType)) {
                 keyType = String.class;
             }
-            Decoder keyDecoder = decoderProvider.apply(keyType);
+            Decoder keyDecoder = spi.decoderOf(keyType);
             if (VALID_KEY_CLASSES.contains(keyType)) {
                 return keyDecoder;
             }
             return source -> {
                 byte[] bytes = source.decodeBytes();
-                BytesDecoderSource newSource = new BytesDecoderSource(decoderProvider, bytes, 0, bytes.length);
+                BytesDecoderSource newSource = new BytesDecoderSource(spi::decoderOf, bytes, 0, bytes.length);
                 return keyDecoder.decode(newSource);
             };
         }
 
-        static Decoder getValueDecoder(Function<Type, Decoder> decoderProvider, Map<TypeVariable, Type> typeArgs) {
+        static Decoder getValueDecoder(DsonSpi spi, Map<TypeVariable, Type> typeArgs) {
             TypeVariable typeParam = Map.class.getTypeParameters()[1];
             Type valueType = SubstituteTypeVariable.$(typeParam, typeArgs);
-            Decoder valueDecoder = decoderProvider.apply(valueType);
+            Decoder valueDecoder = spi.decoderOf(valueType);
             return valueDecoder;
         }
 
@@ -92,10 +92,10 @@ public interface MapDecoder {
         GenDecoder.ctor(g, decoderClassName, new Indent(() -> {
             g.__("this.keyDecoder = "
             ).__(Helper.class.getCanonicalName()
-            ).__(new Line(".getKeyDecoder(decoderProvider, typeArgs);"));
+            ).__(new Line(".getKeyDecoder(spi, typeArgs);"));
             g.__("this.valueDecoder = "
             ).__(Helper.class.getCanonicalName()
-            ).__(new Line(".getValueDecoder(decoderProvider, typeArgs);"));
+            ).__(new Line(".getValueDecoder(spi, typeArgs);"));
         }));
         GenDecoder.method(g, new Indent(() -> {
             g.__(Helper.class.getCanonicalName()).__(new Line(".expectMapHead(source);"));
