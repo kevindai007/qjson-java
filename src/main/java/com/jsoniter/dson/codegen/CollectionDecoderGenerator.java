@@ -61,11 +61,7 @@ public class CollectionDecoderGenerator implements Generator {
         static void fill(DecoderSource source, Decoder elemDecoder, Collection col) {
             byte b;
             do {
-                if (source.decodeNull()) {
-                    col.add(null);
-                } else {
-                    col.add(elemDecoder.decode(source));
-                }
+                col.add(elemDecoder.decode(source));
             } while ((b = source.read()) == ',');
             if (b != ']') {
                 throw source.reportError("expect ]");

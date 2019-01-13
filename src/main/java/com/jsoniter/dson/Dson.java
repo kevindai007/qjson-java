@@ -54,23 +54,26 @@ public class Dson implements DsonSpi {
         put(Iterable.class, new IterableEncoder());
     }};
     private final Map<Type, Decoder> builtinDecoders = new HashMap<Type, Decoder>() {{
-        put(boolean.class, DecoderSource::decodeBoolean);
-        put(Boolean.class, DecoderSource::decodeBoolean);
-        put(byte.class, source -> (byte)source.decodeInt());
-        put(Byte.class, source -> (byte)source.decodeInt());
-        put(short.class, source -> (short)source.decodeInt());
-        put(Short.class, source -> (short)source.decodeInt());
-        put(int.class, DecoderSource::decodeInt);
-        put(Integer.class, DecoderSource::decodeInt);
-        put(long.class, DecoderSource::decodeLong);
-        put(Long.class, DecoderSource::decodeLong);
-        put(float.class, source -> (float)source.decodeDouble());
-        put(Float.class, source -> (float)source.decodeDouble());
-        put(double.class, DecoderSource::decodeDouble);
-        put(Double.class, DecoderSource::decodeDouble);
-        put(String.class, DecoderSource::decodeString);
-        put(byte[].class, DecoderSource::decodeBytes);
+        put(boolean.class, source -> source.decodeNull() ? false : source.decodeBoolean());
+        put(Boolean.class, source -> source.decodeNull() ? null : source.decodeBoolean());
+        put(byte.class, source -> source.decodeNull() ? (byte)0 : (short)source.decodeInt());
+        put(Byte.class, source -> source.decodeNull() ? null : (short)source.decodeInt());
+        put(short.class, source -> source.decodeNull() ? (short)0 : (short)source.decodeInt());
+        put(Short.class, source -> source.decodeNull() ? null : (short)source.decodeInt());
+        put(int.class, source -> source.decodeNull() ? 0 : source.decodeInt());
+        put(Integer.class, source -> source.decodeNull() ? null : source.decodeInt());
+        put(long.class, source -> source.decodeNull() ? 0L : source.decodeLong());
+        put(Long.class, source -> source.decodeNull() ? null : source.decodeLong());
+        put(float.class, source -> source.decodeNull() ? 0.0F : (float)source.decodeDouble());
+        put(Float.class, source -> source.decodeNull() ? null : (float)source.decodeDouble());
+        put(double.class, source -> source.decodeNull() ? 0.0D : source.decodeDouble());
+        put(Double.class, source -> source.decodeNull() ? null : source.decodeDouble());
+        put(String.class, source -> source.decodeNull() ? null : source.decodeString());
+        put(byte[].class, source -> source.decodeNull() ? null : source.decodeBytes());
         put(Byte[].class, source -> {
+            if (source.decodeNull()) {
+                return null;
+            }
             byte[] bytes = source.decodeBytes();
             Byte[] boxed = new Byte[bytes.length];
             for (int i = 0; i < bytes.length; i++) {

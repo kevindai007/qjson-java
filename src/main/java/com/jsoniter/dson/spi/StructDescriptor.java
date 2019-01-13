@@ -120,7 +120,6 @@ public class StructDescriptor {
     // or can be modified directly via StructDescriptor
     public static class Prop {
 
-        @DsonProperty("123")
         public final Field field;
         public final Method method;
         private final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();

@@ -64,21 +64,9 @@ public class ArrayDecoderGenerator implements Generator {
         g.__(new Line("int i = 0;"));
         g.__("do {"
         ).__(new Indent(() -> {
-            g.__("if (source.decodeNull()) {"
-            ).__(new Indent(() -> {
-                // null
-                if (clazz.getComponentType().isPrimitive()) {
-                    g.__(new Line("i++;"));
-                } else {
-                    g.__(new Line("arr[i++] = null;"));
-                }
-            })).__(new Line("} else {")
-            ).__(new Indent(() -> {
-                // not null
-                g.__("arr[i++] = ("
-                ).__(clazz.getComponentType().getCanonicalName()
-                ).__(new Line(")elemDecoder.decode(source);"));
-            })).__(new Line("}"));
+            g.__("arr[i++] = ("
+            ).__(clazz.getComponentType().getCanonicalName()
+            ).__(new Line(")elemDecoder.decode(source);"));
             g.__(new Line("if (i == arr.length) { arr = java.util.Arrays.copyOf(arr, arr.length * 2); }"));
         })).__(new Line("} while((b = source.read()) == ',');"));
         g.__(Helper.class.getCanonicalName()).__(new Line(".expectArrayTail(source, b);"));

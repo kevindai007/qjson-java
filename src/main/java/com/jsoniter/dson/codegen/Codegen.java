@@ -163,7 +163,7 @@ public class Codegen {
 
     private static Generator getEncoderGenerator(Class clazz) {
         if (clazz.isArray()) {
-            throw new UnsupportedOperationException();
+            return new ArrayEncoderGenerator();
         }
         return new StructEncoderGenerator();
     }
