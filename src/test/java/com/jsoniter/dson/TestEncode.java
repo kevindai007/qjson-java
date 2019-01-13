@@ -34,12 +34,12 @@ public interface TestEncode {
             try {
                 Class clazz = LoadClass.$(tempDir, "testdata.TestObject");
                 Object testObject = clazz.getMethod("create").invoke(null);
-                DSON.Config config = new DSON.Config();
+                Dson.Config config = new Dson.Config();
                 config.compiler = InMemoryJavaCompiler.newInstance()
                         .ignoreWarnings()
                         .useParentClassLoader(clazz.getClassLoader())
                         .useOptions("-classpath", System.getProperty("java.class.path") + ":" + tempDir.toString());
-                DSON dson = new DSON(config);
+                Dson dson = new Dson(config);
                 Assert.assertEquals(stripQuote(row.get(hasType ? 2 : 1)), dson.encode(testObject));
             } catch (RuntimeException e) {
                 throw e;

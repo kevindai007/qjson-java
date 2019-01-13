@@ -3,11 +3,13 @@ package com.jsoniter.dson.spi;
 import java.beans.Transient;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -49,6 +51,54 @@ public class StructDescriptor {
                 }
             }
             methods.put(method.getName(), member);
+        }
+    }
+
+    public void customize(Consumer<StructDescriptor> customizeStruct) {
+        if (customizeStruct != null) {
+            customizeStruct.accept(this);
+        }
+        for (Prop value : fields.values()) {
+            DsonProperty dsonProperty = value.getAnnotation(DsonProperty.class);
+            copyProp(value, dsonProperty);
+        }
+    }
+
+    private void copyProp(Prop prop, DsonProperty annotation) {
+        if (annotation == null) {
+            prop.ignore = false;
+            return;
+        }
+        if (prop.ignore == null) {
+            prop.ignore = annotation.ignore();
+        }
+        if (prop.name == null) {
+            prop.name = annotation.value();
+        }
+        if (prop.encoder == null) {
+            prop.encoder = newObject(annotation.encoder());
+        }
+        if (prop.decoder == null) {
+            prop.decoder = newObject(annotation.decoder());
+        }
+        if (prop.shouldEncode == null) {
+            prop.shouldEncode = newObject(annotation.shouldEncode());
+        }
+    }
+
+    private static <T> T newObject(Class<T> clazz) {
+        if (clazz == null) {
+            return null;
+        }
+        if (clazz.isInterface()) {
+            return null;
+        }
+        try {
+            return clazz.getConstructor().newInstance();
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("failed to instantiate: " + clazz, e);
         }
     }
 

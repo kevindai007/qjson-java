@@ -38,4 +38,12 @@ public class StructDescriptorTest {
         StructDescriptor.Prop field4 = struct.methods.get("getField4");
         Assert.assertFalse(field4.getAnnotation(DsonProperty.class).ignore());
     }
+
+    @Test
+    public void copy_dson_property_into_descriptor() {
+        StructDescriptor struct = new StructDescriptor(MyClass.class);
+        struct.customize(null);
+        StructDescriptor.Prop field1 = struct.fields.get("field1");
+        Assert.assertTrue(field1.ignore);
+    }
 }

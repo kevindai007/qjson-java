@@ -43,12 +43,12 @@ public interface TestDecode {
                 Class testDataClass = LoadClass.$(tempDir, "testdata.TestObject");
                 Object testObject = testDataClass.getMethod("create").invoke(null);
                 TypeLiteral testObjectType = (TypeLiteral) testDataClass.getMethod("type").invoke(null);
-                DSON.Config config = new DSON.Config();
+                Dson.Config config = new Dson.Config();
                 config.compiler = InMemoryJavaCompiler.newInstance()
                         .ignoreWarnings()
                         .useParentClassLoader(testDataClass.getClassLoader())
                         .useOptions("-classpath", System.getProperty("java.class.path") + ":" + tempDir.toString());
-                DSON dson = new DSON(config);
+                Dson dson = new Dson(config);
                 byte[] bytes = stripQuote(row.get(hasType ? 2 : 1)).getBytes(StandardCharsets.UTF_8);
                 if (hasType) {
                     Object decoded = dson.decode(testObjectType, bytes, 0, bytes.length);

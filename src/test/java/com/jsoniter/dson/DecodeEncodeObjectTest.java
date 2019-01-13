@@ -10,7 +10,7 @@ public class DecodeEncodeObjectTest {
 
     @Test
     public void decode_object() {
-        DSON dson = new DSON();
+        Dson dson = new Dson();
         FluentAPI testData = testDataFromMySection();
         testData.assertTrue(encoded -> {
             encoded = stripQuote(encoded);

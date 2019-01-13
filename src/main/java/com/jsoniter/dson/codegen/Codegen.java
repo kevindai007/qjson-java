@@ -100,7 +100,7 @@ public class Codegen {
                     if (clazz.isArray()) {
                         ArrayEncoder.$(g, clazz);
                     } else {
-                        StructEncoder.$(g, clazz);
+                        StructEncoder.$(g, cfg, clazz);
                     }
                 })).__("} catch (RuntimeException e) {"
                 ).__(new Indent(() -> {

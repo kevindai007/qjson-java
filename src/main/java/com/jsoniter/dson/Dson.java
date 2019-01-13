@@ -21,13 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class DSON {
+public class Dson {
 
-    public static DSON $ = new DSON();
+    public static Dson $ = new Dson();
 
     public static class Config extends Codegen.Config {
-        public BiFunction<DSON, Type, Decoder> chooseDecoder;
-        public BiFunction<DSON, Class, Encoder> chooseEncoder;
+        public BiFunction<Dson, Type, Decoder> chooseDecoder;
+        public BiFunction<Dson, Class, Encoder> chooseEncoder;
     }
 
     private final Map<Class, Encoder> builtinEncoders = new HashMap<Class, Encoder>() {{
@@ -49,7 +49,7 @@ public class DSON {
             }
             sink.encodeBytes(bytes);
         });
-        put(Map.class, new MapEncoder(DSON.this::encoderOf));
+        put(Map.class, new MapEncoder(Dson.this::encoderOf));
         put(Iterable.class, new IterableEncoder());
     }};
     private final Map<Type, Decoder> builtinDecoders = new HashMap<Type, Decoder>() {{
@@ -83,7 +83,7 @@ public class DSON {
     private final Config cfg;
     private final Codegen codegen;
 
-    public DSON(Config cfg) {
+    public Dson(Config cfg) {
         if (cfg.compiler == null) {
             cfg.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
         }
@@ -123,7 +123,7 @@ public class DSON {
         codegen = new Codegen(cfg, this::decoderOf);
     }
 
-    public DSON() {
+    public Dson() {
         this(new Config());
     }
 

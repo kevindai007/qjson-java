@@ -2,6 +2,7 @@ package com.jsoniter.dson.codegen;
 
 import com.jsoniter.dson.codegen.gen.Gen;
 import com.jsoniter.dson.codegen.gen.Line;
+import com.jsoniter.dson.spi.StructDescriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,7 +10,8 @@ import java.lang.reflect.Modifier;
 
 interface StructEncoder {
 
-    static void $(Gen g, Class clazz) {
+    static void $(Gen g, Codegen.Config cfg, Class clazz) {
+        getProperties(cfg, clazz);
         // {
         g.__(new Line("sink.write('{');"));
         // cast to struct
@@ -43,6 +45,11 @@ interface StructEncoder {
         }
         // }
         g.__(new Line("sink.write('}');"));
+    }
+
+    static void getProperties(Codegen.Config cfg, Class clazz) {
+        StructDescriptor struct = new StructDescriptor(clazz);
+        struct.customize(cfg.customizeStruct);
     }
 
     static String getterPropName(Method method) {
