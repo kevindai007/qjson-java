@@ -28,6 +28,38 @@ public interface MapDecoder {
         add(Double.class);
     }};
 
+    static void $(Gen g, String decoderClassName, Class clazz) {
+        g.__("private final "
+        ).__(Decoder.class.getCanonicalName()
+        ).__(new Line(" keyDecoder;"));
+        g.__("private final "
+        ).__(Decoder.class.getCanonicalName()
+        ).__(new Line(" valueDecoder;"));
+        GenDecoder.ctor(g, decoderClassName, new Indent(() -> {
+            g.__("this.keyDecoder = "
+            ).__(Helper.class.getCanonicalName()
+            ).__(new Line(".getKeyDecoder(spi, typeArgs);"));
+            g.__("this.valueDecoder = "
+            ).__(Helper.class.getCanonicalName()
+            ).__(new Line(".getValueDecoder(spi, typeArgs);"));
+        }));
+        GenDecoder.method(g, new Indent(() -> {
+            g.__(Helper.class.getCanonicalName()).__(new Line(".expectMapHead(source);"));
+            g.__("java.util.Map map = new "
+            ).__(clazz.getCanonicalName()
+            ).__(new Line("();"));
+            // if map is {}
+            g.__("if (source.peek() == '}') { "
+            ).__(new Indent(() -> {
+                g.__(new Line("source.next();"));
+                g.__(new Line("return map;"));
+            })).__(new Line("}"));
+            // fill map
+            g.__(Helper.class.getCanonicalName()).__(new Line(".fill(source, keyDecoder, valueDecoder, map);"));
+            g.__(new Line("return map;"));
+        }));
+    }
+
     interface Helper {
 
         static Decoder getKeyDecoder(DsonSpi spi, Map<TypeVariable, Type> typeArgs) {
@@ -80,37 +112,5 @@ public interface MapDecoder {
                 throw source.reportError("expect }");
             }
         }
-    }
-
-    static void $(Gen g, String decoderClassName, Class clazz) {
-        g.__("private final "
-        ).__(Decoder.class.getCanonicalName()
-        ).__(new Line(" keyDecoder;"));
-        g.__("private final "
-        ).__(Decoder.class.getCanonicalName()
-        ).__(new Line(" valueDecoder;"));
-        GenDecoder.ctor(g, decoderClassName, new Indent(() -> {
-            g.__("this.keyDecoder = "
-            ).__(Helper.class.getCanonicalName()
-            ).__(new Line(".getKeyDecoder(spi, typeArgs);"));
-            g.__("this.valueDecoder = "
-            ).__(Helper.class.getCanonicalName()
-            ).__(new Line(".getValueDecoder(spi, typeArgs);"));
-        }));
-        GenDecoder.method(g, new Indent(() -> {
-            g.__(Helper.class.getCanonicalName()).__(new Line(".expectMapHead(source);"));
-            g.__("java.util.Map map = new "
-            ).__(clazz.getCanonicalName()
-            ).__(new Line("();"));
-            // if map is {}
-            g.__("if (source.peek() == '}') { "
-            ).__(new Indent(() -> {
-                g.__(new Line("source.next();"));
-                g.__(new Line("return map;"));
-            })).__(new Line("}"));
-            // fill map
-            g.__(Helper.class.getCanonicalName()).__(new Line(".fill(source, keyDecoder, valueDecoder, map);"));
-            g.__(new Line("return map;"));
-        }));
     }
 }

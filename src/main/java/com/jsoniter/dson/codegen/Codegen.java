@@ -78,6 +78,8 @@ public class Codegen {
     }
 
     public synchronized Encoder generateEncoder(Class clazz) {
+        Generator generator = getEncoderGenerator(clazz);
+        Map<String, Object> args = generator.args(cfg, spi, clazz, null);
         String encoderClassName = "GeneratedEncoder" + (counter++);
         Gen g = new Gen();
         g.__(new Line("package gen;"));
@@ -87,17 +89,23 @@ public class Codegen {
         ).__(Encoder.class.getCanonicalName()
         ).__(" {"
         ).__(new Indent(() -> {
+            // fields
+            generator.genFields(args);
+            // ctor
+            g.__("public "
+            ).__(encoderClassName
+            ).__("(java.util.Map<String, Object> args) {"
+            ).__(new Indent(() -> {
+                generator.genCtor(g, args);
+            })).__(new Line("}"));
+            // encode method
             g.__("public void encode("
             ).__(EncoderSink.class.getCanonicalName()
             ).__(" sink, Object val) {"
             ).__(new Indent(() -> {
                 g.__("try {"
                 ).__(new Indent(() -> {
-                    if (clazz.isArray()) {
-                        ArrayEncoder.$(g, clazz);
-                    } else {
-                        StructEncoder.$(g, cfg, spi, clazz);
-                    }
+                    generator.genMethod(g, args, clazz);
                 })).__("} catch (RuntimeException e) {"
                 ).__(new Indent(() -> {
                     g.__("throw e;");
@@ -113,7 +121,8 @@ public class Codegen {
         try {
             printSourceCode(clazz, src);
             Class<?> encoderClass = cfg.compiler.compile("gen." + encoderClassName, src);
-            return (Encoder) encoderClass.newInstance();
+            Constructor<?> ctor = encoderClass.getConstructor(Map.class);
+            return (Encoder) ctor.newInstance(args);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -121,12 +130,23 @@ public class Codegen {
         }
     }
 
+    private static Generator getEncoderGenerator(Class clazz) {
+        if (clazz.isArray()) {
+            throw new UnsupportedOperationException();
+        }
+        return new StructEncoderGenerator();
+    }
+
     private static void printSourceCode(Class clazz, String src) {
         if (!"true".equals(System.getenv("DSON_DEBUG"))) {
             return;
         }
         System.out.println("=== " + clazz.getCanonicalName() + " ===");
-        System.out.println(src);
+        String lines[] = src.split("\\r?\\n");
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i];
+            System.out.println((i + 1) + ":\t" + line);
+        }
     }
 
     public static boolean isJavaUtil(Class clazz) {

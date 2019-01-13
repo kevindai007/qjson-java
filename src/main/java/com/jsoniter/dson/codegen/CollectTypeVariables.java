@@ -6,6 +6,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.Map;
 
 interface CollectTypeVariables {
+    
     static Class $(Type type, Map<TypeVariable, Type> collector) {
         if (Object.class.equals(type)) {
             return null;

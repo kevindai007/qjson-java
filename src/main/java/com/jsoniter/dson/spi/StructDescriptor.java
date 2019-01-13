@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -59,8 +58,9 @@ public class StructDescriptor {
         return create(clazz, null, null);
     }
 
-    public static StructDescriptor create(Class clazz, DsonSpi spi,
-                                          BiFunction<DsonSpi, StructDescriptor, StructDescriptor> customizeStruct) {
+    public static StructDescriptor create(
+            Class clazz, DsonSpi spi,
+            BiFunction<DsonSpi, StructDescriptor, StructDescriptor> customizeStruct) {
         StructDescriptor struct = new StructDescriptor(clazz);
         if (customizeStruct != null) {
             struct = customizeStruct.apply(spi, struct);

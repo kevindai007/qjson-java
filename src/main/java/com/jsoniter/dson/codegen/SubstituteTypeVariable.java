@@ -7,6 +7,7 @@ import java.lang.reflect.WildcardType;
 import java.util.Map;
 
 interface SubstituteTypeVariable {
+
     static Type $(TypeVariable typeParam, Map<TypeVariable, Type> typeArgs) {
         Type sub = typeArgs.get(typeParam);
         if (sub instanceof Class || sub instanceof ParameterizedType) {

@@ -6,9 +6,7 @@ import com.jsoniter.dson.encode.BytesEncoderSink;
 import com.jsoniter.dson.spi.Encoder;
 import com.jsoniter.dson.spi.EncoderSink;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 

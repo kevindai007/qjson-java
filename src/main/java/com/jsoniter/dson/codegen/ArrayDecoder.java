@@ -9,28 +9,6 @@ import com.jsoniter.dson.spi.DsonSpi;
 
 public interface ArrayDecoder {
 
-    interface Helper {
-
-        static Decoder getElemDecoder(DsonSpi spi, Class clazz) {
-            Decoder decoder = spi.decoderOf(clazz.getComponentType());
-            return decoder;
-        }
-
-        static void expectArrayHead(DecoderSource source) {
-            byte b = source.peek();
-            if (b != '[') {
-                throw source.reportError("expect [");
-            }
-            source.next();
-        }
-
-        static void expectArrayTail(DecoderSource source, byte b) {
-            if (b != ']') {
-                throw source.reportError("expect ]");
-            }
-        }
-    }
-
     static void $(Gen g, String decoderClassName, Class clazz) {
         g.__("private final "
         ).__(Decoder.class.getCanonicalName()
@@ -87,5 +65,27 @@ public interface ArrayDecoder {
             g.__(Helper.class.getCanonicalName()).__(new Line(".expectArrayTail(source, b);"));
             g.__(new Line("return java.util.Arrays.copyOf(arr, i);"));
         }));
+    }
+
+    interface Helper {
+
+        static Decoder getElemDecoder(DsonSpi spi, Class clazz) {
+            Decoder decoder = spi.decoderOf(clazz.getComponentType());
+            return decoder;
+        }
+
+        static void expectArrayHead(DecoderSource source) {
+            byte b = source.peek();
+            if (b != '[') {
+                throw source.reportError("expect [");
+            }
+            source.next();
+        }
+
+        static void expectArrayTail(DecoderSource source, byte b) {
+            if (b != ']') {
+                throw source.reportError("expect ]");
+            }
+        }
     }
 }
