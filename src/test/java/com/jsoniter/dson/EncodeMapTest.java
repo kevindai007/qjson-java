@@ -5,7 +5,7 @@ import org.junit.Test;
 public class EncodeMapTest {
 
     @Test
-    public void type_map() {
+    public void typed_map() {
         TestEncode.$();
     }
 

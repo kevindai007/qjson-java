@@ -1,4 +1,4 @@
-# type_map
+# typed_map
 
 | type | value | encoded |
 | ---  | ---   | ---     |
@@ -7,6 +7,7 @@
 | `AnyMap<String,String>` | `new AnyMap("a",null)` | `{"a":null}` |
 | `AnyMap<String,Integer>` | `new AnyMap("a",100)` | `{"a":"\b;;;;;>?"}` |
 | `AnyMap<Integer,String>` | `new AnyMap(100,"a")` | `{"\b;;;;;>?":"a"}` |
+| `AnyMap<Boolean,String>` | `new AnyMap(true,"a")` | `{"true":"a"}` |
 
 # null_key
 

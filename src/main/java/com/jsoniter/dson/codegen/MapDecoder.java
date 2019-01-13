@@ -3,15 +3,30 @@ package com.jsoniter.dson.codegen;
 import com.jsoniter.dson.codegen.gen.Gen;
 import com.jsoniter.dson.codegen.gen.Indent;
 import com.jsoniter.dson.codegen.gen.Line;
+import com.jsoniter.dson.decode.BytesDecoderSource;
 import com.jsoniter.dson.spi.Decoder;
 import com.jsoniter.dson.spi.DecoderSource;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public interface MapDecoder {
+
+    Set<Class> VALID_KEY_CLASSES = new HashSet<Class>() {{
+        add(String.class);
+        add(Character.class);
+        add(byte[].class);
+        add(Byte.class);
+        add(Short.class);
+        add(Integer.class);
+        add(Long.class);
+        add(Float.class);
+        add(Double.class);
+    }};
 
     interface Helper {
 
@@ -19,7 +34,14 @@ public interface MapDecoder {
             TypeVariable typeParam = Map.class.getTypeParameters()[0];
             Type keyType = SubstituteType.$(typeParam, typeArgs);
             Decoder keyDecoder = decoderProvider.apply(keyType);
-            return keyDecoder;
+            if (VALID_KEY_CLASSES.contains(keyType)) {
+                return keyDecoder;
+            }
+            return source -> {
+                byte[] bytes = source.decodeBytes();
+                BytesDecoderSource newSource = new BytesDecoderSource(bytes);
+                return keyDecoder.decode(newSource);
+            };
         }
 
         static Decoder getValueDecoder(Function<Type, Decoder> decoderProvider, Map<TypeVariable, Type> typeArgs) {

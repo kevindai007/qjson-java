@@ -47,7 +47,7 @@ public class DSON {
             }
             sink.encodeBytes(bytes);
         });
-        put(Map.class, new MapEncoder());
+        put(Map.class, new MapEncoder(DSON.this::encoderOf));
         put(Iterable.class, new IterableEncoder());
     }};
     private final Map<Type, Decoder> builtinDecoders = new HashMap<Type, Decoder>() {{

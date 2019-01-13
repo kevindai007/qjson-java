@@ -98,4 +98,8 @@ public final class BytesEncoderSink implements EncoderSink {
 
     public void releaseTemp(byte[] temp) {
     }
+
+    public byte[] copyOfBytes() {
+        return builder.copyOfBytes();
+    }
 }

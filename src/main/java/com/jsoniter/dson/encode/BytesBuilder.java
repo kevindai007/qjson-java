@@ -169,4 +169,8 @@ public class BytesBuilder {
     public String toString() {
         return new String(buf, 0, len, StandardCharsets.UTF_8);
     }
+
+    public byte[] copyOfBytes() {
+        return Arrays.copyOf(buf, len);
+    }
 }
