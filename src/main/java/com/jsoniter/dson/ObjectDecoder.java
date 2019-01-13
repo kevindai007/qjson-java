@@ -5,10 +5,10 @@ import com.jsoniter.dson.spi.DecoderSource;
 
 class ObjectDecoder implements Decoder  {
 
-    private final Decoder listDecoder;
-    private final Decoder mapDecoder;
+    private Decoder listDecoder;
+    private Decoder mapDecoder;
 
-    public ObjectDecoder(Decoder listDecoder, Decoder mapDecoder) {
+    public void init(Decoder listDecoder, Decoder mapDecoder) {
         this.listDecoder = listDecoder;
         this.mapDecoder = mapDecoder;
     }

@@ -18,7 +18,7 @@ public interface CollectionDecoder {
 
         static Decoder getElemDecoder(Function<Type, Decoder> decoderProvider, Map<TypeVariable, Type> typeArgs) {
             TypeVariable typeParam = Collection.class.getTypeParameters()[0];
-            Type elemType = SubstituteType.$(typeParam, typeArgs);
+            Type elemType = SubstituteTypeVariable.$(typeParam, typeArgs);
             Decoder elemDecoder = decoderProvider.apply(elemType);
             return elemDecoder;
         }

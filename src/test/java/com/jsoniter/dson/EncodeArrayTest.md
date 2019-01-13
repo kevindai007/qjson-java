@@ -22,8 +22,10 @@
 | `new double[]{1.1D}` | `["\f;>ZWGTNAGTNAGU"]` |
 | `new Double[]{1.1D}` | `["\f;>ZWGTNAGTNAGU"]` |
 
-# temp
+# object_array
 
+| value | encoded |
+| ---   | ---     |
 | `new Object[0]` | `[]` |
 | `new Object[1]` | `[null]` |
 | `new Object[]{"hello"}` | `["hello"]` |

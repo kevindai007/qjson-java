@@ -161,9 +161,12 @@ public class DSON {
             return decoder;
         }
         if (Object.class.equals(type)) {
-            return new ObjectDecoder(
+            ObjectDecoder objectDecoder = new ObjectDecoder();
+            decoderCache.put(Object.class, objectDecoder);
+            objectDecoder.init(
                     decoderOf(cfg.chooseImpl.apply(List.class)),
                     decoderOf(cfg.chooseImpl.apply(Map.class)));
+            return objectDecoder;
         }
         return codegen.generateDecoder(type);
     }
@@ -192,12 +195,7 @@ public class DSON {
     }
 
     public <T> T decode(TypeLiteral<T> typeLiteral, byte[] encoded, int offset, int size) {
-        if (TypeLiteral.class.equals(typeLiteral.getClass())) {
-            throw new DsonDecodeException("should specify type like this: new TypeLiteral<List<String>>(){}");
-        }
-        ParameterizedType parameterizedType = (ParameterizedType) typeLiteral.getClass().getGenericSuperclass();
-        Type type = parameterizedType.getActualTypeArguments()[0];
-        return (T) decode(type, encoded, offset, size);
+        return (T) decode(typeLiteral.$(), encoded, offset, size);
     }
 
     private Object decode(Type type, byte[] encoded, int offset, int size) {

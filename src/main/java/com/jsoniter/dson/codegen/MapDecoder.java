@@ -32,7 +32,10 @@ public interface MapDecoder {
 
         static Decoder getKeyDecoder(Function<Type, Decoder> decoderProvider, Map<TypeVariable, Type> typeArgs) {
             TypeVariable typeParam = Map.class.getTypeParameters()[0];
-            Type keyType = SubstituteType.$(typeParam, typeArgs);
+            Type keyType = SubstituteTypeVariable.$(typeParam, typeArgs);
+            if (Object.class.equals(keyType)) {
+                keyType = String.class;
+            }
             Decoder keyDecoder = decoderProvider.apply(keyType);
             if (VALID_KEY_CLASSES.contains(keyType)) {
                 return keyDecoder;
@@ -46,7 +49,7 @@ public interface MapDecoder {
 
         static Decoder getValueDecoder(Function<Type, Decoder> decoderProvider, Map<TypeVariable, Type> typeArgs) {
             TypeVariable typeParam = Map.class.getTypeParameters()[1];
-            Type valueType = SubstituteType.$(typeParam, typeArgs);
+            Type valueType = SubstituteTypeVariable.$(typeParam, typeArgs);
             Decoder valueDecoder = decoderProvider.apply(valueType);
             return valueDecoder;
         }

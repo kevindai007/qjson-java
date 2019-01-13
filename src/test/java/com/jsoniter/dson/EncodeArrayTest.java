@@ -10,7 +10,7 @@ public class EncodeArrayTest {
     }
 
     @Test
-    public void primitive_array() {
+    public void object_array() {
         TestEncode.$();
     }
 

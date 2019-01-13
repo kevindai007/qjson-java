@@ -6,7 +6,7 @@ import org.junit.Test;
 import static com.dexscript.test.framework.TestFramework.stripQuote;
 import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
 
-public class DecodeObjectTest {
+public class DecodeEncodeObjectTest {
 
     @Test
     public void decode_object() {

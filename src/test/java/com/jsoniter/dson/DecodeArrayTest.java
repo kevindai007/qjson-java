@@ -9,4 +9,9 @@ public class DecodeArrayTest {
         TestDecode.$();
     }
 
+    @Test
+    public void object_array() {
+        TestDecode.$();
+    }
+
 }
