@@ -13,9 +13,8 @@ public interface ArrayDecoder {
 
     interface Helper {
 
-        static Decoder getElemDecoder(Codegen.Config cfg, Function<Type, Decoder> decoderProvider, Class clazz) {
-            Class elemClass = cfg.chooseImpl.apply(clazz.getComponentType());
-            Decoder decoder = decoderProvider.apply(elemClass);
+        static Decoder getElemDecoder(Function<Type, Decoder> decoderProvider, Class clazz) {
+            Decoder decoder = decoderProvider.apply(clazz.getComponentType());
             return decoder;
         }
 
@@ -42,7 +41,7 @@ public interface ArrayDecoder {
         GenDecoder.ctor(g, decoderClassName, new Indent(() -> {
             g.__("this.elemDecoder = "
             ).__(Helper.class.getCanonicalName()
-            ).__(new Line(".getElemDecoder(cfg, decoderProvider, clazz);"));
+            ).__(new Line(".getElemDecoder(decoderProvider, clazz);"));
         }));
         GenDecoder.method(g, new Indent(() -> {
             g.__(Helper.class.getCanonicalName()).__(new Line(".expectArrayHead(source);"));

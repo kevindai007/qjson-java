@@ -59,7 +59,7 @@ public class Codegen {
             if (clazz.isArray()) {
                 ArrayDecoder.$(g, decoderClassName, clazz);
             } else if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
-                CollectionDecoder.$(g, clazz);
+                CollectionDecoder.$(g, decoderClassName, clazz);
             } else if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
                 MapDecoder.$(g, clazz, typeArgs);
             } else {
@@ -68,9 +68,7 @@ public class Codegen {
         })).__(new Line("}"));
         String src = g.toString();
         try {
-            if ("true".equals(System.getenv("DSON_DEBUG"))) {
-                System.out.println(src);
-            }
+            printSourceCode(clazz, src);
             Class<?> decoderClass = cfg.compiler.compile("gen." + decoderClassName, src);
             Constructor<?> ctor = decoderClass.getConstructor(Codegen.Config.class, Function.class, Class.class, Map.class);
             return (Decoder) ctor.newInstance(cfg, decoderProvider, clazz, typeArgs);
@@ -104,9 +102,7 @@ public class Codegen {
         })).__(new Line("}"));
         String src = g.toString();
         try {
-            if ("true".equals(System.getenv("DSON_DEBUG"))) {
-                System.out.println(src);
-            }
+            printSourceCode(clazz, src);
             Class<?> encoderClass = cfg.compiler.compile("gen." + encoderClassName, src);
             return (Encoder) encoderClass.newInstance();
         } catch (RuntimeException e) {
@@ -114,6 +110,14 @@ public class Codegen {
         } catch (Exception e) {
             throw new DsonEncodeException(e);
         }
+    }
+
+    private static void printSourceCode(Class clazz, String src) {
+        if (!"true".equals(System.getenv("DSON_DEBUG"))) {
+            return;
+        }
+        System.out.println("=== " + clazz.getCanonicalName() + " ===");
+        System.out.println(src);
     }
 
     public static boolean isJavaUtil(Class clazz) {

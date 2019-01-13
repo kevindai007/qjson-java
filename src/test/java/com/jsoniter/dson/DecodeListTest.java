@@ -2,11 +2,10 @@ package com.jsoniter.dson;
 
 import org.junit.Test;
 
-public class DecodeArrayTest {
+public class DecodeListTest {
 
     @Test
-    public void typed_array() {
+    public void typed_list() {
         TestDecode.$();
     }
-
 }

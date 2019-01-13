@@ -13,7 +13,11 @@ public class CollectTypeVariablesTest {
         public T field1;
     }
 
-    private static class DerivedClass extends  BaseClass<String> {
+    private interface BaseInf<T> {
+
+    }
+
+    private static class DerivedClass extends BaseClass<String> implements BaseInf<String> {
 
     }
 
@@ -22,6 +26,8 @@ public class CollectTypeVariablesTest {
         HashMap<TypeVariable, Type> typeArgs = new HashMap<>();
         CollectTypeVariables.$(DerivedClass.class, typeArgs);
         TypeVariable typeParam = BaseClass.class.getTypeParameters()[0];
+        Assert.assertEquals(String.class, typeArgs.get(typeParam));
+        typeParam = BaseInf.class.getTypeParameters()[0];
         Assert.assertEquals(String.class, typeArgs.get(typeParam));
     }
 

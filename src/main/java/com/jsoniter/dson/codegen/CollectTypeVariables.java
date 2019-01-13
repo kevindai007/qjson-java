@@ -12,6 +12,9 @@ interface CollectTypeVariables {
         }
         if (type instanceof Class) {
             Class clazz = (Class) type;
+            for (Type inf : clazz.getGenericInterfaces()) {
+                CollectTypeVariables.$(inf, collector);
+            }
             CollectTypeVariables.$(clazz.getGenericSuperclass(), collector);
             return clazz;
         }
@@ -33,6 +36,9 @@ interface CollectTypeVariables {
                 // if the type arg is also a type param, try substitute
                 collector.put(theTypeParam, collector.getOrDefault(theTypeArg, theTypeArg));
             }
+        }
+        for (Type inf : clazz.getGenericInterfaces()) {
+            CollectTypeVariables.$(inf, collector);
         }
         CollectTypeVariables.$(clazz.getGenericSuperclass(), collector);
         return clazz;
