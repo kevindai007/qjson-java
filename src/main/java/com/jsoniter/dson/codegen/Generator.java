@@ -11,7 +11,7 @@ public interface Generator {
 
     Map<String, Object> args(Codegen.Config cfg, DsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs);
 
-    void genFields(Map<String, Object> args);
+    void genFields(Gen g, Map<String, Object> args);
 
     void genCtor(Gen g, Map<String, Object> args);
 

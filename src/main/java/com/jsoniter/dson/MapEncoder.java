@@ -1,6 +1,6 @@
 package com.jsoniter.dson;
 
-import com.jsoniter.dson.codegen.MapDecoder;
+import com.jsoniter.dson.codegen.MapDecoderGenerator;
 import com.jsoniter.dson.encode.BytesBuilder;
 import com.jsoniter.dson.encode.BytesEncoderSink;
 import com.jsoniter.dson.spi.Encoder;
@@ -49,7 +49,7 @@ class MapEncoder implements Encoder {
 
     private Encoder generateKeyEncoder(Class clazz) {
         Encoder encoder = encoderProvider.apply(clazz);
-        if (MapDecoder.VALID_KEY_CLASSES.contains(clazz)) {
+        if (MapDecoderGenerator.VALID_KEY_CLASSES.contains(clazz)) {
             return encoder;
         }
         return (sink, val) -> {

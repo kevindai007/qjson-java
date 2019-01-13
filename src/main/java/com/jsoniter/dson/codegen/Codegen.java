@@ -44,6 +44,8 @@ public class Codegen {
     }
 
     public synchronized Decoder generateDecoder(Class clazz, Map<TypeVariable, Type> typeArgs) {
+        Generator generator = getDecoderGenerator(clazz);
+        Map<String, Object> args = generator.args(cfg, spi, clazz, typeArgs);
         String decoderClassName = "GeneratedDecoder" + (counter++);
         Gen g = new Gen();
         g.__(new Line("package gen;"));
@@ -53,23 +55,40 @@ public class Codegen {
         ).__(Decoder.class.getCanonicalName()
         ).__(" {"
         ).__(new Indent(() -> {
-            boolean isJavaUtil = isJavaUtil(clazz);
-            if (clazz.isArray()) {
-                ArrayDecoder.$(g, decoderClassName, clazz);
-            } else if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
-                CollectionDecoder.$(g, decoderClassName, clazz);
-            } else if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
-                MapDecoder.$(g, decoderClassName, clazz);
-            } else {
-                StructDecoder.$(g, decoderClassName, clazz);
-            }
+            // fields
+            generator.genFields(g, args);
+            // ctor
+            g.__("public "
+            ).__(decoderClassName
+            ).__("(java.util.Map<String, Object> args) {"
+            ).__(new Indent(() -> {
+                generator.genCtor(g, args);
+            })).__(new Line("}"));
+            // method
+            g.__("public Object decode("
+            ).__(DecoderSource.class.getCanonicalName()
+            ).__(" source) {"
+            ).__(new Indent(() -> {
+                g.__("try {"
+                ).__(new Indent(() -> {
+                    generator.genMethod(g, args, clazz);
+                })).__("} catch (RuntimeException e) {"
+                ).__(new Indent(() -> {
+                    g.__("throw e;");
+                })).__("} catch (Exception e) {"
+                ).__(new Indent(() -> {
+                    g.__("throw new "
+                    ).__(DsonDecodeException.class.getCanonicalName()
+                    ).__("(e);");
+                })).__(new Line("}"));
+            })).__(new Line("}"));
         })).__(new Line("}"));
         String src = g.toString();
         try {
             printSourceCode(clazz, src);
             Class<?> decoderClass = cfg.compiler.compile("gen." + decoderClassName, src);
-            Constructor<?> ctor = decoderClass.getConstructor(Codegen.Config.class, DsonSpi.class, Class.class, Map.class);
-            return (Decoder) ctor.newInstance(cfg, spi, clazz, typeArgs);
+            Constructor<?> ctor = decoderClass.getConstructor(Map.class);
+            return (Decoder) ctor.newInstance(args);
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
@@ -90,7 +109,7 @@ public class Codegen {
         ).__(" {"
         ).__(new Indent(() -> {
             // fields
-            generator.genFields(args);
+            generator.genFields(g, args);
             // ctor
             g.__("public "
             ).__(encoderClassName
@@ -128,6 +147,18 @@ public class Codegen {
         } catch (Exception e) {
             throw new DsonEncodeException(e);
         }
+    }
+
+    private static Generator getDecoderGenerator(Class clazz) {
+        boolean isJavaUtil = isJavaUtil(clazz);
+        if (clazz.isArray()) {
+            return new ArrayDecoderGenerator();
+        } else if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
+            return new CollectionDecoderGenerator();
+        } else if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
+            return new MapDecoderGenerator();
+        }
+        return new StructDecoderGenerator();
     }
 
     private static Generator getEncoderGenerator(Class clazz) {

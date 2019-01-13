@@ -24,7 +24,7 @@ public class StructEncoderGenerator implements Generator {
     }
 
     @Override
-    public void genFields(Map<String, Object> args) {
+    public void genFields(Gen g, Map<String, Object> args) {
 
     }
 
