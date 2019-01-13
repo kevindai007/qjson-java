@@ -103,7 +103,13 @@ public class StructDecoderGenerator implements Generator {
     }
 
     private static void setPropertyBySetter(Gen g, int i, StructDescriptor.Prop prop) {
-
+        g.__("obj."
+        ).__(prop.method.getName()
+        ).__("(("
+        ).__(prop.method.getParameterTypes()[0].getCanonicalName()
+        ).__(")decoder"
+        ).__(i
+        ).__(new Line(".decode(source));"));
     }
 
     private static void setPropertyByField(Gen g, int i, StructDescriptor.Prop prop) {
@@ -129,7 +135,7 @@ public class StructDecoderGenerator implements Generator {
                     method.name = propName;
                 }
                 if (method.decoder == null) {
-                    method.decoder = spi.decoderOf(method.method.getGenericReturnType());
+                    method.decoder = spi.decoderOf(method.method.getGenericParameterTypes()[0]);
                 }
                 props.put(method.name, method);
             }
