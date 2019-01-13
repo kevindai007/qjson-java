@@ -3,8 +3,8 @@ package org.qjson.codegen;
 import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Indent;
 import org.qjson.codegen.gen.Line;
-import org.qjson.decode.DsonDecodeException;
-import org.qjson.encode.DsonEncodeException;
+import org.qjson.decode.QJsonDecodeException;
+import org.qjson.encode.QJsonEncodeException;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 import org.qjson.spi.*;
 
@@ -20,16 +20,16 @@ import java.util.function.Function;
 public class Codegen {
 
     private final Config cfg;
-    private final DsonSpi spi;
+    private final QJsonSpi spi;
     private int counter;
 
     public static class Config {
         public InMemoryJavaCompiler compiler;
         public Function<Class, Class> chooseImpl;
-        public BiFunction<DsonSpi, StructDescriptor, StructDescriptor> customizeStruct;
+        public BiFunction<QJsonSpi, StructDescriptor, StructDescriptor> customizeStruct;
     }
 
-    public Codegen(Config cfg, DsonSpi spi) {
+    public Codegen(Config cfg, QJsonSpi spi) {
         this.cfg = cfg;
         this.spi = spi;
     }
@@ -38,7 +38,7 @@ public class Codegen {
         Map<TypeVariable, Type> typeArgs = new HashMap<>();
         Class clazz = CollectTypeVariables.$(type, typeArgs);
         if (clazz == null) {
-            throw new DsonDecodeException("can not cast to class: " + type);
+            throw new QJsonDecodeException("can not cast to class: " + type);
         }
         return generateDecoder(clazz, typeArgs);
     }
@@ -78,7 +78,7 @@ public class Codegen {
                 })).__("} catch (Exception e) {"
                 ).__(new Indent(() -> {
                     g.__("throw new "
-                    ).__(DsonDecodeException.class.getCanonicalName()
+                    ).__(QJsonDecodeException.class.getCanonicalName()
                     ).__("(e);");
                 })).__(new Line("}"));
             })).__(new Line("}"));
@@ -92,7 +92,7 @@ public class Codegen {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DsonDecodeException(e);
+            throw new QJsonDecodeException(e);
         }
     }
 
@@ -131,7 +131,7 @@ public class Codegen {
                 })).__("} catch (Exception e) {"
                 ).__(new Indent(() -> {
                     g.__("throw new "
-                    ).__(DsonEncodeException.class.getCanonicalName()
+                    ).__(QJsonEncodeException.class.getCanonicalName()
                     ).__("(e);");
                 })).__(new Line("}"));
             })).__(new Line("}"));
@@ -145,7 +145,7 @@ public class Codegen {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new DsonEncodeException(e);
+            throw new QJsonEncodeException(e);
         }
     }
 
@@ -169,7 +169,7 @@ public class Codegen {
     }
 
     private static void printSourceCode(Class clazz, String src) {
-        if (!"true".equals(System.getenv("DSON_DEBUG"))) {
+        if (!"true".equals(System.getenv("QJSON_DEBUG"))) {
             return;
         }
         System.out.println("=== " + clazz.getCanonicalName() + " ===");

@@ -43,18 +43,18 @@ public interface TestDecode {
                 Class testDataClass = LoadClass.$(tempDir, "testdata.TestObject");
                 Object testObject = testDataClass.getMethod("create").invoke(null);
                 TypeLiteral testObjectType = (TypeLiteral) testDataClass.getMethod("type").invoke(null);
-                Dson.Config config = new Dson.Config();
+                QJSON.Config config = new QJSON.Config();
                 config.compiler = InMemoryJavaCompiler.newInstance()
                         .ignoreWarnings()
                         .useParentClassLoader(testDataClass.getClassLoader())
                         .useOptions("-classpath", System.getProperty("java.class.path") + ":" + tempDir.toString());
-                Dson dson = new Dson(config);
+                QJSON qjson = new QJSON(config);
                 byte[] bytes = stripQuote(row.get(hasType ? 2 : 1)).getBytes(StandardCharsets.UTF_8);
                 if (hasType) {
-                    Object decoded = dson.decode(testObjectType, bytes, 0, bytes.length);
+                    Object decoded = qjson.decode(testObjectType, bytes, 0, bytes.length);
                     Assert.assertTrue(row.get(hasType ? 1 : 0), Objects.deepEquals(testObject, decoded));
                 } else {
-                    Object decoded = dson.decode(testObject.getClass(), bytes, 0, bytes.length);
+                    Object decoded = qjson.decode(testObject.getClass(), bytes, 0, bytes.length);
                     Assert.assertTrue(row.get(hasType ? 1 : 0), Objects.deepEquals(testObject, decoded));
                 }
             } catch (RuntimeException e) {

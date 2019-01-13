@@ -1,6 +1,6 @@
 package org.qjson.spi;
 
-import org.qjson.encode.DsonEncodeException;
+import org.qjson.encode.QJsonEncodeException;
 
 public interface EncoderSink {
     void encodeNull();
@@ -12,6 +12,6 @@ public interface EncoderSink {
     void encodeBytes(byte[] val);
     void encodeObject(Object val);
     void write(char b);
-    DsonEncodeException reportError(String errMsg);
-    DsonEncodeException reportError(String errMsg, Exception cause);
+    QJsonEncodeException reportError(String errMsg);
+    QJsonEncodeException reportError(String errMsg, Exception cause);
 }

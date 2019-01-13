@@ -121,7 +121,7 @@ import org.qjson.spi.*;
 import java.util.*;
 public class MyClass {
 
-    @DsonProperty("\"")
+    @QJsonProperty("\"")
     public String field;
 
     public MyClass init(String field) {

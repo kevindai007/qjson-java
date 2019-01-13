@@ -6,7 +6,7 @@ import org.qjson.codegen.gen.Line;
 import org.qjson.decode.BytesDecoderSource;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
-import org.qjson.spi.DsonSpi;
+import org.qjson.spi.QJsonSpi;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -30,7 +30,7 @@ public class MapDecoderGenerator implements Generator {
     }};
 
     @Override
-    public Map<String, Object> args(Codegen.Config cfg, DsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
+    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
         Decoder keyDecoder = getKeyDecoder(spi, typeArgs);
         Decoder valueDecoder = getValueDecoder(spi, typeArgs);
         return new HashMap<String, Object>(){{
@@ -76,7 +76,7 @@ public class MapDecoderGenerator implements Generator {
         g.__(new Line("return map;"));
     }
 
-    private static Decoder getKeyDecoder(DsonSpi spi, Map<TypeVariable, Type> typeArgs) {
+    private static Decoder getKeyDecoder(QJsonSpi spi, Map<TypeVariable, Type> typeArgs) {
         TypeVariable typeParam = Map.class.getTypeParameters()[0];
         Type keyType = SubstituteTypeVariable.$(typeParam, typeArgs);
         if (Object.class.equals(keyType)) {
@@ -93,7 +93,7 @@ public class MapDecoderGenerator implements Generator {
         };
     }
 
-    private static Decoder getValueDecoder(DsonSpi spi, Map<TypeVariable, Type> typeArgs) {
+    private static Decoder getValueDecoder(QJsonSpi spi, Map<TypeVariable, Type> typeArgs) {
         TypeVariable typeParam = Map.class.getTypeParameters()[1];
         Type valueType = SubstituteTypeVariable.$(typeParam, typeArgs);
         Decoder valueDecoder = spi.decoderOf(valueType);

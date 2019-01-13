@@ -2,7 +2,7 @@ package org.qjson.codegen;
 
 import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Line;
-import org.qjson.spi.DsonSpi;
+import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.StructDescriptor;
 
@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 public class StructEncoderGenerator implements Generator {
 
     @Override
-    public Map<String, Object> args(Codegen.Config cfg, DsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
+    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
         List<StructDescriptor.Prop> props = getProperties(cfg, spi, clazz);
         return new HashMap<String, Object>() {{
             put("props", props);
@@ -101,7 +101,7 @@ public class StructEncoderGenerator implements Generator {
                 .replace("\"", "\\\"") + "\"";
     }
 
-    static List<StructDescriptor.Prop> getProperties(Codegen.Config cfg, DsonSpi spi, Class clazz) {
+    static List<StructDescriptor.Prop> getProperties(Codegen.Config cfg, QJsonSpi spi, Class clazz) {
         StructDescriptor struct = StructDescriptor.create(clazz, spi, cfg.customizeStruct);
         Map<String, StructDescriptor.Prop> props = new HashMap<>();
         for (List<StructDescriptor.Prop> methods : struct.methods.values()) {

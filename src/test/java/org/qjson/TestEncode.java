@@ -34,13 +34,13 @@ public interface TestEncode {
             try {
                 Class clazz = LoadClass.$(tempDir, "testdata.TestObject");
                 Object testObject = clazz.getMethod("create").invoke(null);
-                Dson.Config config = new Dson.Config();
+                QJSON.Config config = new QJSON.Config();
                 config.compiler = InMemoryJavaCompiler.newInstance()
                         .ignoreWarnings()
                         .useParentClassLoader(clazz.getClassLoader())
                         .useOptions("-classpath", System.getProperty("java.class.path") + ":" + tempDir.toString());
-                Dson dson = new Dson(config);
-                Assert.assertEquals(stripQuote(row.get(hasType ? 2 : 1)), dson.encode(testObject));
+                QJSON qjson = new QJSON(config);
+                Assert.assertEquals(stripQuote(row.get(hasType ? 2 : 1)), qjson.encode(testObject));
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {

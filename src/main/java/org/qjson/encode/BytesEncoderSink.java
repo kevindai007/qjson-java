@@ -74,13 +74,13 @@ public final class BytesEncoderSink implements EncoderSink {
     }
 
     @Override
-    public DsonEncodeException reportError(String errMsg) {
-        throw new DsonEncodeException(errMsg);
+    public QJsonEncodeException reportError(String errMsg) {
+        throw new QJsonEncodeException(errMsg);
     }
 
     @Override
-    public DsonEncodeException reportError(String errMsg, Exception cause) {
-        throw new DsonEncodeException(errMsg, cause);
+    public QJsonEncodeException reportError(String errMsg, Exception cause) {
+        throw new QJsonEncodeException(errMsg, cause);
     }
 
     public BytesBuilder bytesBuilder() {

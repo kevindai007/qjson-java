@@ -3,7 +3,7 @@ package org.qjson.codegen;
 import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Indent;
 import org.qjson.codegen.gen.Line;
-import org.qjson.spi.DsonSpi;
+import org.qjson.spi.QJsonSpi;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -12,7 +12,7 @@ import java.util.Map;
 class ArrayEncoderGenerator implements Generator {
 
     @Override
-    public Map<String, Object> args(Codegen.Config cfg, DsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
+    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
         return null;
     }
 

@@ -5,7 +5,7 @@ import org.qjson.codegen.gen.Indent;
 import org.qjson.codegen.gen.Line;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
-import org.qjson.spi.DsonSpi;
+import org.qjson.spi.QJsonSpi;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class CollectionDecoderGenerator implements Generator {
 
     @Override
-    public Map<String, Object> args(Codegen.Config cfg, DsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
+    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
         TypeVariable typeParam = Collection.class.getTypeParameters()[0];
         Type elemType = SubstituteTypeVariable.$(typeParam, typeArgs);
         Decoder elemDecoder = spi.decoderOf(elemType);

@@ -1,6 +1,6 @@
 package org.qjson.spi;
 
-import org.qjson.decode.DsonDecodeException;
+import org.qjson.decode.QJsonDecodeException;
 
 import java.lang.reflect.Type;
 
@@ -18,6 +18,6 @@ public interface DecoderSource {
     byte peek();
     void next();
     void skip();
-    DsonDecodeException reportError(String errMsg);
-    DsonDecodeException reportError(String errMsg, Exception cause);
+    QJsonDecodeException reportError(String errMsg);
+    QJsonDecodeException reportError(String errMsg, Exception cause);
 }

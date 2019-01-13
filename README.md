@@ -1,4 +1,4 @@
-# qjson
+# QJSON
 
 QJSON is a subset of JSON for better performance.
 Every QJSON is a valid JSON.

@@ -161,12 +161,12 @@ public class BytesDecoderSource implements DecoderSource {
         offset++;
     }
 
-    public DsonDecodeException reportError(String errMsg) {
-        throw new DsonDecodeException(errMsg);
+    public QJsonDecodeException reportError(String errMsg) {
+        throw new QJsonDecodeException(errMsg);
     }
 
-    public DsonDecodeException reportError(String errMsg, Exception cause) {
-        throw new DsonDecodeException(errMsg, cause);
+    public QJsonDecodeException reportError(String errMsg, Exception cause) {
+        throw new QJsonDecodeException(errMsg, cause);
     }
 
     public byte peek() {

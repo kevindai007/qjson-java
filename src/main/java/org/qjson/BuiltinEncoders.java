@@ -1,13 +1,13 @@
 package org.qjson;
 
-import org.qjson.spi.DsonSpi;
+import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.Encoder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 interface BuiltinEncoders {
-    static Map<Class, Encoder> $(DsonSpi spi) {
+    static Map<Class, Encoder> $(QJsonSpi spi) {
         return new HashMap<Class, Encoder>(){{
             put(boolean.class, (sink, val) -> sink.encodeBoolean((Boolean) val));
             put(Boolean.class, (sink, val) -> {

@@ -60,12 +60,12 @@ public class StringEncoderSink implements EncoderSink {
     }
 
     @Override
-    public DsonEncodeException reportError(String errMsg) {
+    public QJsonEncodeException reportError(String errMsg) {
         throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
-    public DsonEncodeException reportError(String errMsg, Exception cause) {
+    public QJsonEncodeException reportError(String errMsg, Exception cause) {
         throw new UnsupportedOperationException("not implemented");
     }
 

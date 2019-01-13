@@ -31,8 +31,8 @@ public class StructDescriptor {
                 continue;
             }
             Prop member = new Prop(field);
-            if (Modifier.isTransient(field.getModifiers()) && member.getAnnotation(DsonProperty.class) == null) {
-                member.setAnnotation(DsonProperty.class, new DsonProperty.Ignore());
+            if (Modifier.isTransient(field.getModifiers()) && member.getAnnotation(QJsonProperty.class) == null) {
+                member.setAnnotation(QJsonProperty.class, new QJsonProperty.Ignore());
             }
             fields.put(field.getName(), member);
         }
@@ -44,10 +44,10 @@ public class StructDescriptor {
                 continue;
             }
             Prop member = new Prop(method);
-            if (member.getAnnotation(Transient.class) != null && member.getAnnotation(DsonProperty.class) == null) {
+            if (member.getAnnotation(Transient.class) != null && member.getAnnotation(QJsonProperty.class) == null) {
                 Transient transientAnnotation = member.getAnnotation(Transient.class);
                 if (transientAnnotation.value()) {
-                    member.setAnnotation(DsonProperty.class, new DsonProperty.Ignore());
+                    member.setAnnotation(QJsonProperty.class, new QJsonProperty.Ignore());
                 }
             }
             methods.computeIfAbsent(method.getName(), k -> new ArrayList<>()).add(member);
@@ -59,25 +59,25 @@ public class StructDescriptor {
     }
 
     public static StructDescriptor create(
-            Class clazz, DsonSpi spi,
-            BiFunction<DsonSpi, StructDescriptor, StructDescriptor> customizeStruct) {
+            Class clazz, QJsonSpi spi,
+            BiFunction<QJsonSpi, StructDescriptor, StructDescriptor> customizeStruct) {
         StructDescriptor struct = new StructDescriptor(clazz);
         if (customizeStruct != null) {
             struct = customizeStruct.apply(spi, struct);
         }
         for (Prop value : struct.fields.values()) {
-            moveDsonPropertyValue(value);
+            moveProperty(value);
         }
         for (List<Prop> values : struct.methods.values()) {
             for (Prop value : values) {
-                moveDsonPropertyValue(value);
+                moveProperty(value);
             }
         }
         return struct;
     }
 
-    private static void moveDsonPropertyValue(Prop prop) {
-        DsonProperty annotation = prop.getAnnotation(DsonProperty.class);
+    private static void moveProperty(Prop prop) {
+        QJsonProperty annotation = prop.getAnnotation(QJsonProperty.class);
         if (annotation == null) {
             prop.name = "";
             prop.ignore = false;
@@ -116,7 +116,7 @@ public class StructDescriptor {
         }
     }
 
-    // property can be customized by @DsonProperty
+    // property can be customized by @QJsonProperty
     // or can be modified directly via StructDescriptor
     public static class Prop {
 

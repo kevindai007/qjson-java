@@ -5,11 +5,11 @@ import org.qjson.any.AnyList;
 import org.qjson.any.AnyMap;
 import org.qjson.codegen.Codegen;
 import org.qjson.decode.BytesDecoderSource;
-import org.qjson.decode.DsonDecodeException;
+import org.qjson.decode.QJsonDecodeException;
 import org.qjson.encode.BytesBuilder;
 import org.qjson.encode.BytesEncoderSink;
 import org.qjson.spi.Decoder;
-import org.qjson.spi.DsonSpi;
+import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.Encoder;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
@@ -21,13 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class Dson implements DsonSpi {
+public class QJSON implements QJsonSpi {
 
-    public static Dson $ = new Dson();
+    public static QJSON $ = new QJSON();
 
     public static class Config extends Codegen.Config {
-        public BiFunction<DsonSpi, Type, Decoder> chooseDecoder;
-        public BiFunction<DsonSpi, Class, Encoder> chooseEncoder;
+        public BiFunction<QJsonSpi, Type, Decoder> chooseDecoder;
+        public BiFunction<QJsonSpi, Class, Encoder> chooseEncoder;
     }
 
     private final Map<Class, Encoder> builtinEncoders = BuiltinEncoders.$(this);
@@ -37,7 +37,7 @@ public class Dson implements DsonSpi {
     private final Config cfg;
     private final Codegen codegen;
 
-    public Dson(Config cfg) {
+    public QJSON(Config cfg) {
         if (cfg.compiler == null) {
             cfg.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
         }
@@ -57,7 +57,7 @@ public class Dson implements DsonSpi {
             }
             Class impl = implMap.get(clazz);
             if (impl == null) {
-                throw new DsonDecodeException("can not determine implementation class to decode: " + clazz);
+                throw new QJsonDecodeException("can not determine implementation class to decode: " + clazz);
             }
             return impl;
         };
@@ -77,7 +77,7 @@ public class Dson implements DsonSpi {
         codegen = new Codegen(cfg, this);
     }
 
-    public Dson() {
+    public QJSON() {
         this(new Config());
     }
 

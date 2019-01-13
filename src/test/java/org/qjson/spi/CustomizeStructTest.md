@@ -16,7 +16,7 @@ package testdata;
 import org.qjson.spi.*;
 public class MyClass {
 
-    @DsonProperty(encoder = StringAsBoolean.class)
+    @QJsonProperty(encoder = StringAsBoolean.class)
     public String field;
 
     public MyClass init(String field) {
@@ -48,7 +48,7 @@ package testdata;
 import org.qjson.spi.*;
 public class MyClass {
 
-    @DsonProperty(shouldEncode = OmitNull.class)
+    @QJsonProperty(shouldEncode = OmitNull.class)
     public String field1;
     public String field2;
 

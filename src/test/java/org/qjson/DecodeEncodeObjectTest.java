@@ -10,12 +10,12 @@ public class DecodeEncodeObjectTest {
 
     @Test
     public void decode_object() {
-        Dson dson = new Dson();
+        QJSON qjson = new QJSON();
         FluentAPI testData = testDataFromMySection();
         testData.assertTrue(encoded -> {
             encoded = stripQuote(encoded);
-            Object decoded = dson.decode(Object.class, encoded);
-            String encodedBack = dson.encode(decoded);
+            Object decoded = qjson.decode(Object.class, encoded);
+            String encodedBack = qjson.encode(decoded);
             return encoded.equals(encodedBack);
         });
     }

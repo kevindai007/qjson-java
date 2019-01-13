@@ -11,9 +11,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
-public @interface DsonProperty {
+public @interface QJsonProperty {
 
-    class Ignore implements DsonProperty {
+    class Ignore implements QJsonProperty {
 
         @Override
         public String value() {
@@ -42,7 +42,7 @@ public @interface DsonProperty {
 
         @Override
         public Class<? extends Annotation> annotationType() {
-            return DsonProperty.class;
+            return QJsonProperty.class;
         }
     }
 
