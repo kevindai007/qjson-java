@@ -7,7 +7,8 @@ import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.dexscript.test.framework.TestFramework.stripQuote;
 import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
@@ -18,6 +19,7 @@ public interface TestEncode {
         Table table = testData.table();
         boolean hasType = "type".equals(table.head.get(0));
         for (Row row : table.body) {
+            List<String> sources = new ArrayList<>(testData.codes());
             String source = "" +
                     "package testdata;\n" +
                     "import java.util.*;\n" +
@@ -27,12 +29,16 @@ public interface TestEncode {
                     "       return " + stripQuote(row.get(hasType ? 1 : 0)) + ";\n" +
                     "   }\n" +
                     "}";
-            Path tempDir = CompileClasses.$(Arrays.asList(source));
+            sources.add(source);
+            Path tempDir = CompileClasses.$(sources);
             try {
                 Class clazz = LoadClass.$(tempDir, "testdata.TestObject");
                 Object testObject = clazz.getMethod("create").invoke(null);
                 DSON.Config config = new DSON.Config();
-                config.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
+                config.compiler = InMemoryJavaCompiler.newInstance()
+                        .ignoreWarnings()
+                        .useParentClassLoader(clazz.getClassLoader())
+                        .useOptions("-classpath", System.getProperty("java.class.path") + ":" + tempDir.toString());
                 DSON dson = new DSON(config);
                 Assert.assertEquals(stripQuote(row.get(hasType ? 2 : 1)), dson.encode(testObject));
             } catch (RuntimeException e) {

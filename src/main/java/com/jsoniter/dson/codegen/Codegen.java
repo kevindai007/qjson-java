@@ -93,11 +93,23 @@ public class Codegen {
             ).__(EncoderSink.class.getCanonicalName()
             ).__(" sink, Object val) {"
             ).__(new Indent(() -> {
-                if (clazz.isArray()) {
-                    ArrayEncoder.$(g, clazz);
-                } else {
-                    throw new UnsupportedOperationException("not implemented: " + clazz);
-                }
+                g.__("try {"
+                ).__(new Indent(() -> {
+
+                    if (clazz.isArray()) {
+                        ArrayEncoder.$(g, clazz);
+                    } else {
+                        StructEncoder.$(g, clazz);
+                    }
+                })).__("} catch (RuntimeException e) {"
+                ).__(new Indent(() -> {
+                    g.__("throw e;");
+                })).__("} catch (Exception e) {"
+                ).__(new Indent(() -> {
+                    g.__("throw new "
+                    ).__(DsonEncodeException.class.getCanonicalName()
+                    ).__("(e);");
+                })).__(new Line("}"));
             })).__(new Line("}"));
         })).__(new Line("}"));
         String src = g.toString();
