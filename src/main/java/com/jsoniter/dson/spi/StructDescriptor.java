@@ -6,7 +6,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class StructDescriptor {
@@ -14,6 +16,8 @@ public class StructDescriptor {
     private final Class clazz;
     public final Map<String, Prop> fields = new HashMap<>();
     public final Map<String, Prop> methods = new HashMap<>();
+    // sort the properties in order to encode
+    public Function<List<Prop>, List<Prop>> sortProperties;
 
     public StructDescriptor(Class clazz) {
         this.clazz = clazz;
@@ -48,16 +52,19 @@ public class StructDescriptor {
         }
     }
 
+    // property can be customized by @DsonProperty
+    // or can be modified directly via StructDescriptor
     public static class Prop {
 
         @DsonProperty("123")
         public final Field field;
         public final Method method;
+        private final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
         public Encoder encoder;
         public Decoder decoder;
-        private final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
-        // shouldEncode can be used to omit empty value when encoding
         public Predicate<Object> shouldEncode;
+        public String name;
+        public Boolean ignore;
 
         public Prop(Field field) {
             this.field = field;

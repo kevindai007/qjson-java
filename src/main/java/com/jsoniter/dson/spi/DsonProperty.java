@@ -50,6 +50,7 @@ public @interface DsonProperty {
 
     boolean ignore() default false;
 
+    // shouldEncode can be used to omit empty value when encoding
     Class<? extends Predicate> shouldEncode() default Predicate.class;
 
     Class<? extends Encoder> encoder() default Encoder.class;

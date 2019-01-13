@@ -1,7 +1,5 @@
-package com.jsoniter.dson.codegen;
+package com.jsoniter.dson.spi;
 
-import com.jsoniter.dson.spi.DsonProperty;
-import com.jsoniter.dson.spi.StructDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 

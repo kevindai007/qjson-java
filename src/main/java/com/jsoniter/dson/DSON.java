@@ -26,8 +26,8 @@ public class DSON {
     public static DSON $ = new DSON();
 
     public static class Config extends Codegen.Config {
-        public BiFunction<DSON, Type, Decoder> decoderProvider;
-        public BiFunction<DSON, Class, Encoder> encoderProvider;
+        public BiFunction<DSON, Type, Decoder> chooseDecoder;
+        public BiFunction<DSON, Class, Encoder> chooseEncoder;
     }
 
     private final Map<Class, Encoder> builtinEncoders = new HashMap<Class, Encoder>() {{

@@ -8,6 +8,7 @@ import com.jsoniter.dson.encode.DsonEncodeException;
 import com.jsoniter.dson.spi.Decoder;
 import com.jsoniter.dson.spi.Encoder;
 import com.jsoniter.dson.spi.EncoderSink;
+import com.jsoniter.dson.spi.StructDescriptor;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.lang.reflect.Constructor;
@@ -16,6 +17,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Codegen {
@@ -27,6 +29,7 @@ public class Codegen {
     public static class Config {
         public InMemoryJavaCompiler compiler;
         public Function<Class, Class> chooseImpl;
+        public Consumer<StructDescriptor> customizeStruct;
     }
 
     public Codegen(Config cfg, Function<Type, Decoder> decoderProvider) {

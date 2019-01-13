@@ -1,4 +1,4 @@
-package com.jsoniter.dson;
+package com.jsoniter.dson.spi;
 
 public class CustomizeStructTest {
 
