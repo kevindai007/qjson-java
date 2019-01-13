@@ -121,7 +121,7 @@ public class Codegen {
     }
 
     public static boolean isJavaUtil(Class clazz) {
-        if (Object.class.equals(clazz)) {
+        if (clazz == null) {
             return false;
         }
         if (clazz.getName().startsWith("java.util.")) {

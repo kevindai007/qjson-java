@@ -1,5 +1,6 @@
 package com.jsoniter.dson;
 
+import com.jsoniter.dson.any.Any;
 import com.jsoniter.dson.any.AnyList;
 import com.jsoniter.dson.any.AnyMap;
 import com.jsoniter.dson.codegen.Codegen;
@@ -13,7 +14,6 @@ import com.jsoniter.dson.spi.Encoder;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -22,6 +22,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class DSON {
+
+    public static DSON $ = new DSON();
 
     public static class Config extends Codegen.Config {
         public BiFunction<DSON, Type, Decoder> decoderProvider;
@@ -168,6 +170,9 @@ public class DSON {
                     decoderOf(cfg.chooseImpl.apply(Map.class)));
             return objectDecoder;
         }
+        if (Any.class.equals(type)) {
+            return new AnyDecoder(decoderOf(Object.class));
+        }
         return codegen.generateDecoder(type);
     }
 
@@ -180,6 +185,14 @@ public class DSON {
     public void encode(Object val, BytesBuilder bytesBuilder) {
         BytesEncoderSink sink = new BytesEncoderSink(this::encoderOf, bytesBuilder);
         sink.encodeObject(val);
+    }
+
+    public Any decode(String encoded) {
+        return decode(encoded.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public Any decode(byte[] encoded) {
+        return decode(Any.class, encoded);
     }
 
     public <T> T decode(Class<T> clazz, String encoded) {

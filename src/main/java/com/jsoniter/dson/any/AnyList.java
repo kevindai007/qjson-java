@@ -16,7 +16,15 @@ public class AnyList<E> extends ArrayList<E> implements Any {
     }
 
     @Override
-    public Object get(Object... path) {
-        return null;
+    public Object get(Object key) {
+        Integer index = (Integer) key;
+        return super.get(index);
+    }
+
+    @Override
+    public Any set(Object key, Object value) {
+        Integer index = (Integer) key;
+        super.set(index, (E) value);
+        return this;
     }
 }

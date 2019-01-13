@@ -8,4 +8,9 @@ public class EncodeListTest {
     public void typed_list() {
         TestEncode.$();
     }
+
+    @Test
+    public void object_list() {
+        TestEncode.$();
+    }
 }

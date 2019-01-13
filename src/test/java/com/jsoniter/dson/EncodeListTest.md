@@ -7,3 +7,11 @@
 | `AnyList<String>` | `new AnyList("hello")` | `["hello"]` |
 | `AnyList<String>` | `new AnyList(null)` | `[null]` |
 | `AnyList<Integer>` | `new AnyList(100)` | `["\b;;;;;>?"]` |
+
+# object_list
+
+| type | value | encoded |
+| ---  | ---   | ---  |
+| `AnyList` | `null` | `null` |
+| `AnyList` | `new AnyList()` | `[]` |
+| `AnyList` | `new AnyList("hello")` | `["hello"]` |
