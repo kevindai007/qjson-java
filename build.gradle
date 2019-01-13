@@ -1,4 +1,4 @@
-group 'com.jsoniter.dson'
+group 'org.qjson'
 version '0.9-SNAPSHOT'
 apply plugin: 'java'
 
