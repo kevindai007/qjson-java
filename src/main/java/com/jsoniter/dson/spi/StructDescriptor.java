@@ -3,9 +3,9 @@ package com.jsoniter.dson.spi;
 import java.beans.Transient;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class StructDescriptor {
 
     private final Class clazz;
     public final Map<String, Prop> fields = new HashMap<>();
-    public final Map<String, Prop> methods = new HashMap<>();
+    public final Map<String, List<Prop>> methods = new HashMap<>();
     // sort the properties in order to encode
     public Function<List<Prop>, List<Prop>> sortProperties;
 
@@ -50,7 +50,7 @@ public class StructDescriptor {
                     member.setAnnotation(DsonProperty.class, new DsonProperty.Ignore());
                 }
             }
-            methods.put(method.getName(), member);
+            methods.computeIfAbsent(method.getName(), k -> new ArrayList<>()).add(member);
         }
     }
 
@@ -59,12 +59,17 @@ public class StructDescriptor {
             customizeStruct.accept(this);
         }
         for (Prop value : fields.values()) {
-            DsonProperty dsonProperty = value.getAnnotation(DsonProperty.class);
-            copyProp(value, dsonProperty);
+            moveDsonPropertyValue(value);
+        }
+        for (List<Prop> values : methods.values()) {
+            for (Prop value : values) {
+                moveDsonPropertyValue(value);
+            }
         }
     }
 
-    private void copyProp(Prop prop, DsonProperty annotation) {
+    private static void moveDsonPropertyValue(Prop prop) {
+        DsonProperty annotation = prop.getAnnotation(DsonProperty.class);
         if (annotation == null) {
             prop.ignore = false;
             return;

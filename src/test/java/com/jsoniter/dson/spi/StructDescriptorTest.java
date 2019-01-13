@@ -33,9 +33,9 @@ public class StructDescriptorTest {
         Assert.assertTrue(field1.getAnnotation(DsonProperty.class).ignore());
         StructDescriptor.Prop field2 = struct.fields.get("field2");
         Assert.assertFalse(field2.getAnnotation(DsonProperty.class).ignore());
-        StructDescriptor.Prop field3 = struct.methods.get("getField3");
+        StructDescriptor.Prop field3 = struct.methods.get("getField3").get(0);
         Assert.assertTrue(field3.getAnnotation(DsonProperty.class).ignore());
-        StructDescriptor.Prop field4 = struct.methods.get("getField4");
+        StructDescriptor.Prop field4 = struct.methods.get("getField4").get(0);
         Assert.assertFalse(field4.getAnnotation(DsonProperty.class).ignore());
     }
 

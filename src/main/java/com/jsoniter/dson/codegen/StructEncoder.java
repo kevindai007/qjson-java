@@ -6,12 +6,13 @@ import com.jsoniter.dson.spi.StructDescriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.function.Function;
 
 interface StructEncoder {
 
     static void $(Gen g, Codegen.Config cfg, Class clazz) {
-        getProperties(cfg, clazz);
+        List<StructDescriptor.Prop> props = getProperties(cfg, clazz);
         // {
         g.__(new Line("sink.write('{');"));
         // cast to struct
@@ -19,46 +20,57 @@ interface StructEncoder {
         ).__(" obj = ("
         ).__(clazz.getCanonicalName()
         ).__(new Line(")val;"));
-        // foreach fields
-        for (Field field : clazz.getFields()) {
+        // foreach properties
+        for (StructDescriptor.Prop prop : props) {
             g.__("sink.encodeString(\""
-            ).__(field.getName()
+            ).__(prop.name
             ).__(new Line("\");"));
             g.__(new Line("sink.write(':');"));
-            g.__("sink.encodeObject(obj."
-            ).__(field.getName()
-            ).__(new Line(");"));
-        }
-        // foreach methods
-        for (Method method : clazz.getMethods()) {
-            String propName = getterPropName(method);
-            if (propName == null) {
-                continue;
+            if (prop.field != null) {
+                g.__("sink.encodeObject(obj."
+                ).__(prop.field.getName()
+                ).__(new Line(");"));
+            } else {
+                g.__("sink.encodeObject(obj."
+                ).__(prop.method.getName()
+                ).__(new Line("());"));
             }
-            g.__("sink.encodeString(\""
-            ).__(propName
-            ).__(new Line("\");"));
-            g.__(new Line("sink.write(':');"));
-            g.__("sink.encodeObject(obj."
-            ).__(method.getName()
-            ).__(new Line("());"));
         }
         // }
         g.__(new Line("sink.write('}');"));
     }
 
-    static void getProperties(Codegen.Config cfg, Class clazz) {
+    static List<StructDescriptor.Prop> getProperties(Codegen.Config cfg, Class clazz) {
         StructDescriptor struct = new StructDescriptor(clazz);
         struct.customize(cfg.customizeStruct);
+        Map<String, StructDescriptor.Prop> props = new HashMap<>();
+        for (List<StructDescriptor.Prop> methods : struct.methods.values()) {
+            for (StructDescriptor.Prop method : methods) {
+                String propName = getterPropName(method.method);
+                if (propName == null) {
+                    continue;
+                }
+                if (method.name == null) {
+                    method.name = propName;
+                }
+                props.put(method.name, method);
+            }
+        }
+        for (StructDescriptor.Prop field : struct.fields.values()) {
+            field.name = field.field.getName();
+            props.put(field.name, field);
+        }
+        Function<List<StructDescriptor.Prop>, List<StructDescriptor.Prop>> sortProperties = struct.sortProperties;
+        if (sortProperties == null) {
+            sortProperties = properties -> {
+                Collections.sort(properties, Comparator.comparing(o -> o.name));
+                return properties;
+            };
+        }
+        return sortProperties.apply(new ArrayList<>(props.values()));
     }
 
     static String getterPropName(Method method) {
-        if (Modifier.isStatic(method.getModifiers())) {
-            return null;
-        }
-        if (Object.class.equals(method.getDeclaringClass())) {
-            return null;
-        }
         String methodName = method.getName();
         if (method.getReturnType().equals(Void.TYPE)) {
             return null;
