@@ -23,4 +23,9 @@ public class EncodeStructTest {
     public void rename_property() {
         TestEncode.$();
     }
+
+    @Test
+    public void multiple_fields() {
+        TestEncode.$();
+    }
 }

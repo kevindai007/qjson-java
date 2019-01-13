@@ -6,6 +6,10 @@ import com.jsoniter.dson.spi.EncoderSink;
 class IterableEncoder implements Encoder {
     @Override
     public void encode(EncoderSink sink, Object val) {
+        if (val == null) {
+            sink.encodeNull();
+            return;
+        }
         Iterable iterable = (Iterable) val;
         sink.write('[');
         boolean isFirst = true;

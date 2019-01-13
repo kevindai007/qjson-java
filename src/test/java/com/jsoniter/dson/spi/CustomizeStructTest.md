@@ -29,3 +29,36 @@ public class MyClass {
 | value | encoded |
 | ---   | ---     |
 | `new MyClass().init("true")` | `{"field":true}` |
+
+# customize_should_encode
+
+```java
+package testdata;
+import com.jsoniter.dson.spi.*;
+import java.util.function.Predicate;
+public class OmitNull implements Predicate<Object> {
+    public boolean test(Object val) {
+        return val != null;
+    }
+}
+```
+
+```java
+package testdata;
+import com.jsoniter.dson.spi.*;
+public class MyClass {
+
+    @DsonProperty(shouldEncode = OmitNull.class)
+    public String field1;
+    public String field2;
+
+    public MyClass init(String field2) {
+        this.field2 = field2;
+        return this;
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `new MyClass().init("hello")` | `{"field2":"hello"}` |

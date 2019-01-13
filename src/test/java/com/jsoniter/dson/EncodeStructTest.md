@@ -91,3 +91,25 @@ public class MyClass {
 | value | encoded |
 | ---   | ---     |
 | `new MyClass().init("hello")` | `{"\/CC":"hello"}` |
+
+# multiple_fields
+
+
+```java
+package testdata;
+public class MyClass {
+
+    public String field1;
+    public String field2;
+
+    public MyClass init(String field1, String field2) {
+        this.field1 = field1;
+        this.field2 = field2;
+        return this;
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `new MyClass().init("a","b")` | `{"field1":"a","field2":"b"}` |

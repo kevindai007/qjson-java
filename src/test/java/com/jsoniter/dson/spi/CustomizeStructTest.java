@@ -9,4 +9,9 @@ public class CustomizeStructTest {
     public void customize_encoder() {
         TestEncode.$();
     }
+
+    @Test
+    public void customize_should_encode() {
+        TestEncode.$();
+    }
 }

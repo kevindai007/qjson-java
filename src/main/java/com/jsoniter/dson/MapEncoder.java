@@ -21,6 +21,10 @@ class MapEncoder implements Encoder {
 
     @Override
     public void encode(EncoderSink sink, Object val) {
+        if (val == null) {
+            sink.encodeNull();
+            return;
+        }
         Map<Object, Object> map = (Map<Object, Object>) val;
         sink.write('{');
         boolean isFirst = true;
