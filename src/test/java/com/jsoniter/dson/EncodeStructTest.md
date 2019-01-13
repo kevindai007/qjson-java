@@ -2,6 +2,7 @@
 
 ```java
 package testdata;
+import java.util.*;
 public class MyClass {
 
     public String field;
@@ -9,6 +10,19 @@ public class MyClass {
     public MyClass init(String field) {
         this.field = field;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyClass that = (MyClass) o;
+        return Objects.equals(field, that.field);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field);
     }
 }
 ```

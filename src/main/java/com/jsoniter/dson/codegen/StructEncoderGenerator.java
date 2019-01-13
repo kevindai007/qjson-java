@@ -96,7 +96,7 @@ public class StructEncoderGenerator implements Generator {
         g.__(new Line("sink.write('}');"));
     }
 
-    private static String asStringLiteral(String str) {
+    static String asStringLiteral(String str) {
         return "\"" + str.replace("\\", "\\\\")
                 .replace("\"", "\\\"") + "\"";
     }
@@ -167,7 +167,7 @@ public class StructEncoderGenerator implements Generator {
      * @param name The string to be decapitalized.
      * @return The decapitalized version of the string.
      */
-    private static String decapitalize(String name) {
+    static String decapitalize(String name) {
         if (name == null || name.length() == 0) {
             return name;
         }
