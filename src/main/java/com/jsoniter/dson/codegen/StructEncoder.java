@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-public interface StructEncoder {
+interface StructEncoder {
 
     static void $(Gen g, Class clazz) {
         // {

@@ -25,9 +25,7 @@ public class Codegen {
     private int counter;
 
     public static class Config {
-
         public InMemoryJavaCompiler compiler;
-
         public Function<Class, Class> chooseImpl;
     }
 
@@ -63,7 +61,7 @@ public class Codegen {
             } else if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
                 MapDecoder.$(g, decoderClassName, clazz);
             } else {
-                throw new UnsupportedOperationException("not implemented: " + clazz);
+                StructDecoder.$(g, decoderClassName, clazz);
             }
         })).__(new Line("}"));
         String src = g.toString();
