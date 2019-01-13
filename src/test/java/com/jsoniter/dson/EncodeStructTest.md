@@ -70,3 +70,24 @@ public class MyClass {
 | value | encoded |
 | ---   | ---     |
 | `new MyClass().init("hello")` | `{"field":"hello"}` |
+
+# rename_property
+
+```java
+package testdata;
+import com.jsoniter.dson.spi.*;
+public class MyClass {
+
+    @DsonProperty("\"")
+    public String field;
+
+    public MyClass init(String field) {
+        this.field = field;
+        return this;
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `new MyClass().init("hello")` | `{"\/CC":"hello"}` |

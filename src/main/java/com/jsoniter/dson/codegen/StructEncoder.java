@@ -22,9 +22,9 @@ interface StructEncoder {
         ).__(new Line(")val;"));
         // foreach properties
         for (StructDescriptor.Prop prop : props) {
-            g.__("sink.encodeString(\""
-            ).__(prop.name
-            ).__(new Line("\");"));
+            g.__("sink.encodeString("
+            ).__(asStringLiteral(prop.name)
+            ).__(new Line(");"));
             g.__(new Line("sink.write(':');"));
             if (prop.field != null) {
                 g.__("sink.encodeObject(obj."
@@ -38,6 +38,11 @@ interface StructEncoder {
         }
         // }
         g.__(new Line("sink.write('}');"));
+    }
+
+    static String asStringLiteral(String str) {
+        return "\"" + str.replace("\\", "\\\\")
+                .replace("\"", "\\\"") + "\"";
     }
 
     static List<StructDescriptor.Prop> getProperties(Codegen.Config cfg, Class clazz) {
@@ -57,7 +62,9 @@ interface StructEncoder {
             }
         }
         for (StructDescriptor.Prop field : struct.fields.values()) {
-            field.name = field.field.getName();
+            if (field.name == null) {
+                field.name = field.field.getName();
+            }
             props.put(field.name, field);
         }
         Function<List<StructDescriptor.Prop>, List<StructDescriptor.Prop>> sortProperties = struct.sortProperties;

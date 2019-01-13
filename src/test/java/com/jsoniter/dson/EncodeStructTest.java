@@ -18,4 +18,9 @@ public class EncodeStructTest {
     public void fluent_getter_and_fluent_setter() {
         TestEncode.$();
     }
+
+    @Test
+    public void rename_property() {
+        TestEncode.$();
+    }
 }
