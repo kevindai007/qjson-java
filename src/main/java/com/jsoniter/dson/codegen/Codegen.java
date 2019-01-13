@@ -55,11 +55,12 @@ public class Codegen {
         ).__(Decoder.class.getCanonicalName()
         ).__(" {"
         ).__(new Indent(() -> {
+            boolean isJavaUtil = isJavaUtil(clazz);
             if (clazz.isArray()) {
                 ArrayDecoder.$(g, decoderClassName, clazz);
-            } else if (Collection.class.isAssignableFrom(clazz)) {
+            } else if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
                 CollectionDecoder.$(g, clazz);
-            } else if (Map.class.isAssignableFrom(clazz)) {
+            } else if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
                 MapDecoder.$(g, clazz, typeArgs);
             } else {
                 throw new UnsupportedOperationException("not implemented: " + clazz);
@@ -113,5 +114,15 @@ public class Codegen {
         } catch (Exception e) {
             throw new DsonEncodeException(e);
         }
+    }
+
+    public static boolean isJavaUtil(Class clazz) {
+        if (Object.class.equals(clazz)) {
+            return false;
+        }
+        if (clazz.getName().startsWith("java.util.")) {
+            return true;
+        }
+        return isJavaUtil(clazz.getSuperclass());
     }
 }

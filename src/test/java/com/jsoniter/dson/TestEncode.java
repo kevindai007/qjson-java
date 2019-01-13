@@ -2,6 +2,7 @@ package com.jsoniter.dson;
 
 import com.dexscript.test.framework.FluentAPI;
 import com.dexscript.test.framework.Row;
+import com.dexscript.test.framework.Table;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
@@ -14,13 +15,16 @@ import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
 public interface TestEncode {
     static void $() {
         FluentAPI testData = testDataFromMySection();
-        for (Row row : testData.table().body) {
+        Table table = testData.table();
+        boolean hasType = "type".equals(table.head.get(0));
+        for (Row row : table.body) {
             String source = "" +
                     "package testdata;\n" +
                     "import java.util.*;\n" +
+                    "import com.jsoniter.dson.any.*;\n" +
                     "public class TestObject {\n" +
                     "   public static Object create() {\n" +
-                    "       return " + stripQuote(row.get(0)) + ";\n" +
+                    "       return " + stripQuote(row.get(hasType ? 1 : 0)) + ";\n" +
                     "   }\n" +
                     "}";
             Path tempDir = CompileClasses.$(Arrays.asList(source));
@@ -30,7 +34,7 @@ public interface TestEncode {
                 DSON.Config config = new DSON.Config();
                 config.compiler = InMemoryJavaCompiler.newInstance().ignoreWarnings();
                 DSON dson = new DSON(config);
-                Assert.assertEquals(stripQuote(row.get(1)), dson.encode(testObject));
+                Assert.assertEquals(stripQuote(row.get(hasType ? 2 : 1)), dson.encode(testObject));
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {

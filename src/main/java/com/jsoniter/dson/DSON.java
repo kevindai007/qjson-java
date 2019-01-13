@@ -13,6 +13,7 @@ import com.jsoniter.dson.spi.Encoder;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -133,10 +134,11 @@ public class DSON {
         if (encoder != null) {
             return encoder;
         }
-        if (Map.class.isAssignableFrom(clazz)) {
+        boolean isJavaUtil = Codegen.isJavaUtil(clazz);
+        if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
             return builtinEncoders.get(Map.class);
         }
-        if (Iterable.class.isAssignableFrom(clazz)) {
+        if (Iterable.class.isAssignableFrom(clazz) && isJavaUtil) {
             return builtinEncoders.get(Iterable.class);
         }
         return codegen.generateEncoder(clazz);
@@ -189,7 +191,16 @@ public class DSON {
         return (T) decode((Type) clazz, encoded, offset, size);
     }
 
-    public Object decode(Type type, byte[] encoded, int offset, int size) {
+    public <T> T decode(TypeLiteral<T> typeLiteral, byte[] encoded, int offset, int size) {
+        if (TypeLiteral.class.equals(typeLiteral.getClass())) {
+            throw new DsonDecodeException("should specify type like this: new TypeLiteral<List<String>>(){}");
+        }
+        ParameterizedType parameterizedType = (ParameterizedType) typeLiteral.getClass().getGenericSuperclass();
+        Type type = parameterizedType.getActualTypeArguments()[0];
+        return (T) decode(type, encoded, offset, size);
+    }
+
+    private Object decode(Type type, byte[] encoded, int offset, int size) {
         BytesDecoderSource source = new BytesDecoderSource(this::decoderOf, encoded, offset, size);
         return source.decodeObject(type);
     }
