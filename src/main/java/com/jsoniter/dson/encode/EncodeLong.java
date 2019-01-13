@@ -2,8 +2,8 @@ package com.jsoniter.dson.encode;
 
 class EncodeLong {
 
-    static void $(BytesEncoderSink stream, int val) {
-        BytesBuilder builder = stream.bytesBuilder();
+    static void $(BytesEncoderSink sink, int val) {
+        BytesBuilder builder = sink.bytesBuilder();
         int mask = (1 << 5) - 1;
         builder.append('"', '\\', 'b');
         builder.append(
@@ -18,12 +18,12 @@ class EncodeLong {
         builder.append('"');
     }
 
-    static void $(BytesEncoderSink stream, long val) {
-        EncodeLong.$(stream, 'b', val);
+    static void $(BytesEncoderSink sink, long val) {
+        EncodeLong.$(sink, 'b', val);
     }
 
-    static void $(BytesEncoderSink stream, char type, long val) {
-        BytesBuilder builder = stream.bytesBuilder();
+    static void $(BytesEncoderSink sink, char type, long val) {
+        BytesBuilder builder = sink.bytesBuilder();
         int mask = (1 << 5) - 1;
         builder.append('"', '\\', type);
         builder.append(
@@ -45,6 +45,19 @@ class EncodeLong {
         builder.append('"');
     }
 
-    static void $(StringStream stream, long val) {
+    static void $(StringEncoderSink sink, int val) {
+        StringBuilder builder = sink.stringBuilder();
+        int mask = (1 << 5) - 1;
+        Append.$(builder,
+                '"', '\\', 'b',
+                (char) (';' + ((val >>> 30) & mask)),
+                (char) (';' + ((val >>> 25) & mask)),
+                (char) (';' + ((val >>> 20) & mask)),
+                (char) (';' + ((val >>> 15) & mask)),
+                (char) (';' + ((val >>> 10) & mask)),
+                (char) (';' + ((val >>> 5) & mask)),
+                (char) (';' + (val & mask)),
+                '"'
+        );
     }
 }
