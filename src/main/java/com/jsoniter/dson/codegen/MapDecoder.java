@@ -39,7 +39,7 @@ public interface MapDecoder {
             }
             return source -> {
                 byte[] bytes = source.decodeBytes();
-                BytesDecoderSource newSource = new BytesDecoderSource(bytes);
+                BytesDecoderSource newSource = new BytesDecoderSource(decoderProvider, bytes, 0, bytes.length);
                 return keyDecoder.decode(newSource);
             };
         }

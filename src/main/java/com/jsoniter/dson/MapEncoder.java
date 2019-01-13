@@ -1,6 +1,7 @@
 package com.jsoniter.dson;
 
 import com.jsoniter.dson.codegen.MapDecoder;
+import com.jsoniter.dson.encode.BytesBuilder;
 import com.jsoniter.dson.encode.BytesEncoderSink;
 import com.jsoniter.dson.spi.Encoder;
 import com.jsoniter.dson.spi.EncoderSink;
@@ -54,7 +55,7 @@ class MapEncoder implements Encoder {
             return encoder;
         }
         return (sink, val) -> {
-            BytesEncoderSink newSink = new BytesEncoderSink();
+            BytesEncoderSink newSink = new BytesEncoderSink(encoderProvider, new BytesBuilder());
             encoder.encode(newSink, val);
             sink.encodeBytes(newSink.copyOfBytes());
         };
