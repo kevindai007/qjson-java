@@ -22,7 +22,7 @@ class MapEncoder implements Encoder {
             if (key == null) {
                 sink.encodeString("null");
             } else {
-                sink.encodeString(key.toString());
+                sink.encodeObject(key);
             }
             sink.write(':');
             sink.encodeObject(entry.getValue());

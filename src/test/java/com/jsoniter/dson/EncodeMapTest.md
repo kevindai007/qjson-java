@@ -4,4 +4,12 @@
 | ---  | ---   | ---     |
 | `AnyMap<String,String>` | `null` | `null` |
 | `AnyMap<String,String>` | `new AnyMap("a","b")` | `{"a":"b"}` |
-| `AnyMap<String,String>` |`new AnyMap(null,"b")` | `{"null":"b"}` |
+| `AnyMap<String,String>` | `new AnyMap("a",null)` | `{"a":null}` |
+| `AnyMap<String,Integer>` | `new AnyMap("a",100)` | `{"a":"\b;;;;;>?"}` |
+| `AnyMap<Integer,String>` | `new AnyMap(100,"a")` | `{"\b;;;;;>?":"a"}` |
+
+# null_key
+
+| value | encoded |
+| ---   | ---     |
+| `new AnyMap(null,"b")` | `{"null":"b"}` |

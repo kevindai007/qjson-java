@@ -44,8 +44,12 @@ public interface MapDecoder {
                 if (source.read() != ':') {
                     throw source.reportError("expect :");
                 }
-                Object value = valueDecoder.decode(source);
-                map.put(key, value);
+                if (source.decodeNull()) {
+                    map.put(key, null);
+                } else {
+                    Object value = valueDecoder.decode(source);
+                    map.put(key, value);
+                }
             } while ((b = source.read()) == ',');
             if (b != '}') {
                 throw source.reportError("expect }");

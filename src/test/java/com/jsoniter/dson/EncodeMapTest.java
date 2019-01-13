@@ -8,4 +8,9 @@ public class EncodeMapTest {
     public void type_map() {
         TestEncode.$();
     }
+
+    @Test
+    public void null_key() {
+        TestEncode.$();
+    }
 }
