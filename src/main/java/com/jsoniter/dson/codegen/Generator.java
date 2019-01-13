@@ -9,6 +9,7 @@ import java.util.Map;
 
 public interface Generator {
 
+    // typeArgs will be null for encoder generator
     Map<String, Object> args(Codegen.Config cfg, DsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs);
 
     void genFields(Gen g, Map<String, Object> args);

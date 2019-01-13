@@ -4,6 +4,7 @@ import com.jsoniter.dson.codegen.gen.Gen;
 import com.jsoniter.dson.codegen.gen.Indent;
 import com.jsoniter.dson.codegen.gen.Line;
 import com.jsoniter.dson.spi.DsonSpi;
+import com.jsoniter.dson.spi.Encoder;
 import com.jsoniter.dson.spi.StructDescriptor;
 
 import java.lang.reflect.Field;
@@ -18,19 +19,34 @@ public class StructEncoderGenerator implements Generator {
     @Override
     public Map<String, Object> args(Codegen.Config cfg, DsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
         List<StructDescriptor.Prop> props = getProperties(cfg, spi, clazz);
-        return new HashMap<String, Object>(){{
+        return new HashMap<String, Object>() {{
             put("props", props);
         }};
     }
 
     @Override
     public void genFields(Gen g, Map<String, Object> args) {
-
+        List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
+        for (int i = 0; i < props.size(); i++) {
+            g.__("private final "
+            ).__(Encoder.class.getCanonicalName()
+            ).__(" encoder"
+            ).__(i
+            ).__(new Line(";"));
+        }
     }
 
     @Override
     public void genCtor(Gen g, Map<String, Object> args) {
-
+        g.__("java.util.List<"
+        ).__(StructDescriptor.Prop.class.getCanonicalName()
+        ).__("> props = (java.util.List<"
+        ).__(StructDescriptor.Prop.class.getCanonicalName()
+        ).__(new Line(">)args.get(\"props\");"));
+        List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
+        for (int i = 0; i < props.size(); i++) {
+            g.__("this.encoder").__(i).__(" = props.get(").__(i).__(new Line(").encoder;"));
+        }
     }
 
     @Override
@@ -44,19 +60,22 @@ public class StructEncoderGenerator implements Generator {
         ).__(clazz.getCanonicalName()
         ).__(new Line(")val;"));
         // foreach properties
-        for (StructDescriptor.Prop prop : props) {
+        for (int i = 0; i < props.size(); i++) {
+            StructDescriptor.Prop prop = props.get(i);
             g.__("sink.encodeString("
             ).__(asStringLiteral(prop.name)
             ).__(new Line(");"));
             g.__(new Line("sink.write(':');"));
+            String expr;
             if (prop.field != null) {
-                g.__("sink.encodeObject(obj."
-                ).__(prop.field.getName()
-                ).__(new Line(");"));
+                expr = "obj." + prop.field.getName();
             } else {
-                g.__("sink.encodeObject(obj."
-                ).__(prop.method.getName()
-                ).__(new Line("());"));
+                expr = "obj." + prop.method.getName() + "()";
+            }
+            if (prop.encoder == null) {
+                g.__("sink.encodeObject(").__(expr).__(new Line(");"));
+            } else {
+                g.__("this.encoder").__(i).__(".encode(sink, ").__(expr).__(new Line(");"));
             }
         }
         // }
