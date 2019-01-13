@@ -125,6 +125,20 @@ public class BytesDecoderSource implements DecoderSource {
         offset += 5;
     }
 
+    void expect(char b1, char b2, char b3, char b4) {
+        if (offset + 5 > size) {
+            throw reportError("expect 5 more bytes");
+        }
+        boolean expected = buf[offset] == b1
+                && buf[offset + 1] == b2
+                && buf[offset + 2] == b3
+                && buf[offset + 3] == b4;
+        if (!expected) {
+            throw reportError("expect " + new String(new char[]{b1, b2, b3, b4}));
+        }
+        offset += 4;
+    }
+
     void expect(char b1, char b2, char b3) {
         if (offset + 3 > size) {
             throw reportError("expect 3 more bytes");
@@ -164,6 +178,11 @@ public class BytesDecoderSource implements DecoderSource {
 
     public void next() {
         offset++;
+    }
+
+    @Override
+    public void skip() {
+        Skip.$(this);
     }
 
     public byte[] borrowTemp(int capacity) {

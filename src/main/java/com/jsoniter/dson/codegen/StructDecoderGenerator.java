@@ -84,6 +84,7 @@ public class StructDecoderGenerator implements Generator {
                     ).__(": "
                     ).__(propCase(g, i, prop));
                 }
+                g.__(new Line("default: source.skip(); "));
             })).__(new Line("}"));
         })).__(new Line("} while ((b = source.read()) == ',');"));
         g.__(new Line("if (b != '}') { throw source.reportError(\"expect }\"); }"));

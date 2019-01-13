@@ -17,6 +17,7 @@ public interface DecoderSource {
     byte read();
     byte peek();
     void next();
+    void skip();
     DsonDecodeException reportError(String errMsg);
     DsonDecodeException reportError(String errMsg, Exception cause);
 }

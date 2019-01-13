@@ -28,4 +28,9 @@ public class EncodeStructTest {
     public void multiple_fields() {
         TestEncode.$();
     }
+
+    @Test
+    public void no_field() {
+        TestEncode.$();
+    }
 }

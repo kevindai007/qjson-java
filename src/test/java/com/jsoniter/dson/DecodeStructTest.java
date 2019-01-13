@@ -18,4 +18,24 @@ public class DecodeStructTest {
     public void fluent_getter_and_fluent_setter() {
         TestDecode.$();
     }
+
+    @Test
+    public void rename_property() {
+        TestDecode.$();
+    }
+
+    @Test
+    public void multiple_fields() {
+        TestDecode.$();
+    }
+
+    @Test
+    public void no_field() {
+        TestDecode.$();
+    }
+
+    @Test
+    public void skip_unknown_field() {
+        TestDecode.$();
+    }
 }

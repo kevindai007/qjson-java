@@ -118,6 +118,7 @@ public class MyClass {
 ```java
 package testdata;
 import com.jsoniter.dson.spi.*;
+import java.util.*;
 public class MyClass {
 
     @DsonProperty("\"")
@@ -126,6 +127,19 @@ public class MyClass {
     public MyClass init(String field) {
         this.field = field;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyClass that = (MyClass) o;
+        return Objects.equals(field, that.field);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field);
     }
 }
 ```
@@ -139,6 +153,7 @@ public class MyClass {
 
 ```java
 package testdata;
+import java.util.*;
 public class MyClass {
 
     public String field1;
@@ -149,9 +164,80 @@ public class MyClass {
         this.field2 = field2;
         return this;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyClass that = (MyClass) o;
+        return Objects.equals(field1, that.field1) &&
+                Objects.equals(field2, that.field2);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field1, field2);
+    }
+
 }
 ```
 
 | value | encoded |
 | ---   | ---     |
 | `new MyClass().init("a","b")` | `{"field1":"a","field2":"b"}` |
+
+# no_field
+
+```java
+package testdata;
+public class MyClass {
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `new MyClass()` | `{}` |
+
+# skip_unknown_field
+
+```java
+package testdata;
+import java.util.*;
+public class MyClass {
+
+    public String field;
+
+    public MyClass init(String field) {
+        this.field = field;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyClass that = (MyClass) o;
+        return Objects.equals(field, that.field);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field);
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `new MyClass().init("hello")` | `{"a":"b","field":"hello"}` |
