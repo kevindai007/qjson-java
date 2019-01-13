@@ -187,12 +187,12 @@ public class DSON {
         sink.encodeObject(val);
     }
 
-    public Any decode(String encoded) {
-        return decode(encoded.getBytes(StandardCharsets.UTF_8));
+    public static Any decode(String encoded) {
+        return $.decode(encoded.getBytes(StandardCharsets.UTF_8));
     }
 
-    public Any decode(byte[] encoded) {
-        return decode(Any.class, encoded);
+    public static Any decode(byte[] encoded) {
+        return $.decode(Any.class, encoded);
     }
 
     public <T> T decode(Class<T> clazz, String encoded) {
