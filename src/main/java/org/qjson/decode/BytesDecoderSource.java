@@ -1,5 +1,6 @@
 package org.qjson.decode;
 
+import org.qjson.encode.BytesBuilder;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
 import org.qjson.spi.QJsonSpi;
@@ -13,6 +14,7 @@ public class BytesDecoderSource implements DecoderSource {
     final byte[] buf;
     int offset;
     final int size;
+    private BytesBuilder temp;
 
     public BytesDecoderSource(Decoder.Provider spi, byte[] buf, int offset, int size) {
         this.spi = spi;
@@ -185,10 +187,16 @@ public class BytesDecoderSource implements DecoderSource {
         Skip.$(this);
     }
 
-    public byte[] borrowTemp(int capacity) {
-        return new byte[capacity];
+    public BytesBuilder borrowTemp(int capacity) {
+        if (temp == null) {
+            return new BytesBuilder(new byte[capacity], 0);
+        }
+        temp.ensureCapacity(capacity);
+        return temp;
     }
 
-    public void releaseTemp(byte[] temp) {
+    public void releaseTemp(BytesBuilder temp) {
+        temp.setLength(0);
+        this.temp = temp;
     }
 }

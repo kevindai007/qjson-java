@@ -14,7 +14,7 @@ interface EncodeString {
         int maxSize = 4 * val.length();
         builder.ensureCapacity(builder.length() + maxSize);
         int offset = builder.length();
-        byte[] buf = builder.getBuffer();
+        byte[] buf = builder.buf();
         ByteBuffer byteBuf = ByteBuffer.wrap(buf, offset, maxSize);
         CoderResult result = StandardCharsets.UTF_8.newEncoder().encode(
                 CharBuffer.wrap(val),

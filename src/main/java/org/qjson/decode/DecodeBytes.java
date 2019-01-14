@@ -23,21 +23,20 @@ interface DecodeBytes {
             throw source.reportError("missing double quote");
         }
         int noEscapeLen = i - source.offset;
-        byte[] temp = source.borrowTemp(noEscapeLen + 16);
-        System.arraycopy(source.buf, source.offset, temp, 0, noEscapeLen);
-        BytesBuilder builder = new BytesBuilder(temp, noEscapeLen);
+        BytesBuilder temp = source.borrowTemp(noEscapeLen + 16);
+        System.arraycopy(source.buf, source.offset, temp.buf(), 0, noEscapeLen);
+        temp.setLength(noEscapeLen);
         source.offset = i;
         while (true) {
-            if (DecodeString.readEscaped(source, builder)) {
+            if (DecodeString.readEscaped(source, temp)) {
                 break;
             }
-            if (DecodeString.readRaw(source, builder)) {
+            if (DecodeString.readRaw(source, temp)) {
                 break;
             }
         }
-        byte[] decoded = new byte[builder.length()];
-        System.arraycopy(builder.getBuffer(), 0, decoded, 0, decoded.length);
-        source.releaseTemp(builder.getBuffer());
+        byte[] decoded = temp.copyOfBytes();
+        source.releaseTemp(temp);
         return decoded;
     }
 }

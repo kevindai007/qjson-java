@@ -1,5 +1,6 @@
 package org.qjson.decode;
 
+import org.qjson.encode.BytesBuilder;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
 
@@ -10,6 +11,7 @@ public class StringDecoderSource implements DecoderSource {
     private final Decoder.Provider spi;
     final String buf;
     int offset;
+    private BytesBuilder temp;
 
     public StringDecoderSource(Decoder.Provider spi, String buf) {
         this.spi = spi;
@@ -38,12 +40,13 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public double decodeDouble() {
-        throw new UnsupportedOperationException("not implemented");
+        long l = DecodeLong.$(this, 'f');
+        return Double.longBitsToDouble(l);
     }
 
     @Override
     public String decodeString() {
-        throw new UnsupportedOperationException("not implemented");
+        return DecodeString.$(this);
     }
 
     @Override
@@ -111,4 +114,29 @@ public class StringDecoderSource implements DecoderSource {
         }
         offset += 3;
     }
+
+    public void expect(char c) {
+        if (offset >= buf.length()) {
+            throw reportError("expect more bytes");
+        }
+        boolean expected = buf.charAt(offset) == c;
+        if (!expected) {
+            throw reportError("expect " + new String(new char[]{c}));
+        }
+        offset++;
+    }
+
+    public BytesBuilder borrowTemp(int capacity) {
+        if (temp == null) {
+            return new BytesBuilder(new byte[capacity], 0);
+        }
+        temp.ensureCapacity(capacity);
+        return temp;
+    }
+
+    public void releaseTemp(BytesBuilder temp) {
+        temp.setLength(0);
+        this.temp = temp;
+    }
+
 }

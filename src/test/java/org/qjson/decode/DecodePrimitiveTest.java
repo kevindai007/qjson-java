@@ -38,9 +38,12 @@ public class DecodePrimitiveTest {
     public void type_double() {
         for (List<String> row : testDataFromMySection().table().body) {
             String expected = stripQuote(row.get(0));
-            String actual = String.valueOf(new BytesDecoderSource(null,
+            String actual1 = String.valueOf(new BytesDecoderSource(null,
                     stripQuote(row.get(1)).getBytes()).decodeStringOrNumber());
-            Assert.assertEquals(row.get(0), expected, actual);
+            String actual2 = String.valueOf(new StringDecoderSource(null,
+                    stripQuote(row.get(1))).decodeStringOrNumber());
+            Assert.assertEquals(row.get(0), expected, actual1);
+            Assert.assertEquals(row.get(0), expected, actual2);
         }
     }
 
@@ -52,9 +55,12 @@ public class DecodePrimitiveTest {
                 char c = (char) Long.parseLong(expected.substring(2), 16);
                 expected = new String(new char[]{c});
             }
-            String actual = new BytesDecoderSource(null,
+            String actual1 = new BytesDecoderSource(null,
                     stripQuote(row.get(1)).getBytes()).decodeString();
-            Assert.assertEquals(row.get(0), expected, actual);
+            String actual2 = new StringDecoderSource(null,
+                    stripQuote(row.get(1))).decodeString();
+            Assert.assertEquals(row.get(0), expected, actual1);
+            Assert.assertEquals(row.get(0), expected, actual2);
         }
     }
 

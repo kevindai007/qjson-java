@@ -8,14 +8,14 @@ interface EncodeBytes {
         int escapePos = shouldEscape(val);
         if (escapePos == -1) {
             builder.ensureCapacity(builder.length() + val.length + 1);
-            System.arraycopy(val, 0, builder.getBuffer(), builder.length(), val.length);
+            System.arraycopy(val, 0, builder.buf(), builder.length(), val.length);
             builder.setLength(builder.length() + val.length);
             builder.append('"');
             return;
         }
         int maxSize = 4 * val.length;
         builder.ensureCapacity(builder.length() + maxSize);
-        System.arraycopy(val, 0, builder.getBuffer(), builder.length(), escapePos);
+        System.arraycopy(val, 0, builder.buf(), builder.length(), escapePos);
         builder.setLength(builder.length() + escapePos);
         escape(val, escapePos, builder);
         builder.append('"');

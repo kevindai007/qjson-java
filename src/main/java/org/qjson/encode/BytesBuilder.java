@@ -201,7 +201,7 @@ public class BytesBuilder {
         buf[len++] = b14;
     }
 
-    public byte[] getBuffer() {
+    public byte[] buf() {
         return buf;
     }
 
