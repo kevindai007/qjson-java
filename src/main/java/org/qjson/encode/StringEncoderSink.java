@@ -31,7 +31,7 @@ public class StringEncoderSink implements EncoderSink {
 
     @Override
     public void encodeLong(long val) {
-        throw new UnsupportedOperationException("not implemented");
+        EncodeLong.$(this, val);
     }
 
     @Override

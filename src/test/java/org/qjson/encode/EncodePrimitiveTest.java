@@ -31,6 +31,11 @@ public class EncodePrimitiveTest {
             stream.encodeLong(Long.valueOf(stripQuote(row.get(0))));
             Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
         }
+        for (List<String> row : testDataFromMySection().table().body) {
+            StringEncoderSink stream = new StringEncoderSink();
+            stream.encodeLong(Long.valueOf(stripQuote(row.get(0))));
+            Assert.assertEquals(row.get(0), stripQuote(row.get(1)), stream.toString());
+        }
     }
 
     @Test

@@ -104,6 +104,84 @@ public class BytesBuilder {
         buf[len++] = b8;
     }
 
+    public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7, byte b8, byte b9) {
+        ensureCapacity(9);
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
+        buf[len++] = b5;
+        buf[len++] = b6;
+        buf[len++] = b7;
+        buf[len++] = b8;
+        buf[len++] = b9;
+    }
+
+    public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7, byte b8, byte b9, byte b10) {
+        ensureCapacity(10);
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
+        buf[len++] = b5;
+        buf[len++] = b6;
+        buf[len++] = b7;
+        buf[len++] = b8;
+        buf[len++] = b9;
+        buf[len++] = b10;
+    }
+
+    public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7,
+                       byte b8, byte b9, byte b10, byte b11) {
+        ensureCapacity(11);
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
+        buf[len++] = b5;
+        buf[len++] = b6;
+        buf[len++] = b7;
+        buf[len++] = b8;
+        buf[len++] = b9;
+        buf[len++] = b10;
+        buf[len++] = b11;
+    }
+
+    public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7,
+                       byte b8, byte b9, byte b10, byte b11, byte b12) {
+        ensureCapacity(12);
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
+        buf[len++] = b5;
+        buf[len++] = b6;
+        buf[len++] = b7;
+        buf[len++] = b8;
+        buf[len++] = b9;
+        buf[len++] = b10;
+        buf[len++] = b11;
+        buf[len++] = b12;
+    }
+
+    public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7,
+                       byte b8, byte b9, byte b10, byte b11, byte b12, byte b13) {
+        ensureCapacity(13);
+        buf[len++] = b1;
+        buf[len++] = b2;
+        buf[len++] = b3;
+        buf[len++] = b4;
+        buf[len++] = b5;
+        buf[len++] = b6;
+        buf[len++] = b7;
+        buf[len++] = b8;
+        buf[len++] = b9;
+        buf[len++] = b10;
+        buf[len++] = b11;
+        buf[len++] = b12;
+        buf[len++] = b13;
+    }
+
     public void append(byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7,
                        byte b8, byte b9, byte b10, byte b11, byte b12, byte b13, byte b14) {
         ensureCapacity(14);
