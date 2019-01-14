@@ -132,20 +132,20 @@ public class QJSON implements QJsonSpi {
     }
 
     public String encode(Object val) {
-        StringEncoderSink sink = new StringEncoderSink(this::encoderOf, new StringBuilder());
+        StringEncoderSink sink = new StringEncoderSink(this, new StringBuilder());
         sink.encodeObject(val);
         return sink.toString();
     }
 
     public String encode(Object val, StringBuilder builder) {
         builder.setLength(0);
-        StringEncoderSink sink = new StringEncoderSink(this::encoderOf, builder);
+        StringEncoderSink sink = new StringEncoderSink(this, builder);
         sink.encodeObject(val);
         return sink.toString();
     }
 
     public void encode(Object val, BytesBuilder bytesBuilder) {
-        BytesEncoderSink sink = new BytesEncoderSink(this::encoderOf, bytesBuilder);
+        BytesEncoderSink sink = new BytesEncoderSink(this, bytesBuilder);
         sink.encodeObject(val);
     }
 

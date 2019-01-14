@@ -8,15 +8,14 @@ import org.qjson.spi.EncoderSink;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 class MapEncoder implements Encoder {
 
     private final Map<Class, Encoder> keyEncoderCache = new ConcurrentHashMap<>();
-    private final Function<Class, Encoder> encoderProvider;
+    private final Encoder.Provider spi;
 
-    MapEncoder(Function<Class, Encoder> encoderProvider) {
-        this.encoderProvider = encoderProvider;
+    MapEncoder(Encoder.Provider spi) {
+        this.spi = spi;
     }
 
     @Override
@@ -52,12 +51,12 @@ class MapEncoder implements Encoder {
     }
 
     private Encoder generateKeyEncoder(Class clazz) {
-        Encoder encoder = encoderProvider.apply(clazz);
+        Encoder encoder = spi.encoderOf(clazz);
         if (MapDecoderGenerator.VALID_KEY_CLASSES.contains(clazz)) {
             return encoder;
         }
         return (sink, val) -> {
-            BytesEncoderSink newSink = new BytesEncoderSink(encoderProvider, new BytesBuilder());
+            BytesEncoderSink newSink = new BytesEncoderSink(spi, new BytesBuilder());
             encoder.encode(newSink, val);
             sink.encodeBytes(newSink.copyOfBytes());
         };

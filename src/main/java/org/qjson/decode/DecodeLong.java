@@ -2,21 +2,44 @@ package org.qjson.decode;
 
 interface DecodeLong {
 
-    static long $(BytesDecoderSource iter) {
-        return DecodeLong.$(iter, 'b');
+    static long $(BytesDecoderSource source) {
+        return DecodeLong.$(source, 'b');
     }
 
-    static long $(BytesDecoderSource iter, char type) {
-        iter.expect('"', '\\', type);
+    static long $(BytesDecoderSource source, char type) {
+        source.expect('"', '\\', type);
         long val = 0;
-        int i = iter.offset;
-        for (; i < iter.size; i++) {
-            if (iter.buf[i] == '"') {
-                iter.offset = i + 1;
+        int i = source.offset;
+        for (; i < source.size; i++) {
+            if (source.buf[i] == '"') {
+                source.offset = i + 1;
                 return val;
             }
-            val = (val << 5) + (iter.buf[i] - ';');
+            val = (val << 5) + (source.buf[i] - ';');
         }
-        throw iter.reportError("missing double quote");
+        throw source.reportError("missing double quote");
+    }
+
+    static long $(StringDecoderSource source) {
+        return DecodeLong.$(source, 'b');
+    }
+
+    static long $(StringDecoderSource source, char type) {
+        source.expect('"', '\\', type);
+        long val = 0;
+        int i = source.offset;
+        for (; i < source.buf.length(); i++) {
+            char c = source.buf.charAt(i);
+            if (c >= 128) {
+                throw source.reportError("expect ascii");
+            }
+            byte b = (byte) c;
+            if (b == '"') {
+                source.offset = i + 1;
+                return val;
+            }
+            val = (val << 5) + (b - ';');
+        }
+        throw source.reportError("missing double quote");
     }
 }

@@ -1,14 +1,13 @@
 package org.qjson;
 
-import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.Encoder;
 
 import java.util.HashMap;
 import java.util.Map;
 
 interface BuiltinEncoders {
-    static Map<Class, Encoder> $(QJsonSpi spi) {
-        return new HashMap<Class, Encoder>(){{
+    static Map<Class, Encoder> $(Encoder.Provider spi) {
+        return new HashMap<Class, Encoder>() {{
             put(boolean.class, (sink, val) -> sink.encodeBoolean((Boolean) val));
             put(Boolean.class, (sink, val) -> {
                 if (val == null) {
@@ -72,7 +71,7 @@ interface BuiltinEncoders {
                 }
                 sink.encodeDouble((Float) val);
             });
-            put(double.class, (sink, val) -> sink.encodeDouble((Double)val));
+            put(double.class, (sink, val) -> sink.encodeDouble((Double) val));
             put(Double.class, (sink, val) -> {
                 if (val == null) {
                     sink.encodeNull();
@@ -99,7 +98,7 @@ interface BuiltinEncoders {
                 }
                 sink.encodeBytes(bytes);
             });
-            put(Map.class, new MapEncoder(spi::encoderOf));
+            put(Map.class, new MapEncoder(spi));
             put(Iterable.class, new IterableEncoder());
         }};
     }

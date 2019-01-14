@@ -3,21 +3,17 @@ package org.qjson.encode;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.EncoderSink;
 
-import java.util.function.Function;
-
 public class StringEncoderSink implements EncoderSink {
 
-    private final Function<Class, Encoder> encoderProvider;
+    private final Encoder.Provider spi;
     private final StringBuilder builder;
 
-    public StringEncoderSink() {
-        this(type -> {
-            throw new QJsonEncodeException("can not encode: " + type);
-        }, new StringBuilder());
+    public StringEncoderSink(Encoder.Provider spi) {
+        this(spi, new StringBuilder());
     }
 
-    public StringEncoderSink(Function<Class, Encoder> encoderProvider, StringBuilder builder) {
-        this.encoderProvider = encoderProvider;
+    public StringEncoderSink(Encoder.Provider spi, StringBuilder builder) {
+        this.spi = spi;
         this.builder = builder;
     }
 
@@ -67,7 +63,7 @@ public class StringEncoderSink implements EncoderSink {
             encodeNull();
             return;
         }
-        Encoder encoder = encoderProvider.apply(val.getClass());
+        Encoder encoder = spi.encoderOf(val.getClass());
         encoder.encode(this, val);
     }
 

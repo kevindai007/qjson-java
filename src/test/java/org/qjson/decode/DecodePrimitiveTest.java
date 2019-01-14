@@ -14,8 +14,10 @@ public class DecodePrimitiveTest {
     public void type_int() {
         for (List<String> row : testDataFromMySection().table().body) {
             int expected = Integer.valueOf(stripQuote(row.get(0)));
-            int actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeInt();
-            Assert.assertEquals(row.get(0), expected, actual);
+            int actual1 = new BytesDecoderSource(null, stripQuote(row.get(1)).getBytes()).decodeInt();
+            int actual2= new StringDecoderSource(null, stripQuote(row.get(1))).decodeInt();
+            Assert.assertEquals(row.get(0), expected, actual1);
+            Assert.assertEquals(row.get(0), expected, actual2);
         }
     }
 
@@ -23,7 +25,8 @@ public class DecodePrimitiveTest {
     public void type_long() {
         for (List<String> row : testDataFromMySection().table().body) {
             long expected = Long.valueOf(stripQuote(row.get(0)));
-            long actual = (Long)new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeStringOrNumber();
+            long actual = (Long)new BytesDecoderSource(null,
+                    stripQuote(row.get(1)).getBytes()).decodeStringOrNumber();
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -32,7 +35,8 @@ public class DecodePrimitiveTest {
     public void type_double() {
         for (List<String> row : testDataFromMySection().table().body) {
             String expected = stripQuote(row.get(0));
-            String actual = String.valueOf(new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeStringOrNumber());
+            String actual = String.valueOf(new BytesDecoderSource(null,
+                    stripQuote(row.get(1)).getBytes()).decodeStringOrNumber());
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -45,7 +49,8 @@ public class DecodePrimitiveTest {
                 char c = (char) Long.parseLong(expected.substring(2), 16);
                 expected = new String(new char[]{c});
             }
-            String actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeString();
+            String actual = new BytesDecoderSource(null,
+                    stripQuote(row.get(1)).getBytes()).decodeString();
             Assert.assertEquals(row.get(0), expected, actual);
         }
     }
@@ -64,7 +69,8 @@ public class DecodePrimitiveTest {
                 String elem = elems[i];
                 expected[i] = (byte) Long.parseLong(elem, 16);
             }
-            byte[] actual = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeBytes();
+            byte[] actual = new BytesDecoderSource(null,
+                    stripQuote(row.get(1)).getBytes()).decodeBytes();
             Assert.assertArrayEquals(row.get(0), expected, actual);
         }
     }

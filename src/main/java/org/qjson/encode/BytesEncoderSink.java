@@ -3,23 +3,19 @@ package org.qjson.encode;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.EncoderSink;
 
-import java.util.function.Function;
-
 public final class BytesEncoderSink implements EncoderSink {
 
-    private final Function<Class, Encoder> encoderProvider;
+    private final Encoder.Provider spi;
     private final BytesBuilder builder;
     private byte[] temp;
 
-    public BytesEncoderSink(Function<Class, Encoder> encoderProvider, BytesBuilder builder) {
-        this.encoderProvider = encoderProvider;
+    public BytesEncoderSink(Encoder.Provider spi, BytesBuilder builder) {
+        this.spi = spi;
         this.builder = builder;
     }
 
-    public BytesEncoderSink() {
-        this(type -> {
-            throw new QJsonEncodeException("can not encode: " + type);
-        }, new BytesBuilder());
+    public BytesEncoderSink(Encoder.Provider spi) {
+        this(spi, new BytesBuilder());
     }
 
     @Override
@@ -54,7 +50,7 @@ public final class BytesEncoderSink implements EncoderSink {
             encodeNull();
             return;
         }
-        Encoder encoder = encoderProvider.apply(val.getClass());
+        Encoder encoder = spi.encoderOf(val.getClass());
         encoder.encode(this, val);
     }
 

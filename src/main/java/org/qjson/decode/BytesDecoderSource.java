@@ -2,31 +2,31 @@ package org.qjson.decode;
 
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
+import org.qjson.spi.QJsonSpi;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Function;
 
 public class BytesDecoderSource implements DecoderSource {
 
-    private final Function<Type, Decoder> decoderProvider;
+    private final Decoder.Provider spi;
     final byte[] buf;
     int offset;
     final int size;
 
-    public BytesDecoderSource(Function<Type, Decoder> decoderProvider, byte[] buf, int offset, int size) {
-        this.decoderProvider = decoderProvider;
+    public BytesDecoderSource(Decoder.Provider spi, byte[] buf, int offset, int size) {
+        this.spi = spi;
         this.buf = buf;
         this.offset = offset;
         this.size = size;
     }
 
-    public BytesDecoderSource(String buf) {
-        this(buf.getBytes(StandardCharsets.UTF_8));
+    public BytesDecoderSource(QJsonSpi spi, String buf) {
+        this(spi, buf.getBytes(StandardCharsets.UTF_8));
     }
 
-    public BytesDecoderSource(byte[] buf) {
-        this(type -> null, buf, 0, buf.length);
+    public BytesDecoderSource(QJsonSpi spi, byte[] buf) {
+        this(spi, buf, 0, buf.length);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class BytesDecoderSource implements DecoderSource {
         if (decodeNull()) {
             return null;
         }
-        return decoderProvider.apply(type).decode(this);
+        return spi.decoderOf(type).decode(this);
     }
 
     @Override
