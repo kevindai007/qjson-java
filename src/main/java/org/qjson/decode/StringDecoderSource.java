@@ -33,7 +33,7 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public long decodeLong() {
-        throw new UnsupportedOperationException("not implemented");
+        return DecodeLong.$(this);
     }
 
     @Override
@@ -48,7 +48,17 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public Object decodeStringOrNumber() {
-        throw new UnsupportedOperationException("not implemented");
+        if (offset + 2 < buf.length() && buf.charAt(offset + 1) == '\\') {
+            char type = buf.charAt(offset + 2);
+            if (type == 'b') {
+                return decodeLong();
+            } else if (type == 'f') {
+                return decodeDouble();
+            } else {
+                throw reportError("expect \\b or \\f");
+            }
+        }
+        return decodeString();
     }
 
     @Override

@@ -25,9 +25,12 @@ public class DecodePrimitiveTest {
     public void type_long() {
         for (List<String> row : testDataFromMySection().table().body) {
             long expected = Long.valueOf(stripQuote(row.get(0)));
-            long actual = (Long)new BytesDecoderSource(null,
+            long actual1 = (Long)new BytesDecoderSource(null,
                     stripQuote(row.get(1)).getBytes()).decodeStringOrNumber();
-            Assert.assertEquals(row.get(0), expected, actual);
+            long actual2 = (Long)new StringDecoderSource(null,
+                    stripQuote(row.get(1))).decodeStringOrNumber();
+            Assert.assertEquals(row.get(0), expected, actual1);
+            Assert.assertEquals(row.get(0), expected, actual2);
         }
     }
 
