@@ -5,8 +5,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static com.dexscript.test.framework.TestFramework.stripQuote;
-import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
+import static org.qjson.test.md.TestFramework.stripQuote;
+import static org.qjson.test.md.TestFramework.testDataFromMySection;
 
 public class EncodePrimitiveTest {
 

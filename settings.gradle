@@ -1,1 +1,1 @@
-includeBuild '../../dexscript'
+includeBuild '../test.md/java/test.md'

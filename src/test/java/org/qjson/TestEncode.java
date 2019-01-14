@@ -1,8 +1,8 @@
 package org.qjson;
 
-import com.dexscript.test.framework.FluentAPI;
-import com.dexscript.test.framework.Row;
-import com.dexscript.test.framework.Table;
+import org.qjson.test.md.FluentAPI;
+import org.qjson.test.md.Row;
+import org.qjson.test.md.Table;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
@@ -10,8 +10,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dexscript.test.framework.TestFramework.stripQuote;
-import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
+import static org.qjson.test.md.TestFramework.stripQuote;
+import static org.qjson.test.md.TestFramework.testDataFromMySection;
 
 public interface TestEncode {
     static void $() {

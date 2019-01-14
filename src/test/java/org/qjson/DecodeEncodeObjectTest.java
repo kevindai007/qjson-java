@@ -1,10 +1,10 @@
 package org.qjson;
 
-import com.dexscript.test.framework.FluentAPI;
+import org.qjson.test.md.FluentAPI;
 import org.junit.Test;
 
-import static com.dexscript.test.framework.TestFramework.stripQuote;
-import static com.dexscript.test.framework.TestFramework.testDataFromMySection;
+import static org.qjson.test.md.TestFramework.stripQuote;
+import static org.qjson.test.md.TestFramework.testDataFromMySection;
 
 public class DecodeEncodeObjectTest {
 

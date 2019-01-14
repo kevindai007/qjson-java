@@ -1,9 +1,9 @@
 package org.qjson.decode;
 
-import com.dexscript.test.framework.TestFramework;
+import org.qjson.test.md.TestFramework;
 import org.junit.Test;
 
-import static com.dexscript.test.framework.TestFramework.stripQuote;
+import static org.qjson.test.md.TestFramework.stripQuote;
 
 public class SkipTest {
 
