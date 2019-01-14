@@ -20,12 +20,28 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public boolean decodeNull() {
-        throw new UnsupportedOperationException("not implemented");
+        if (offset + 4 > buf.length()) {
+            return false;
+        }
+        boolean isNull = buf.charAt(offset) == 'n' && buf.charAt(offset + 1) == 'u' && buf.charAt(offset + 2) == 'l' && buf.charAt(offset + 3) == 'l';
+        if (isNull) {
+            offset += 4;
+        }
+        return isNull;
     }
 
     @Override
     public boolean decodeBoolean() {
-        throw new UnsupportedOperationException("not implemented");
+        if (offset + 4 > buf.length()) {
+            throw reportError("expect true or false");
+        }
+        boolean isTrue = buf.charAt(offset) == 't' && buf.charAt(offset + 1) == 'r' && buf.charAt(offset + 2) == 'u' && buf.charAt(offset + 3) == 'e';
+        if (isTrue) {
+            offset += 4;
+            return true;
+        }
+        expect('f', 'a', 'l', 's', 'e');
+        return false;
     }
 
     @Override
@@ -76,22 +92,31 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public byte read() {
-        throw new UnsupportedOperationException("not implemented");
+        char c = buf.charAt(offset);
+        if (c < 128) {
+            offset++;
+            return (byte) c;
+        }
+        throw reportError("expect ascii");
     }
 
     @Override
     public byte peek() {
-        throw new UnsupportedOperationException("not implemented");
+        char c = buf.charAt(offset);
+        if (c < 128) {
+            return (byte) c;
+        }
+        throw reportError("expect ascii");
     }
 
     @Override
     public void next() {
-        throw new UnsupportedOperationException("not implemented");
+        offset++;
     }
 
     @Override
     public void skip() {
-        throw new UnsupportedOperationException("not implemented");
+        Skip.$(this);
     }
 
     @Override
@@ -102,6 +127,35 @@ public class StringDecoderSource implements DecoderSource {
     @Override
     public QJsonDecodeException reportError(String errMsg, Exception cause) {
         throw new UnsupportedOperationException("not implemented");
+    }
+
+    void expect(char c1, char c2, char c3, char c4, char c5) {
+        if (offset + 5 > buf.length()) {
+            throw reportError("expect 5 more bytes");
+        }
+        boolean expected = buf.charAt(offset) == c1
+                && buf.charAt(offset + 1) == c2
+                && buf.charAt(offset + 2) == c3
+                && buf.charAt(offset + 3) == c4
+                && buf.charAt(offset + 4) == c5;
+        if (!expected) {
+            throw reportError("expect " + new String(new char[]{c1, c2, c3, c4, c5}));
+        }
+        offset += 5;
+    }
+
+    void expect(char c1, char c2, char c3, char c4) {
+        if (offset + 4 > buf.length()) {
+            throw reportError("expect 4 more bytes");
+        }
+        boolean expected = buf.charAt(offset) == c1
+                && buf.charAt(offset + 1) == c2
+                && buf.charAt(offset + 2) == c3
+                && buf.charAt(offset + 3) == c4;
+        if (!expected) {
+            throw reportError("expect " + new String(new char[]{c1, c2, c3, c4}));
+        }
+        offset += 4;
     }
 
     void expect(char c1, char c2, char c3) {
@@ -115,7 +169,7 @@ public class StringDecoderSource implements DecoderSource {
         offset += 3;
     }
 
-    public void expect(char c) {
+    void expect(char c) {
         if (offset >= buf.length()) {
             throw reportError("expect more bytes");
         }
@@ -138,5 +192,4 @@ public class StringDecoderSource implements DecoderSource {
         temp.setLength(0);
         this.temp = temp;
     }
-
 }

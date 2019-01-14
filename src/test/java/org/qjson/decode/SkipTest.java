@@ -14,5 +14,10 @@ public class SkipTest {
             source.skip();
             return source.decodeBoolean();
         });
+        TestFramework.assertTrue(code -> {
+            StringDecoderSource source = new StringDecoderSource(null, stripQuote(code) + "true");
+            source.skip();
+            return source.decodeBoolean();
+        });
     }
 }
