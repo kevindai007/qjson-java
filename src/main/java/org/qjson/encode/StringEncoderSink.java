@@ -42,7 +42,7 @@ public class StringEncoderSink implements EncoderSink {
 
     @Override
     public void encodeString(String val) {
-        throw new UnsupportedOperationException("not implemented");
+        EncodeString.$(this, val);
     }
 
     @Override

@@ -35,7 +35,7 @@ interface DecodeBytes {
                 break;
             }
         }
-        byte[] decoded = new byte[builder.getLength()];
+        byte[] decoded = new byte[builder.length()];
         System.arraycopy(builder.getBuffer(), 0, decoded, 0, decoded.length);
         iter.releaseTemp(builder.getBuffer());
         return decoded;

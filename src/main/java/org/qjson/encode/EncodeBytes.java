@@ -7,16 +7,16 @@ interface EncodeBytes {
         builder.append('"');
         int escapePos = shouldEscape(val);
         if (escapePos == -1) {
-            builder.ensureCapacity(val.length + 1);
-            System.arraycopy(val, 0, builder.getBuffer(), builder.getLength(), val.length);
-            builder.setLength(builder.getLength() + val.length);
+            builder.ensureCapacity(builder.length() + val.length + 1);
+            System.arraycopy(val, 0, builder.getBuffer(), builder.length(), val.length);
+            builder.setLength(builder.length() + val.length);
             builder.append('"');
             return;
         }
         int maxSize = 4 * val.length;
-        builder.ensureCapacity(maxSize);
-        System.arraycopy(val, 0, builder.getBuffer(), builder.getLength(), escapePos);
-        builder.setLength(builder.getLength() + escapePos);
+        builder.ensureCapacity(builder.length() + maxSize);
+        System.arraycopy(val, 0, builder.getBuffer(), builder.length(), escapePos);
+        builder.setLength(builder.length() + escapePos);
         escape(val, escapePos, builder);
         builder.append('"');
     }

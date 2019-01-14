@@ -10,9 +10,10 @@ interface EncodeString {
     static void $(BytesEncoderSink sink, String val) {
         BytesBuilder builder = sink.bytesBuilder();
         builder.append('"');
-        int maxSize = 8 * val.length();
-        builder.ensureCapacity(maxSize);
-        int offset = builder.getLength();
+        // one char translated to 4 bytes "\/AA" in worst case
+        int maxSize = 4 * val.length();
+        builder.ensureCapacity(builder.length() + maxSize);
+        int offset = builder.length();
         byte[] buf = builder.getBuffer();
         ByteBuffer byteBuf = ByteBuffer.wrap(buf, offset, maxSize);
         CoderResult result = StandardCharsets.UTF_8.newEncoder().encode(
@@ -46,6 +47,24 @@ interface EncodeString {
             }
         }
         sink.releaseTemp(temp);
+        builder.append('"');
+    }
+
+    static void $(StringEncoderSink sink, String val) {
+        StringBuilder builder = sink.stringBuilder();
+        builder.append('"');
+        // one char translated to 4 chars "\/AA" in worst case
+        int maxSize = 4 * val.length();
+        builder.ensureCapacity(builder.length() + maxSize);
+        for (int i = 0; i < val.length(); i++) {
+            char c = val.charAt(i);
+            boolean isControlCharacter = c < 0x20;
+            if (isControlCharacter || c == '\\' || c == '/' || c == '"') {
+                Append.escape(builder, (byte) c);
+            } else {
+                builder.append(c);
+            }
+        }
         builder.append('"');
     }
 
