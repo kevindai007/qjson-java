@@ -66,7 +66,7 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public byte[] decodeBytes() {
-        throw new UnsupportedOperationException("not implemented");
+        return DecodeBytes.$(this);
     }
 
     @Override

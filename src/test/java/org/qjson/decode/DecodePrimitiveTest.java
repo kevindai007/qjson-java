@@ -78,9 +78,12 @@ public class DecodePrimitiveTest {
                 String elem = elems[i];
                 expected[i] = (byte) Long.parseLong(elem, 16);
             }
-            byte[] actual = new BytesDecoderSource(null,
+            byte[] actual1 = new BytesDecoderSource(null,
                     stripQuote(row.get(1)).getBytes()).decodeBytes();
-            Assert.assertArrayEquals(row.get(0), expected, actual);
+            byte[] actual2 = new StringDecoderSource(null,
+                    stripQuote(row.get(1))).decodeBytes();
+            Assert.assertArrayEquals(row.get(0), expected, actual1);
+            Assert.assertArrayEquals(row.get(0), expected, actual2);
         }
     }
 }

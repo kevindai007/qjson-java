@@ -2,6 +2,9 @@ package org.qjson.decode;
 
 import org.qjson.encode.BytesBuilder;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 
 interface DecodeString {
@@ -97,6 +100,30 @@ interface DecodeString {
         throw source.reportError("missing double quote");
     }
 
+    static boolean readEscaped(StringDecoderSource source, BytesBuilder builder) {
+        for (int i = source.offset; i < source.buf.length(); ) {
+            char c = source.buf.charAt(i);
+            if (c == '"') {
+                source.offset = i + 1;
+                return true;
+            }
+            if (c != '\\') {
+                source.offset = i;
+                return false;
+            }
+            if (i + 4 >= source.buf.length()) {
+                throw source.reportError("missing double quote");
+            }
+            if (source.buf.charAt(i + 1) != '/') {
+                throw source.reportError("escape \\/ is the only supported escape form");
+            }
+            byte b = (byte) (((source.buf.charAt(i + 2) - 'A') << 4) + source.buf.charAt(i + 3) - 'A');
+            builder.append(b);
+            i += 4;
+        }
+        throw source.reportError("missing double quote");
+    }
+
     static boolean readEscaped(StringDecoderSource source, StringBuilder builder, BytesBuilder temp) {
         temp.setLength(0);
         for (int i = source.offset; i < source.buf.length(); ) {
@@ -154,5 +181,39 @@ interface DecodeString {
             builder.append(c);
         }
         throw source.reportError("missing double quote");
+    }
+
+    static boolean readRaw(StringDecoderSource source, BytesBuilder builder) {
+        int start = source.offset;
+        for (int i = source.offset; i < source.buf.length(); i++) {
+            char c = source.buf.charAt(i);
+            if (c == '"') {
+                appendUTF8(source, builder, source.buf, start, i);
+                source.offset = i + 1;
+                return true;
+            }
+            if (c == '\\') {
+                appendUTF8(source, builder, source.buf, start, i);
+                source.offset = i;
+                return false;
+            }
+        }
+        throw source.reportError("missing double quote");
+    }
+
+    static void appendUTF8(StringDecoderSource source, BytesBuilder builder, String buf, int offset, int end) {
+        CharBuffer charBuffer = CharBuffer.wrap(buf, offset, end);
+        int maxLength = 3 * (end - offset);
+        builder.ensureCapacity(builder.length() + maxLength);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(builder.buf(), builder.length(), maxLength);
+        CoderResult result = StandardCharsets.UTF_8.newEncoder().encode(charBuffer, byteBuffer, true);
+        if (result.isError()) {
+            try {
+                result.throwException();
+            } catch (Exception e) {
+                throw source.reportError("encode string to utf8 failed", e);
+            }
+        }
+        builder.setLength(byteBuffer.position());
     }
 }
