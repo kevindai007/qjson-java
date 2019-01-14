@@ -7,18 +7,18 @@ public class BytesEncoderSinkTest {
 
     @Test
     public void encode_boolean() {
-        BytesEncoderSink stream = new BytesEncoderSink();
-        stream.encodeBoolean(true);
-        Assert.assertEquals("true", stream.toString());
-        stream = new BytesEncoderSink();
-        stream.encodeBoolean(false);
-        Assert.assertEquals("false", stream.toString());
+        BytesEncoderSink sink = new BytesEncoderSink();
+        sink.encodeBoolean(true);
+        Assert.assertEquals("true", sink.toString());
+        sink = new BytesEncoderSink();
+        sink.encodeBoolean(false);
+        Assert.assertEquals("false", sink.toString());
     }
 
     @Test
     public void encode_null() {
-        BytesEncoderSink stream = new BytesEncoderSink();
-        stream.encodeNull();
-        Assert.assertEquals("null", stream.toString());
+        BytesEncoderSink sink = new BytesEncoderSink();
+        sink.encodeNull();
+        Assert.assertEquals("null", sink.toString());
     }
 }

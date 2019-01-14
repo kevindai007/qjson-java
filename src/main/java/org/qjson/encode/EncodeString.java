@@ -7,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 
 interface EncodeString {
 
-    static void $(BytesEncoderSink stream, String val) {
-        BytesBuilder builder = stream.bytesBuilder();
+    static void $(BytesEncoderSink sink, String val) {
+        BytesBuilder builder = sink.bytesBuilder();
         builder.append('"');
         int maxSize = 8 * val.length();
         builder.ensureCapacity(maxSize);
@@ -22,7 +22,7 @@ interface EncodeString {
             try {
                 result.throwException();
             } catch (Exception e) {
-                throw stream.reportError("encode string to utf8 failed", e);
+                throw sink.reportError("encode string to utf8 failed", e);
             }
         }
         int end = byteBuf.position();
@@ -34,7 +34,7 @@ interface EncodeString {
         }
         builder.setLength(escapePos);
         int toEscapeLen = end - escapePos;
-        byte[] temp = stream.borrowTemp(toEscapeLen);
+        byte[] temp = sink.borrowTemp(toEscapeLen);
         System.arraycopy(buf, escapePos, temp, 0, toEscapeLen);
         for (int i = 0; i < toEscapeLen; i++) {
             byte b = temp[i];
@@ -45,7 +45,7 @@ interface EncodeString {
                 builder.append(b);
             }
         }
-        stream.releaseTemp(temp);
+        sink.releaseTemp(temp);
         builder.append('"');
     }
 

@@ -7,17 +7,17 @@ public class BytesDecoderSourceTest {
 
     @Test
     public void decode_boolean() {
-        BytesDecoderSource iter = new BytesDecoderSource("true");
-        Assert.assertTrue(iter.decodeBoolean());
-        iter = new BytesDecoderSource("false");
-        Assert.assertFalse(iter.decodeBoolean());
+        BytesDecoderSource source = new BytesDecoderSource("true");
+        Assert.assertTrue(source.decodeBoolean());
+        source = new BytesDecoderSource("false");
+        Assert.assertFalse(source.decodeBoolean());
     }
 
     @Test
     public void decode_null() {
-        BytesDecoderSource iter = new BytesDecoderSource("\"\"");
-        Assert.assertFalse(iter.decodeNull());
-        iter = new BytesDecoderSource("null");
-        Assert.assertTrue(iter.decodeNull());
+        BytesDecoderSource source = new BytesDecoderSource("\"\"");
+        Assert.assertFalse(source.decodeNull());
+        source = new BytesDecoderSource("null");
+        Assert.assertTrue(source.decodeNull());
     }
 }

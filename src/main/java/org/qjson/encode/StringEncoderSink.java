@@ -36,7 +36,8 @@ public class StringEncoderSink implements EncoderSink {
 
     @Override
     public void encodeDouble(double val) {
-        throw new UnsupportedOperationException("not implemented");
+        long l = Double.doubleToRawLongBits(val);
+        EncodeLong.$(this, 'f', l);
     }
 
     @Override

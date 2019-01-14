@@ -2,8 +2,8 @@ package org.qjson.encode;
 
 interface EncodeBytes {
 
-    static void $(BytesEncoderSink stream, byte[] val) {
-        BytesBuilder builder = stream.bytesBuilder();
+    static void $(BytesEncoderSink sink, byte[] val) {
+        BytesBuilder builder = sink.bytesBuilder();
         builder.append('"');
         int escapePos = shouldEscape(val);
         if (escapePos == -1) {
