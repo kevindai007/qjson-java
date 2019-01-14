@@ -8,6 +8,7 @@ import org.qjson.decode.BytesDecoderSource;
 import org.qjson.decode.QJsonDecodeException;
 import org.qjson.encode.BytesBuilder;
 import org.qjson.encode.BytesEncoderSink;
+import org.qjson.encode.StringEncoderSink;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.Encoder;
@@ -131,22 +132,21 @@ public class QJSON implements QJsonSpi {
     }
 
     public String encode(Object val) {
-        BytesBuilder builder = new BytesBuilder();
-        encode(val, builder);
-        return builder.toString();
+        StringEncoderSink sink = new StringEncoderSink(this::encoderOf, new StringBuilder());
+        sink.encodeObject(val);
+        return sink.toString();
+    }
+
+    public String encode(Object val, StringBuilder builder) {
+        builder.setLength(0);
+        StringEncoderSink sink = new StringEncoderSink(this::encoderOf, builder);
+        sink.encodeObject(val);
+        return sink.toString();
     }
 
     public void encode(Object val, BytesBuilder bytesBuilder) {
         BytesEncoderSink sink = new BytesEncoderSink(this::encoderOf, bytesBuilder);
         sink.encodeObject(val);
-    }
-
-    public Any decode(String encoded) {
-        return decode(encoded.getBytes(StandardCharsets.UTF_8));
-    }
-
-    public Any decode(byte[] encoded) {
-        return decode(Any.class, encoded);
     }
 
     public <T> T decode(Class<T> clazz, String encoded) {
@@ -168,5 +168,19 @@ public class QJSON implements QJsonSpi {
     private Object decode(Type type, byte[] encoded, int offset, int size) {
         BytesDecoderSource source = new BytesDecoderSource(this::decoderOf, encoded, offset, size);
         return source.decodeObject(type);
+    }
+
+    // === static api ===
+
+    public static Any parse(String encoded) {
+        return $.decode(Any.class, encoded);
+    }
+
+    public static Any parse(byte[] encoded) {
+        return $.decode(Any.class, encoded);
+    }
+
+    public static String stringify(Object val) {
+        return $.encode(val);
     }
 }

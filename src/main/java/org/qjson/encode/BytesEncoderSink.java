@@ -9,6 +9,7 @@ public final class BytesEncoderSink implements EncoderSink {
 
     private final Function<Class, Encoder> encoderProvider;
     private final BytesBuilder builder;
+    private byte[] temp;
 
     public BytesEncoderSink(Function<Class, Encoder> encoderProvider, BytesBuilder builder) {
         this.encoderProvider = encoderProvider;
@@ -16,7 +17,9 @@ public final class BytesEncoderSink implements EncoderSink {
     }
 
     public BytesEncoderSink() {
-        this(type -> null, new BytesBuilder());
+        this(type -> {
+            throw new QJsonEncodeException("can not encode: " + type);
+        }, new BytesBuilder());
     }
 
     @Override
@@ -93,10 +96,16 @@ public final class BytesEncoderSink implements EncoderSink {
     }
 
     public byte[] borrowTemp(int capacity) {
-        return new byte[capacity];
+        if (temp == null || temp.length < capacity) {
+            return new byte[capacity];
+        }
+        byte[] borrowed = this.temp;
+        this.temp = null;
+        return borrowed;
     }
 
     public void releaseTemp(byte[] temp) {
+        this.temp = temp;
     }
 
     public byte[] copyOfBytes() {
