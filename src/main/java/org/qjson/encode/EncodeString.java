@@ -50,24 +50,6 @@ interface EncodeString {
         builder.append('"');
     }
 
-    static void $(StringEncoderSink sink, String val) {
-        StringBuilder builder = sink.stringBuilder();
-        builder.append('"');
-        // one char translated to 4 chars "\/AA" in worst case
-        int maxSize = 4 * val.length();
-        builder.ensureCapacity(builder.length() + maxSize);
-        for (int i = 0; i < val.length(); i++) {
-            char c = val.charAt(i);
-            boolean isControlCharacter = c < 0x20;
-            if (isControlCharacter || c == '\\' || c == '/' || c == '"') {
-                Append.escape(builder, (byte) c);
-            } else {
-                builder.append(c);
-            }
-        }
-        builder.append('"');
-    }
-
     static int shouldEscape(byte[] buf, int offset, int end) {
         for (int i = offset; i < end; i++) {
             byte b = buf[i];
@@ -79,5 +61,20 @@ interface EncodeString {
             // we can assume it is valid unicode
         }
         return -1;
+    }
+
+    static void $(StringEncoderSink sink, String val) {
+        StringBuilder builder = sink.stringBuilder();
+        builder.append('"');
+        for (int i = 0; i < val.length(); i++) {
+            char c = val.charAt(i);
+            boolean isControlCharacter = c < 0x20;
+            if (isControlCharacter || c == '\\' || c == '/' || c == '"') {
+                Append.escape(builder, (byte) c);
+            } else {
+                builder.append(c);
+            }
+        }
+        builder.append('"');
     }
 }

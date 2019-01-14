@@ -47,7 +47,7 @@ public class StringEncoderSink implements EncoderSink {
 
     @Override
     public void encodeBytes(byte[] val) {
-        throw new UnsupportedOperationException("not implemented");
+        EncodeBytes.$(this, val);
     }
 
     @Override

@@ -150,4 +150,66 @@ interface EncodeBytes {
     static boolean isInvalidByte(byte b) {
         return (b & 0b11000000) != 0b10000000;
     }
+
+    static void $(StringEncoderSink sink, byte[] val) {
+        StringBuilder builder = sink.stringBuilder();
+        builder.append('"');
+        for (int i = 0; i < val.length; ) {
+            byte b = val[i];
+            boolean isControlCharacter = 0 <= b && b < 0x20;
+            if (isControlCharacter || b == '\\' || b == '/' || b == '"') {
+                Append.escape(builder, b);
+                i++;
+                continue;
+            }
+            // the byte[] might not be valid unicode
+            if ((b & 0b10000000) == 0b00000000) {
+                builder.append((char)b);
+                i++;
+                continue;
+            } else if ((b & 0b11100000) == 0b11000000) {
+                if (i + 1 >= val.length) {
+                    Append.escape(builder, val, i);
+                    return;
+                }
+                byte b2 = val[i + 1];
+                if (isInvalidByte(b2)) {
+                    Append.escape(builder, b);
+                    Append.escape(builder, b2);
+                } else {
+                    char c =  (char)(((b & 0x1f) << 6) | (b2 & 0x3f));
+                    builder.append(c);
+                }
+                i += 2;
+                continue;
+            } else if ((b & 0b11110000) == 0b11100000) {
+                if (i + 2 >= val.length) {
+                    Append.escape(builder, val, i);
+                    return;
+                }
+                // low surrogate: 0xED 0x9F 0xBF
+                // high surrogate: 0xEE 0x80 0x80
+                boolean isSurrogate = ((byte) 0xED) <= b && b <= ((byte) 0xEF);
+                byte b2  = val[i + 1];
+                byte b3  = val[i + 2];
+                if (isSurrogate || isInvalidByte(b2) || isInvalidByte(b3)) {
+                    Append.escape(builder, b);
+                    Append.escape(builder, b2);
+                    Append.escape(builder, b3);
+                } else {
+                    char c = (char)(((b & 0x0f) << 12)
+                     | ((b2 & 0x3f) << 6)
+                     | (b3 & 0x3f));
+                    builder.append(c);
+                }
+                i += 3;
+                continue;
+            }
+            // convert utf8 bytes to char is best effort only
+            // if not easily convertible, we fallback to escape
+            Append.escape(builder, b);
+            i++;
+        }
+        builder.append('"');
+    }
 }

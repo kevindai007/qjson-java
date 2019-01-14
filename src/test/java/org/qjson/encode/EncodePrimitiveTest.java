@@ -57,10 +57,10 @@ public class EncodePrimitiveTest {
                 char c = (char) Long.parseLong(input.substring(2), 16);
                 input = new String(new char[]{c});
             }
-            StringEncoderSink sink2 = new StringEncoderSink();
-            sink2.encodeString(input);
             BytesEncoderSink sink1 = new BytesEncoderSink();
             sink1.encodeString(input);
+            StringEncoderSink sink2 = new StringEncoderSink();
+            sink2.encodeString(input);
             Assert.assertEquals(row.get(0), stripQuote(row.get(1)), sink1.toString());
             Assert.assertEquals(row.get(0), stripQuote(row.get(1)), sink2.toString());
         }
@@ -82,7 +82,10 @@ public class EncodePrimitiveTest {
             }
             BytesEncoderSink sink1 = new BytesEncoderSink();
             sink1.encodeBytes(bytes);
+            StringEncoderSink sink2 = new StringEncoderSink();
+            sink2.encodeBytes(bytes);
             Assert.assertEquals(row.get(0), stripQuote(row.get(1)), sink1.toString());
+            Assert.assertEquals(row.get(0), stripQuote(row.get(1)), sink2.toString());
         }
     }
 }
