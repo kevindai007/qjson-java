@@ -10,6 +10,12 @@ interface EncodeString {
     static void $(BytesEncoderSink sink, String val) {
         BytesBuilder builder = sink.bytesBuilder();
         builder.append('"');
+        EncodeString.body(sink, val);
+        builder.append('"');
+    }
+
+    static void body(BytesEncoderSink sink, String val) {
+        BytesBuilder builder = sink.bytesBuilder();
         // one char translated to 4 bytes "\/AA" in worst case
         int maxSize = 4 * val.length();
         builder.ensureCapacity(builder.length() + maxSize);
@@ -30,12 +36,14 @@ interface EncodeString {
         int escapePos = shouldEscape(buf, offset, end);
         if (escapePos == -1) {
             builder.setLength(end);
-            builder.append('"');
             return;
         }
         builder.setLength(escapePos);
         int toEscapeLen = end - escapePos;
-        byte[] temp = sink.borrowTemp(toEscapeLen);
+        byte[] temp = sink.borrowTemp(byte[].class);
+        if (temp == null || temp.length < toEscapeLen) {
+            temp = new byte[toEscapeLen];
+        }
         System.arraycopy(buf, escapePos, temp, 0, toEscapeLen);
         for (int i = 0; i < toEscapeLen; i++) {
             byte b = temp[i];
@@ -47,7 +55,6 @@ interface EncodeString {
             }
         }
         sink.releaseTemp(temp);
-        builder.append('"');
     }
 
     static int shouldEscape(byte[] buf, int offset, int end) {
@@ -66,6 +73,12 @@ interface EncodeString {
     static void $(StringEncoderSink sink, String val) {
         StringBuilder builder = sink.stringBuilder();
         builder.append('"');
+        EncodeString.body(sink, val);
+        builder.append('"');
+    }
+
+    static void body(StringEncoderSink sink, String val) {
+        StringBuilder builder = sink.stringBuilder();
         for (int i = 0; i < val.length(); i++) {
             char c = val.charAt(i);
             boolean isControlCharacter = c < 0x20;
@@ -75,6 +88,5 @@ interface EncodeString {
                 builder.append(c);
             }
         }
-        builder.append('"');
     }
 }

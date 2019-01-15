@@ -5,15 +5,14 @@ import org.qjson.spi.EncoderSink;
 
 public class StringEncoderSink implements EncoderSink {
 
-    private final Encoder.Provider spi;
+    private final PathTracker pathTracker = new PathTracker(this);
     private final StringBuilder builder;
 
-    public StringEncoderSink(Encoder.Provider spi) {
-        this(spi, new StringBuilder());
+    public StringEncoderSink() {
+        this(new StringBuilder());
     }
 
-    public StringEncoderSink(Encoder.Provider spi, StringBuilder builder) {
-        this.spi = spi;
+    public StringEncoderSink(StringBuilder builder) {
         this.builder = builder;
     }
 
@@ -58,13 +57,30 @@ public class StringEncoderSink implements EncoderSink {
     }
 
     @Override
-    public void encodeObject(Object val) {
-        if (val == null) {
-            encodeNull();
-            return;
-        }
-        Encoder encoder = spi.encoderOf(val.getClass());
-        encoder.encode(this, val);
+    public void encodeObject(Object val, Encoder encoder) {
+        pathTracker.encodeObject(val, encoder);
+    }
+
+    @Override
+    public void encodeObject(Object val, Encoder.Provider spi) {
+        pathTracker.encodeObject(val, spi);
+    }
+
+    @Override
+    public CurrentPath currentPath() {
+        return pathTracker.currentPath();
+    }
+
+    @Override
+    public void encodeRef(String ref) {
+        builder.append("\"\\\\");
+        EncodeString.body(this, ref);
+        builder.append('"');
+    }
+
+    @Override
+    public void write(String raw) {
+        builder.append(raw);
     }
 
     @Override
@@ -82,6 +98,16 @@ public class StringEncoderSink implements EncoderSink {
         throw new QJsonEncodeException(errMsg, cause);
     }
 
+    @Override
+    public <T> T borrowTemp(Class<T> clazz) {
+        return null;
+    }
+
+    @Override
+    public void releaseTemp(Object temp) {
+
+    }
+
     public StringBuilder stringBuilder() {
         return builder;
     }
@@ -89,5 +115,10 @@ public class StringEncoderSink implements EncoderSink {
     @Override
     public String toString() {
         return builder.toString();
+    }
+
+    public void reset() {
+        pathTracker.reset();
+        builder.setLength(0);
     }
 }

@@ -1,9 +1,17 @@
 package org.qjson;
 
+import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.EncoderSink;
 
 class IterableEncoder implements Encoder {
+
+    private final Encoder.Provider spi;
+
+    IterableEncoder(Provider spi) {
+        this.spi = spi;
+    }
+
     @Override
     public void encode(EncoderSink sink, Object val) {
         if (val == null) {
@@ -12,14 +20,16 @@ class IterableEncoder implements Encoder {
         }
         Iterable iterable = (Iterable) val;
         sink.write('[');
-        boolean isFirst = true;
+        int i = 0;
         for (Object elem : iterable) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
+            if (i > 0) {
                 sink.write(',');
             }
-            sink.encodeObject(elem);
+            CurrentPath currentPath = sink.currentPath();
+            int oldPath = currentPath.enterListElement(i);
+            sink.encodeObject(elem, spi);
+            currentPath.exit(oldPath);
+            i++;
         }
         sink.write(']');
     }

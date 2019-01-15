@@ -17,7 +17,6 @@ import org.mdkt.compiler.InMemoryJavaCompiler;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -133,21 +132,21 @@ public class QJSON implements QJsonSpi {
     }
 
     public String encode(Object val) {
-        StringEncoderSink sink = new StringEncoderSink(this, new StringBuilder());
-        sink.encodeObject(val);
+        StringEncoderSink sink = new StringEncoderSink(new StringBuilder());
+        sink.encodeObject(val, this);
         return sink.toString();
     }
 
     public String encode(Object val, StringBuilder builder) {
         builder.setLength(0);
-        StringEncoderSink sink = new StringEncoderSink(this, builder);
-        sink.encodeObject(val);
+        StringEncoderSink sink = new StringEncoderSink(builder);
+        sink.encodeObject(val, this);
         return sink.toString();
     }
 
     public void encode(Object val, BytesBuilder bytesBuilder) {
-        BytesEncoderSink sink = new BytesEncoderSink(this, bytesBuilder);
-        sink.encodeObject(val);
+        BytesEncoderSink sink = new BytesEncoderSink(bytesBuilder);
+        sink.encodeObject(val, this);
     }
 
     public <T> T decode(Class<T> clazz, String encoded) {

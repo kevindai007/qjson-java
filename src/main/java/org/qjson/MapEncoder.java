@@ -1,17 +1,18 @@
 package org.qjson;
 
 import org.qjson.codegen.MapDecoderGenerator;
-import org.qjson.encode.BytesBuilder;
-import org.qjson.encode.BytesEncoderSink;
+import org.qjson.encode.CurrentPath;
+import org.qjson.encode.StringEncoderSink;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.EncoderSink;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 class MapEncoder implements Encoder {
 
-    private final Map<Class, Encoder> keyEncoderCache = new ConcurrentHashMap<>();
+    private final Map<Class, BiFunction<EncoderSink, Object,String>> keyEncoderCache = new ConcurrentHashMap<>();
     private final Encoder.Provider spi;
 
     MapEncoder(Encoder.Provider spi) {
@@ -34,32 +35,47 @@ class MapEncoder implements Encoder {
                 sink.write(',');
             }
             Object key = entry.getKey();
+            String encodedKey;
             if (key == null) {
-                sink.encodeString("null");
+                encodedKey = "\"null\"";
             } else {
-                Encoder keyEncoder = getKeyEncoder(key.getClass());
-                keyEncoder.encode(sink, key);
+                BiFunction<EncoderSink, Object, String> keyEncoder = getKeyEncoder(key.getClass());
+                encodedKey = keyEncoder.apply(sink, key);
             }
+            sink.write(encodedKey);
             sink.write(':');
-            sink.encodeObject(entry.getValue());
+            CurrentPath currentPath = sink.currentPath();
+            int oldPath = currentPath.enterMapValue(encodedKey);
+            sink.encodeObject(entry.getValue(), spi);
+            currentPath.exit(oldPath);
         }
         sink.write('}');
     }
 
-    private Encoder getKeyEncoder(Class<?> clazz) {
+    private BiFunction<EncoderSink, Object, String> getKeyEncoder(Class<?> clazz) {
         return keyEncoderCache.computeIfAbsent(clazz, this::generateKeyEncoder);
     }
 
-    private Encoder generateKeyEncoder(Class clazz) {
+    private BiFunction<EncoderSink, Object, String> generateKeyEncoder(Class clazz) {
         Encoder encoder = spi.encoderOf(clazz);
-        if (MapDecoderGenerator.VALID_KEY_CLASSES.contains(clazz)) {
-            return encoder;
-        }
+        boolean isValidKeyClass = MapDecoderGenerator.VALID_KEY_CLASSES.contains(clazz);
         return (sink, val) -> {
-            BytesEncoderSink newSink = new BytesEncoderSink(spi, new BytesBuilder());
-            encoder.encode(newSink, val);
-            sink.encodeBytes(newSink.copyOfBytes());
+            StringEncoderSink newSink = sink.borrowTemp(StringEncoderSink.class);
+            if (newSink == null) {
+                newSink = new StringEncoderSink();
+            }
+            newSink.reset();
+            if (isValidKeyClass) {
+                encoder.encode(newSink, val);
+            } else {
+                newSink.write('"');
+                encoder.encode(newSink, val);
+                newSink.write('"');
+            }
+            String encodedKey = newSink.toString();
+            newSink.reset();
+            sink.releaseTemp(newSink);
+            return encodedKey;
         };
     }
-
 }

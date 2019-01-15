@@ -3,19 +3,23 @@ package org.qjson.encode;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.EncoderSink;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CoderResult;
+import java.nio.charset.StandardCharsets;
+
 public final class BytesEncoderSink implements EncoderSink {
 
-    private final Encoder.Provider spi;
+    private final PathTracker pathTracker = new PathTracker(this);
+    private final TempHolder tempHolder = new TempHolder();
     private final BytesBuilder builder;
-    private byte[] temp;
 
-    public BytesEncoderSink(Encoder.Provider spi, BytesBuilder builder) {
-        this.spi = spi;
+    public BytesEncoderSink(BytesBuilder builder) {
         this.builder = builder;
     }
 
-    public BytesEncoderSink(Encoder.Provider spi) {
-        this(spi, new BytesBuilder());
+    public BytesEncoderSink() {
+        this(new BytesBuilder());
     }
 
     @Override
@@ -45,13 +49,42 @@ public final class BytesEncoderSink implements EncoderSink {
     }
 
     @Override
-    public void encodeObject(Object val) {
-        if (val == null) {
-            encodeNull();
-            return;
+    public void encodeObject(Object val, Encoder encoder) {
+        pathTracker.encodeObject(val, encoder);
+    }
+
+    @Override
+    public void encodeObject(Object val, Encoder.Provider spi) {
+        pathTracker.encodeObject(val, spi);
+    }
+
+    @Override
+    public CurrentPath currentPath() {
+        return null;
+    }
+
+    @Override
+    public void encodeRef(String ref) {
+        builder.append('"', '\\', '\\');
+        EncodeString.body(this, ref);
+        builder.append('"');
+    }
+
+    @Override
+    public void write(String raw) {
+        builder.ensureCapacity(builder.length()  + raw.length() * 3);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(builder.buf(), builder.length(),
+                builder.buf().length - builder.length());
+        CharBuffer charBuffer = CharBuffer.wrap(raw);
+        CoderResult result = StandardCharsets.UTF_8.newEncoder().encode(charBuffer, byteBuffer, true);
+        if (result.isError()) {
+            try {
+                result.throwException();
+            } catch (Exception e) {
+                throw reportError("encode string to utf8 failed", e);
+            }
         }
-        Encoder encoder = spi.encoderOf(val.getClass());
-        encoder.encode(this, val);
+        builder.setLength(byteBuffer.position());
     }
 
     @Override
@@ -82,6 +115,16 @@ public final class BytesEncoderSink implements EncoderSink {
         throw new QJsonEncodeException(errMsg, cause);
     }
 
+    @Override
+    public <T> T borrowTemp(Class<T> clazz) {
+        return tempHolder.borrowTemp(clazz);
+    }
+
+    @Override
+    public void releaseTemp(Object temp) {
+        tempHolder.releaseTemp(temp);
+    }
+
     public BytesBuilder bytesBuilder() {
         return builder;
     }
@@ -89,19 +132,6 @@ public final class BytesEncoderSink implements EncoderSink {
     @Override
     public String toString() {
         return builder.toString();
-    }
-
-    public byte[] borrowTemp(int capacity) {
-        if (temp == null || temp.length < capacity) {
-            return new byte[capacity];
-        }
-        byte[] borrowed = this.temp;
-        this.temp = null;
-        return borrowed;
-    }
-
-    public void releaseTemp(byte[] temp) {
-        this.temp = temp;
     }
 
     public byte[] copyOfBytes() {

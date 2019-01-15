@@ -99,7 +99,7 @@ interface BuiltinEncoders {
                 sink.encodeBytes(bytes);
             });
             put(Map.class, new MapEncoder(spi));
-            put(Iterable.class, new IterableEncoder());
+            put(Iterable.class, new IterableEncoder(spi));
         }};
     }
 }
