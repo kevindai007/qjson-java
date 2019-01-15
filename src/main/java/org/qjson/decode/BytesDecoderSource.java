@@ -163,10 +163,12 @@ public class BytesDecoderSource implements DecoderSource {
         offset++;
     }
 
+    @Override
     public QJsonDecodeException reportError(String errMsg) {
         throw new QJsonDecodeException(errMsg);
     }
 
+    @Override
     public QJsonDecodeException reportError(String errMsg, Exception cause) {
         throw new QJsonDecodeException(errMsg, cause);
     }

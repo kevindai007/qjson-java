@@ -6,6 +6,7 @@ import org.qjson.any.AnyMap;
 import org.qjson.codegen.Codegen;
 import org.qjson.decode.BytesDecoderSource;
 import org.qjson.decode.QJsonDecodeException;
+import org.qjson.decode.StringDecoderSource;
 import org.qjson.encode.BytesBuilder;
 import org.qjson.encode.BytesEncoderSink;
 import org.qjson.encode.StringEncoderSink;
@@ -150,7 +151,7 @@ public class QJSON implements QJsonSpi {
     }
 
     public <T> T decode(Class<T> clazz, String encoded) {
-        return decode(clazz, encoded.getBytes(StandardCharsets.UTF_8));
+        return (T) decode((Type)clazz, encoded);
     }
 
     public <T> T decode(Class<T> clazz, byte[] encoded) {
@@ -165,8 +166,17 @@ public class QJSON implements QJsonSpi {
         return (T) decode(typeLiteral.$(), encoded, offset, size);
     }
 
+    public <T> T decode(TypeLiteral<T> typeLiteral, String encoded) {
+        return (T) decode(typeLiteral.$(), encoded);
+    }
+
     private Object decode(Type type, byte[] encoded, int offset, int size) {
         BytesDecoderSource source = new BytesDecoderSource(this::decoderOf, encoded, offset, size);
+        return source.decodeObject(type);
+    }
+
+    private Object decode(Type type, String encoded) {
+        StringDecoderSource source = new StringDecoderSource(this, encoded);
         return source.decodeObject(type);
     }
 

@@ -87,7 +87,10 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public Object decodeObject(Type type) {
-        throw new UnsupportedOperationException("not implemented");
+        if (decodeNull()) {
+            return null;
+        }
+        return spi.decoderOf(type).decode(this);
     }
 
     @Override
@@ -119,14 +122,15 @@ public class StringDecoderSource implements DecoderSource {
         Skip.$(this);
     }
 
+
     @Override
     public QJsonDecodeException reportError(String errMsg) {
-        throw new UnsupportedOperationException("not implemented");
+        throw new QJsonDecodeException(errMsg);
     }
 
     @Override
     public QJsonDecodeException reportError(String errMsg, Exception cause) {
-        throw new UnsupportedOperationException("not implemented");
+        throw new QJsonDecodeException(errMsg, cause);
     }
 
     void expect(char c1, char c2, char c3, char c4, char c5) {
