@@ -18,7 +18,14 @@ QJSON solve this problem by:
 * encode 1.1 as "\f;>ZWGTNAGTNAGU",as `"\f"` reinterpreted as float
 * drop the support of whitespace
 * encode to and decode from java string without intermediate `byte[]`
-* support referencing encountered object using `"\\'key1'.0.'key2'"` notation
+* support referencing encountered object using `"\/['key1'][0]['key2']"` notation
 
 Value encoded in QJSON, can be decoded as JSON, but the string values need to be decoded again to original value.
 Or we can use QJSON to decode it back directly.
+
+# Get started
+
+```java
+String encoded = QJSON.stringify(your_object)
+QJSON.parse(encoded) // decode as map/list
+```
