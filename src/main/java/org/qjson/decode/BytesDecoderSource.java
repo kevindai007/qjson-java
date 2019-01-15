@@ -1,5 +1,6 @@
 package org.qjson.decode;
 
+import org.qjson.encode.BytesBuilder;
 import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
@@ -13,6 +14,14 @@ public class BytesDecoderSource implements DecoderSource {
     final byte[] buf;
     int offset;
     final int size;
+
+    static {
+        init(DecodeString.TEMP_KEY);
+        init(DecodeBytes.TEMP_KEY);
+    }
+
+    private static void init(Object ignore) {
+    }
 
     public BytesDecoderSource(byte[] buf, int offset, int size) {
         this.buf = buf;

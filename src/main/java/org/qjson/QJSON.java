@@ -221,13 +221,15 @@ public class QJSON implements QJsonSpi {
     }
 
     private Object decode(Type type, byte[] encoded, int offset, int size) {
+        Decoder decoder = decoderOf(type);
         BytesDecoderSource source = new BytesDecoderSource(encoded, offset, size);
-        return source.decodeObject(decoderOf(type));
+        return source.decodeObject(decoder);
     }
 
     private Object decode(Type type, String encoded) {
+        Decoder decoder = decoderOf(type);
         StringDecoderSource source = new StringDecoderSource(encoded);
-        return source.decodeObject(decoderOf(type));
+        return source.decodeObject(decoder);
     }
 
     // === static api ===

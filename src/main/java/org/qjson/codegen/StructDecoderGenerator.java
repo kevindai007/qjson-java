@@ -109,9 +109,9 @@ public class StructDecoderGenerator implements Generator {
         ).__(prop.method.getName()
         ).__("(("
         ).__(prop.method.getParameterTypes()[0].getCanonicalName()
-        ).__(")decoder"
+        ).__(")source.decodeObject(decoder"
         ).__(i
-        ).__(new Line(".decode(source));"));
+        ).__(new Line("));"));
     }
 
     private static void setPropertyByField(Gen g, int i, StructDescriptor.Prop prop) {
@@ -119,9 +119,9 @@ public class StructDecoderGenerator implements Generator {
         ).__(prop.field.getName()
         ).__(" = ("
         ).__(prop.field.getType().getCanonicalName()
-        ).__(")decoder"
+        ).__(")source.decodeObject(decoder"
         ).__(i
-        ).__(new Line(".decode(source);"));
+        ).__(new Line(");"));
     }
 
     static List<StructDescriptor.Prop> getProperties(Codegen.Config cfg, QJsonSpi spi, Class clazz) {

@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CollectionDecoder implements Decoder {
+class CollectionDecoder implements Decoder {
 
     private final Function<DecoderSource, Object> colFactory;
     private final Decoder elemDecoder;

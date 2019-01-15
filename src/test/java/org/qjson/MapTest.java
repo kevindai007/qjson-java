@@ -2,11 +2,12 @@ package org.qjson;
 
 import org.junit.Test;
 
-public class EncodeMapTest {
+public class MapTest {
 
     @Test
     public void typed_map() {
         TestEncode.$();
+        TestDecode.$();
     }
 
     @Test

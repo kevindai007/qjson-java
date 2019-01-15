@@ -6,10 +6,10 @@ import org.junit.Test;
 import static org.qjson.junit.md.TestInMarkdown.stripQuote;
 import static org.qjson.junit.md.TestInMarkdown.myTestData;
 
-public class DecodeEncodeObjectTest {
+public class ObjectTest {
 
     @Test
-    public void decode_object() {
+    public void decode_encode() {
         QJSON qjson = new QJSON();
         TestData testData = myTestData();
         testData.assertTrue(encoded -> {

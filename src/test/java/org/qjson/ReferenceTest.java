@@ -2,7 +2,7 @@ package org.qjson;
 
 import org.junit.Test;
 
-public class CircularReferenceTest {
+public class ReferenceTest {
 
     @Test
     public void ref_map_value() {

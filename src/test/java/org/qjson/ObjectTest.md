@@ -1,4 +1,4 @@
-# decode_object
+# decode_encode
 
 * `null`
 * `true`

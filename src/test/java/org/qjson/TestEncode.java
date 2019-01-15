@@ -1,8 +1,6 @@
 package org.qjson;
 
-import org.qjson.junit.md.TestData;
-import org.qjson.junit.md.Row;
-import org.qjson.junit.md.Table;
+import org.qjson.junit.md.*;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
