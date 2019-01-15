@@ -8,4 +8,14 @@ public class CircularReferenceTest {
     public void ref_map_value() {
         TestEncode.$();
     }
+
+    @Test
+    public void ref_list_value() {
+        TestEncode.$();
+    }
+
+    @Test
+    public void ref_struct_field() {
+        TestEncode.$();
+    }
 }

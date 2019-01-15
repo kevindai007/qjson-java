@@ -16,3 +16,51 @@ public class MyTestObject {
 | value | encoded |
 | ---   | ---     |
 | `MyTestObject.get()` | `{"a":[],"b":"\\['a']"}` |
+
+# ref_list_value
+
+```java
+package testdata;
+import org.qjson.any.*;
+
+public class MyTestObject {
+    
+    public static Object get() {
+        AnyMap sameVal = new AnyMap();
+        return new AnyMap("a", new AnyList(sameVal), "b", new AnyList(sameVal));
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `MyTestObject.get()` | `{"a":[{}],"b":["\\['a'][0]"]}` |
+
+# ref_struct_field
+
+```java
+package testdata;
+import java.util.*;
+public class MyStruct {
+    public Object field;
+}
+```
+
+```java
+package testdata;
+import org.qjson.any.*;
+
+public class MyTestObject {
+    
+    public static Object get() {
+        AnyMap sameVal = new AnyMap();
+        MyStruct struct = new MyStruct();
+        struct.field = sameVal;
+        return new AnyMap("a", struct, "b", sameVal);
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `MyTestObject.get()` | `{"a":{"field":{}},"b":"\\['a'].field"}` |

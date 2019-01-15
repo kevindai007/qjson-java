@@ -21,6 +21,7 @@ public class StructEncoderGenerator implements Generator {
         List<StructDescriptor.Prop> props = getProperties(cfg, spi, clazz);
         return new HashMap<String, Object>() {{
             put("props", props);
+            put("spi", spi);
         }};
     }
 
@@ -39,6 +40,9 @@ public class StructEncoderGenerator implements Generator {
             ).__(i
             ).__(new Line(";"));
         }
+        g.__("private final "
+        ).__(Encoder.Provider.class.getCanonicalName()
+        ).__(new Line(" spi;"));
     }
 
     @Override
@@ -53,6 +57,9 @@ public class StructEncoderGenerator implements Generator {
             g.__("this.encoder").__(i).__(" = props.get(").__(i).__(new Line(").encoder;"));
             g.__("this.shouldEncode").__(i).__(" = props.get(").__(i).__(new Line(").shouldEncode;"));
         }
+        g.__("this.spi = ("
+        ).__(Encoder.Provider.class.getCanonicalName()
+        ).__(new Line(")args.get(\"spi\");"));
     }
 
     @Override
@@ -83,11 +90,15 @@ public class StructEncoderGenerator implements Generator {
             ).__(asStringLiteral(prop.name)
             ).__(new Line(");"));
             g.__(new Line("sink.write(':');"));
+            g.__("int oldPath = sink.currentPath().enterStructField("
+            ).__(asStringLiteral(prop.name)
+            ).__(new Line(");"));
             if (prop.encoder == null) {
-                g.__("sink.encodeObject(").__(expr).__(new Line(");"));
+                g.__("sink.encodeObject(").__(expr).__(new Line(", spi);"));
             } else {
-                g.__("this.encoder").__(i).__(".encode(sink, ").__(expr).__(new Line(");"));
+                g.__("sink.encodeObject(").__(expr).__(", this.encoder").__(i).__(new Line(";"));
             }
+            g.__(new Line("sink.currentPath().exit(oldPath);"));
             if (prop.shouldEncode != null) {
                 g.__(new Line("}"));
             }
