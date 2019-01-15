@@ -1,17 +1,17 @@
 package org.qjson;
 
-import org.qjson.test.md.FluentAPI;
+import org.qjson.junit.md.TestData;
 import org.junit.Test;
 
-import static org.qjson.test.md.TestFramework.stripQuote;
-import static org.qjson.test.md.TestFramework.testDataFromMySection;
+import static org.qjson.junit.md.TestInMarkdown.stripQuote;
+import static org.qjson.junit.md.TestInMarkdown.myTestData;
 
 public class DecodeEncodeObjectTest {
 
     @Test
     public void decode_object() {
         QJSON qjson = new QJSON();
-        FluentAPI testData = testDataFromMySection();
+        TestData testData = myTestData();
         testData.assertTrue(encoded -> {
             encoded = stripQuote(encoded);
             Object decoded = qjson.decode(Object.class, encoded);

@@ -1,1 +1,1 @@
-includeBuild '../test.md/java/test.md'
+includeBuild '../junit.md'

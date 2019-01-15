@@ -1,8 +1,8 @@
 package org.qjson;
 
-import org.qjson.test.md.FluentAPI;
-import org.qjson.test.md.Row;
-import org.qjson.test.md.Table;
+import org.qjson.junit.md.TestData;
+import org.qjson.junit.md.Row;
+import org.qjson.junit.md.Table;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
 
@@ -10,12 +10,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.qjson.test.md.TestFramework.stripQuote;
-import static org.qjson.test.md.TestFramework.testDataFromMySection;
+import static org.qjson.junit.md.TestInMarkdown.stripQuote;
+import static org.qjson.junit.md.TestInMarkdown.myTestData;
 
 public interface TestEncode {
     static void $() {
-        FluentAPI testData = testDataFromMySection();
+        TestData testData = myTestData();
         Table table = testData.table();
         boolean hasType = "type".equals(table.head.get(0));
         for (Row row : table.body) {

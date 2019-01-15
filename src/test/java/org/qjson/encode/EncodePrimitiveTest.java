@@ -6,14 +6,14 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.qjson.test.md.TestFramework.stripQuote;
-import static org.qjson.test.md.TestFramework.testDataFromMySection;
+import static org.qjson.junit.md.TestInMarkdown.stripQuote;
+import static org.qjson.junit.md.TestInMarkdown.myTestData;
 
 public class EncodePrimitiveTest {
 
     @Test
     public void type_int() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             int val = Integer.valueOf(stripQuote(row.get(0)));
             BytesEncoderSink sink1 = newBytesEncoderSink();
             sink1.encodeInt(val);
@@ -26,7 +26,7 @@ public class EncodePrimitiveTest {
 
     @Test
     public void type_long() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             long val = Long.valueOf(stripQuote(row.get(0)));
             BytesEncoderSink sink1 = newBytesEncoderSink();
             sink1.encodeLong(val);
@@ -39,7 +39,7 @@ public class EncodePrimitiveTest {
 
     @Test
     public void type_double() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             double val = Double.valueOf(stripQuote(row.get(0)));
             BytesEncoderSink sink1 = newBytesEncoderSink();
             sink1.encodeDouble(val);
@@ -52,7 +52,7 @@ public class EncodePrimitiveTest {
 
     @Test
     public void type_string() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             String input = stripQuote(row.get(0));
             if (input.startsWith("0x")) {
                 char c = (char) Long.parseLong(input.substring(2), 16);
@@ -69,7 +69,7 @@ public class EncodePrimitiveTest {
 
     @Test
     public void type_bytes() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             String input = stripQuote(row.get(0));
             input = input.substring(1, input.length() - 1);
             String[] elems = input.split(" ");

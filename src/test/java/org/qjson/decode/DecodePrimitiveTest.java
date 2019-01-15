@@ -5,14 +5,14 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.qjson.test.md.TestFramework.stripQuote;
-import static org.qjson.test.md.TestFramework.testDataFromMySection;
+import static org.qjson.junit.md.TestInMarkdown.stripQuote;
+import static org.qjson.junit.md.TestInMarkdown.myTestData;
 
 public class DecodePrimitiveTest {
 
     @Test
     public void type_int() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             int expected = Integer.valueOf(stripQuote(row.get(0)));
             int actual1 = new BytesDecoderSource(null, stripQuote(row.get(1)).getBytes()).decodeInt();
             int actual2= new StringDecoderSource(null, stripQuote(row.get(1))).decodeInt();
@@ -23,7 +23,7 @@ public class DecodePrimitiveTest {
 
     @Test
     public void type_long() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             long expected = Long.valueOf(stripQuote(row.get(0)));
             long actual1 = (Long)new BytesDecoderSource(null,
                     stripQuote(row.get(1)).getBytes()).decodeStringOrNumber();
@@ -36,7 +36,7 @@ public class DecodePrimitiveTest {
 
     @Test
     public void type_double() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             String expected = stripQuote(row.get(0));
             String actual1 = String.valueOf(new BytesDecoderSource(null,
                     stripQuote(row.get(1)).getBytes()).decodeStringOrNumber());
@@ -49,7 +49,7 @@ public class DecodePrimitiveTest {
 
     @Test
     public void type_string() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             String expected = stripQuote(row.get(0));
             if (expected.startsWith("0x")) {
                 char c = (char) Long.parseLong(expected.substring(2), 16);
@@ -66,7 +66,7 @@ public class DecodePrimitiveTest {
 
     @Test
     public void type_bytes() {
-        for (List<String> row : testDataFromMySection().table().body) {
+        for (List<String> row : myTestData().table().body) {
             String input = stripQuote(row.get(0));
             input = input.substring(1, input.length() - 1);
             String[] elems = input.split(" ");
