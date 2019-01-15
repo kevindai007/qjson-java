@@ -60,8 +60,9 @@ public interface EncoderSink {
 
     void encodeRef(String ref);
 
-    // TODO: remove this
-    void write(String raw);
+    int mark();
+
+    String sinceMark(int mark);
 
     void write(char b);
 

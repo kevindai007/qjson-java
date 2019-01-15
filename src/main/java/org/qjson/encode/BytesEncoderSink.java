@@ -3,9 +3,6 @@ package org.qjson.encode;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.EncoderSink;
 
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 
 public final class BytesEncoderSink implements EncoderSink {
@@ -81,20 +78,13 @@ public final class BytesEncoderSink implements EncoderSink {
     }
 
     @Override
-    public void write(String raw) {
-        builder.ensureCapacity(builder.length()  + raw.length() * 3);
-        ByteBuffer byteBuffer = ByteBuffer.wrap(builder.buf(), builder.length(),
-                builder.buf().length - builder.length());
-        CharBuffer charBuffer = CharBuffer.wrap(raw);
-        CoderResult result = StandardCharsets.UTF_8.newEncoder().encode(charBuffer, byteBuffer, true);
-        if (result.isError()) {
-            try {
-                result.throwException();
-            } catch (Exception e) {
-                throw reportError("encode string to utf8 failed", e);
-            }
-        }
-        builder.setLength(byteBuffer.position());
+    public int mark() {
+        return builder.length();
+    }
+
+    @Override
+    public String sinceMark(int mark) {
+        return new String(builder.buf(), mark, builder.length() - mark, StandardCharsets.UTF_8);
     }
 
     @Override

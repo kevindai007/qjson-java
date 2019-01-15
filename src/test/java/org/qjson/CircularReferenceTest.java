@@ -7,11 +7,10 @@ public class CircularReferenceTest {
     @Test
     public void ref_map_value() {
         TestEncode.$();
-        TestDecode.$();
     }
 
     @Test
-    public void ref_list_value() {
+    public void ref_list_element() {
         TestEncode.$();
     }
 

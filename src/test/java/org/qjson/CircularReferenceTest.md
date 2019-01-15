@@ -17,7 +17,7 @@ public class MyTestObject {
 | ---   | ---     |
 | `MyTestObject.get()` | `{"a":[],"b":"\/['a']"}` |
 
-# ref_list_value
+# ref_list_element
 
 ```java
 package testdata;

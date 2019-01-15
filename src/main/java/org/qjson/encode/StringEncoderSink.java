@@ -90,8 +90,13 @@ public class StringEncoderSink implements EncoderSink {
     }
 
     @Override
-    public void write(String raw) {
-        builder.append(raw);
+    public int mark() {
+        return builder.length();
+    }
+
+    @Override
+    public String sinceMark(int mark) {
+        return builder.substring(mark, builder.length());
     }
 
     @Override
