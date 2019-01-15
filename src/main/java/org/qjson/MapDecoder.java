@@ -57,25 +57,31 @@ class MapDecoder implements Decoder {
 
     @Override
     public Object decode(DecoderSource source) {
+        return mapFactory.apply(source);
+    }
+
+    @Override
+    public void decodeProperties(DecoderSource source, Object obj) {
         byte b = source.peek();
         if (b != '{') {
             throw source.reportError("expect {");
         }
         source.next();
-        Map map = (Map) mapFactory.apply(source);
         // if map is {}
-        if (source.peek() == '}') {
+        b = source.peek();
+        if (b == '}') {
             source.next();
-            return map;
+            return;
         }
+        Map map = (Map) obj;
+        CurrentPath currentPath = source.currentPath();
         do {
             int mark = source.mark();
-            Object key = source.decodeObject(keyDecoder);
+            Object key = source.decodeObject(keyDecoder, false);
             String encodedKey = source.sinceMark(mark);
             if (source.read() != ':') {
                 throw source.reportError("expect :");
             }
-            CurrentPath currentPath = source.currentPath();
             int oldPath = currentPath.enterMapValue(encodedKey);
             Object value = source.decodeObject(valueDecoder);
             currentPath.exit(oldPath);
@@ -84,6 +90,5 @@ class MapDecoder implements Decoder {
         if (b != '}') {
             throw source.reportError("expect }");
         }
-        return map;
     }
 }

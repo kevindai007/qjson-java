@@ -48,6 +48,8 @@ public interface DecoderSource {
 
     Object decodeObject(Decoder decoder);
 
+    Object decodeObject(Decoder decoder, boolean track);
+
     CurrentPath currentPath();
 
     default <T> T borrowAttachment(AttachmentKey<T> key) {

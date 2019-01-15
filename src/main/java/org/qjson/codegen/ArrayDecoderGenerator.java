@@ -12,7 +12,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ArrayDecoderGenerator implements Generator {
+public class ArrayDecoderGenerator implements DecoderGenerator {
 
     @Override
     public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
@@ -37,7 +37,7 @@ public class ArrayDecoderGenerator implements Generator {
     }
 
     @Override
-    public void genMethod(Gen g, Map<String, Object> args, Class clazz) {
+    public void genDecode(Gen g, Map<String, Object> args, Class clazz) {
         g.__(Helper.class.getCanonicalName()).__(new Line(".expectArrayHead(source);"));
         // if array is []
         g.__(new Line("byte b = source.peek();"));
@@ -64,10 +64,12 @@ public class ArrayDecoderGenerator implements Generator {
         g.__(new Line("int i = 0;"));
         g.__("do {"
         ).__(new Indent(() -> {
+            g.__(new Line("int oldPath = source.currentPath().enterListElement(i);"));
             g.__("arr[i++] = ("
             ).__(clazz.getComponentType().getCanonicalName()
             ).__(new Line(")source.decodeObject(elemDecoder);"));
             g.__(new Line("if (i == arr.length) { arr = java.util.Arrays.copyOf(arr, arr.length * 2); }"));
+            g.__(new Line("source.currentPath().exit(oldPath);"));
         })).__(new Line("} while((b = source.read()) == ',');"));
         g.__(Helper.class.getCanonicalName()).__(new Line(".expectArrayTail(source, b);"));
         g.__(new Line("return java.util.Arrays.copyOf(arr, i);"));

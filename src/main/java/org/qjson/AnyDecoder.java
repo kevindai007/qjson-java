@@ -15,7 +15,7 @@ class AnyDecoder implements Decoder {
 
     @Override
     public Object decode(DecoderSource source) {
-        Object obj = objectDecoder.decode(source);
+        Object obj = source.decodeObject(objectDecoder);
         if (obj instanceof Any) {
             return obj;
         }

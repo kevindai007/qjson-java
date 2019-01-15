@@ -2,22 +2,20 @@ package org.qjson.codegen;
 
 import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Line;
-import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.Encoder;
+import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.StructDescriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class StructEncoderGenerator implements Generator {
+public class StructEncoderGenerator implements EncoderGenerator {
 
     @Override
-    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
+    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz) {
         List<StructDescriptor.Prop> props = getProperties(cfg, spi, clazz);
         return new HashMap<String, Object>() {{
             put("props", props);
@@ -63,7 +61,7 @@ public class StructEncoderGenerator implements Generator {
     }
 
     @Override
-    public void genMethod(Gen g, Map<String, Object> args, Class clazz) {
+    public void genEncode(Gen g, Map<String, Object> args, Class clazz) {
         List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
         // {
         g.__(new Line("sink.write('{');"));

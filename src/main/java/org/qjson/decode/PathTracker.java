@@ -17,16 +17,20 @@ final class PathTracker {
         this.source = source;
     }
 
-    public Object decodeObject(Decoder decoder) {
+    public Object decodeObject(Decoder decoder, boolean track) {
         if (source.decodeNull()) {
             return decoder.decodeNull(source);
         }
         Object obj = source.decodeRef(decoder);
-        if (obj == null) {
-            obj = decoder.decode(source);
+        if (obj != null) {
+            return obj;
         }
-        String path = currentPath.toString();
-        tracking.put(path, obj);
+        obj = decoder.decode(source);
+        if (track) {
+            String path = currentPath.toString();
+            tracking.put(path, obj);
+        }
+        decoder.decodeProperties(source, obj);
         return obj;
     }
 

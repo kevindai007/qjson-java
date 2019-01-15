@@ -17,12 +17,32 @@ public class ReferenceTest {
     }
 
     @Test
-    public void ref_struct_field() {
+    public void ref_array_element() {
         TestEncode.$();
+        TestDecode.$();
     }
 
     @Test
-    public void ref_itself() {
+    public void ref_struct_field() {
         TestEncode.$();
+        TestDecode.$();
+    }
+
+    @Test
+    public void ref_map_itself() {
+        TestEncode.$();
+        TestDecode.$(false);
+    }
+
+    @Test
+    public void ref_list_itself() {
+        TestEncode.$();
+        TestDecode.$(false);
+    }
+
+    @Test
+    public void ref_struct_itself() {
+        TestEncode.$();
+        TestDecode.$(false);
     }
 }

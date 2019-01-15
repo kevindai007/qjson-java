@@ -10,6 +10,9 @@ public interface Decoder {
 
     Object decode(DecoderSource source);
 
+    default void decodeProperties(DecoderSource source, Object obj) {
+    }
+
     default Object decodeNull(DecoderSource source) {
         return null;
     }

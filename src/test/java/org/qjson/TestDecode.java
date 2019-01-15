@@ -1,21 +1,24 @@
 package org.qjson;
 
-import org.qjson.junit.md.*;
 import org.junit.Assert;
 import org.mdkt.compiler.InMemoryJavaCompiler;
+import org.qjson.junit.md.*;
 
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static org.qjson.junit.md.TestInMarkdown.stripQuote;
 import static org.qjson.junit.md.TestInMarkdown.myTestData;
+import static org.qjson.junit.md.TestInMarkdown.stripQuote;
 
 public interface TestDecode {
 
     static void $() {
+        TestDecode.$(true);
+    }
+
+    static void $(boolean useObjectsEquals) {
         TestData testData = myTestData();
         Table table = testData.table();
         boolean hasType = "type".equals(table.head.get(0));
@@ -47,13 +50,17 @@ public interface TestDecode {
                         .useParentClassLoader(testDataClass.getClassLoader())
                         .useOptions("-classpath", System.getProperty("java.class.path") + ":" + tempDir.toString());
                 QJSON qjson = new QJSON(config);
-                byte[] bytes = stripQuote(row.get(hasType ? 2 : 1)).getBytes(StandardCharsets.UTF_8);
+                String input = stripQuote(row.get(hasType ? 2 : 1));
+                Object decoded;
                 if (hasType) {
-                    Object decoded = qjson.decode(testObjectType, bytes, 0, bytes.length);
+                    decoded = qjson.decode(testObjectType, input);
+                } else {
+                    decoded = qjson.decode(testObject.getClass(), input);
+                }
+                if (useObjectsEquals) {
                     Assert.assertTrue(row.get(hasType ? 1 : 0), Objects.deepEquals(testObject, decoded));
                 } else {
-                    Object decoded = qjson.decode(testObject.getClass(), bytes, 0, bytes.length);
-                    Assert.assertTrue(row.get(hasType ? 1 : 0), Objects.deepEquals(testObject, decoded));
+                    Assert.assertEquals(row.get(hasType ? 1 : 0), qjson.encode(testObject), qjson.encode(decoded));
                 }
             } catch (RuntimeException e) {
                 throw e;

@@ -11,8 +11,6 @@ import org.qjson.spi.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -35,7 +33,7 @@ public class Codegen {
     }
 
     public synchronized Decoder generateDecoder(Class clazz, Map<TypeVariable, Type> typeArgs) {
-        Generator generator = getDecoderGenerator(clazz);
+        DecoderGenerator generator = getDecoderGenerator(clazz);
         Map<String, Object> args = generator.args(cfg, spi, clazz, typeArgs);
         String decoderClassName = "GeneratedDecoder" + (counter++);
         Gen g = new Gen();
@@ -55,14 +53,32 @@ public class Codegen {
             ).__(new Indent(() -> {
                 generator.genCtor(g, args);
             })).__(new Line("}"));
-            // method
+            // method decode
             g.__("public Object decode("
             ).__(DecoderSource.class.getCanonicalName()
             ).__(" source) {"
             ).__(new Indent(() -> {
                 g.__("try {"
                 ).__(new Indent(() -> {
-                    generator.genMethod(g, args, clazz);
+                    generator.genDecode(g, args, clazz);
+                })).__("} catch (RuntimeException e) {"
+                ).__(new Indent(() -> {
+                    g.__("throw e;");
+                })).__("} catch (Exception e) {"
+                ).__(new Indent(() -> {
+                    g.__("throw new "
+                    ).__(QJsonDecodeException.class.getCanonicalName()
+                    ).__("(e);");
+                })).__(new Line("}"));
+            })).__(new Line("}"));
+            // method decodeProperties
+            g.__("public void decodeProperties("
+            ).__(DecoderSource.class.getCanonicalName()
+            ).__(" source, Object obj) {"
+            ).__(new Indent(() -> {
+                g.__("try {"
+                ).__(new Indent(() -> {
+                    generator.genDecodeProperties(g, args, clazz);
                 })).__("} catch (RuntimeException e) {"
                 ).__(new Indent(() -> {
                     g.__("throw e;");
@@ -88,8 +104,8 @@ public class Codegen {
     }
 
     public synchronized Encoder generateEncoder(Class clazz) {
-        Generator generator = getEncoderGenerator(clazz);
-        Map<String, Object> args = generator.args(cfg, spi, clazz, null);
+        EncoderGenerator generator = getEncoderGenerator(clazz);
+        Map<String, Object> args = generator.args(cfg, spi, clazz);
         String encoderClassName = "GeneratedEncoder" + (counter++);
         Gen g = new Gen();
         g.__(new Line("package gen;"));
@@ -115,7 +131,7 @@ public class Codegen {
             ).__(new Indent(() -> {
                 g.__("try {"
                 ).__(new Indent(() -> {
-                    generator.genMethod(g, args, clazz);
+                    generator.genEncode(g, args, clazz);
                 })).__("} catch (RuntimeException e) {"
                 ).__(new Indent(() -> {
                     g.__("throw e;");
@@ -140,14 +156,14 @@ public class Codegen {
         }
     }
 
-    private static Generator getDecoderGenerator(Class clazz) {
+    private static DecoderGenerator getDecoderGenerator(Class clazz) {
         if (clazz.isArray()) {
             return new ArrayDecoderGenerator();
         }
         return new StructDecoderGenerator();
     }
 
-    private static Generator getEncoderGenerator(Class clazz) {
+    private static EncoderGenerator getEncoderGenerator(Class clazz) {
         if (clazz.isArray()) {
             return new ArrayEncoderGenerator();
         }

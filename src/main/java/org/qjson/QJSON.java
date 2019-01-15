@@ -134,7 +134,27 @@ public class QJSON implements QJsonSpi {
         Decoder decoder = decoderCache.get(type);
         if (decoder == null) {
             // placeholder to avoid infinite loop
-            decoderCache.put(type, source -> decoderOf(type).decode(source));
+            decoderCache.put(type, new Decoder() {
+                @Override
+                public Object decode(DecoderSource source) {
+                    return decoderOf(type).decode(source);
+                }
+
+                @Override
+                public void decodeProperties(DecoderSource source, Object obj) {
+                    decoderOf(type).decodeProperties(source, obj);
+                }
+
+                @Override
+                public Object decodeNull(DecoderSource source) {
+                    return decoderOf(type).decodeNull(source);
+                }
+
+                @Override
+                public Object decodeRef(DecoderSource source, String path, Object ref) {
+                    return decoderOf(type).decodeRef(source, path, ref);
+                }
+            });
             decoder = generateDecoder(type);
             decoderCache.put(type, decoder);
         }

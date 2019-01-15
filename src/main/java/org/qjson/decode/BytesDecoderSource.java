@@ -1,6 +1,5 @@
 package org.qjson.decode;
 
-import org.qjson.encode.BytesBuilder;
 import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
@@ -91,7 +90,12 @@ public class BytesDecoderSource implements DecoderSource {
 
     @Override
     public Object decodeObject(Decoder decoder) {
-        return pathTracker.decodeObject(decoder);
+        return pathTracker.decodeObject(decoder, true);
+    }
+
+    @Override
+    public Object decodeObject(Decoder decoder, boolean track) {
+        return pathTracker.decodeObject(decoder, track);
     }
 
     @Override

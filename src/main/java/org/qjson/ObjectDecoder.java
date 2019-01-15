@@ -18,9 +18,9 @@ class ObjectDecoder implements Decoder {
         byte b = source.peek();
         switch (b) {
             case '[':
-                return listDecoder.decode(source);
+                return source.decodeObject(listDecoder);
             case '{':
-                return mapDecoder.decode(source);
+                return source.decodeObject(mapDecoder);
             case 't':
             case 'f':
                 return source.decodeBoolean();

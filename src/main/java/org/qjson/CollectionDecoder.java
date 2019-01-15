@@ -32,16 +32,21 @@ class CollectionDecoder implements Decoder {
 
     @Override
     public Object decode(DecoderSource source) {
+        return colFactory.apply(source);
+    }
+
+    @Override
+    public void decodeProperties(DecoderSource source, Object obj) {
         byte b = source.peek();
         if (b != '[') {
             throw source.reportError("expect [");
         }
         source.next();
-        Collection col = (Collection) colFactory.apply(source);
         if (source.peek() == ']') {
             source.next();
-            return col;
+            return;
         }
+        Collection col = (Collection) obj;
         int i = 0;
         do {
             CurrentPath currentPath = source.currentPath();
@@ -53,6 +58,5 @@ class CollectionDecoder implements Decoder {
         if (b != ']') {
             throw source.reportError("expect ]");
         }
-        return col;
     }
 }

@@ -24,8 +24,11 @@ public final class CurrentPath {
 
     public int enterStructField(String field) {
         int oldLength = path.length();
-        path.append('.');
+        path.append('[');
+        path.append('\'');
         path.append(field);
+        path.append('\'');
+        path.append(']');
         return oldLength;
     }
 

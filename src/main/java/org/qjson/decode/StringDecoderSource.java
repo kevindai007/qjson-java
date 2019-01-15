@@ -95,7 +95,12 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public Object decodeObject(Decoder decoder) {
-        return pathTracker.decodeObject(decoder);
+        return pathTracker.decodeObject(decoder, true);
+    }
+
+    @Override
+    public Object decodeObject(Decoder decoder, boolean track) {
+        return pathTracker.decodeObject(decoder, track);
     }
 
     @Override
@@ -152,15 +157,34 @@ public class StringDecoderSource implements DecoderSource {
         Skip.$(this);
     }
 
-
     @Override
     public QJsonDecodeException reportError(String errMsg) {
-        throw new QJsonDecodeException(errMsg);
+        return reportError(errMsg, null);
     }
 
     @Override
     public QJsonDecodeException reportError(String errMsg, Exception cause) {
-        throw new QJsonDecodeException(errMsg, cause);
+        StringBuilder desc = new StringBuilder(errMsg + ", error found around: \n");
+        int left = offset - 16;
+        if (left < 0) {
+            left = 0;
+        }
+        int right = offset + 16;
+        if (right > buf.length()) {
+            right = buf.length();
+        }
+        desc.append(buf, left, right);
+        desc.append('\n');
+        for (int i = left; i < right; i++) {
+            if (i == offset) {
+                desc.append('^');
+            } else if (offset - 3 < i && i < offset + 3) {
+                desc.append('~');
+            } else {
+                desc.append(' ');
+            }
+        }
+        throw new QJsonDecodeException(desc.toString(), cause);
     }
 
     void expect(char c1, char c2, char c3, char c4, char c5) {

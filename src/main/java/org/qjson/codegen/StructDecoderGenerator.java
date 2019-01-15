@@ -15,7 +15,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.function.Function;
 
-public class StructDecoderGenerator implements Generator {
+public class StructDecoderGenerator implements DecoderGenerator {
 
     @Override
     public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
@@ -51,7 +51,7 @@ public class StructDecoderGenerator implements Generator {
     }
 
     @Override
-    public void genMethod(Gen g, Map<String, Object> args, Class clazz) {
+    public void genDecode(Gen g, Map<String, Object> args, Class clazz) {
         try {
             clazz.getConstructor();
         } catch (NoSuchMethodException e) {
@@ -59,19 +59,27 @@ public class StructDecoderGenerator implements Generator {
             g.__(new Line("return null;"));
             return;
         }
-        List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
-        g.__(Helper.class.getCanonicalName()).__(new Line(".expectMapHead(source);"));
-        g.__(clazz.getCanonicalName()
-        ).__(" obj = new "
+        g.__("return new "
         ).__(clazz.getCanonicalName()
         ).__(new Line("();"));
+    }
+
+    @Override
+    public void genDecodeProperties(Gen g, Map<String, Object> args, Class clazz) {
+        List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
+        g.__(Helper.class.getCanonicalName()).__(new Line(".expectMapHead(source);"));
         // if object is {}
         g.__(new Line("byte b = source.peek();"));
         g.__("if (b == '}') { "
         ).__(new Indent(() -> {
             g.__(new Line("source.next();"));
-            g.__(new Line("return obj;"));
+            g.__(new Line("return;"));
         })).__(new Line("}"));
+
+        g.__(clazz.getCanonicalName()
+        ).__(" struct = ("
+        ).__(clazz.getCanonicalName()
+        ).__(new Line(")obj;"));
         g.__("do {"
         ).__(new Indent(() -> {
             g.__(new Line("String field = source.decodeString();"));
@@ -89,23 +97,25 @@ public class StructDecoderGenerator implements Generator {
             })).__(new Line("}"));
         })).__(new Line("} while ((b = source.read()) == ',');"));
         g.__(new Line("if (b != '}') { throw source.reportError(\"expect }\"); }"));
-        // fill object
-        g.__(new Line("return obj;"));
     }
 
     public Indent propCase(Gen g, int i, StructDescriptor.Prop prop) {
         return new Indent(() -> {
+            g.__("int oldPath = source.currentPath().enterStructField("
+            ).__(StructEncoderGenerator.asStringLiteral(prop.name)
+            ).__(new Line(");"));
             if (prop.field != null) {
                 setPropertyByField(g, i, prop);
             } else {
                 setPropertyBySetter(g, i, prop);
             }
+            g.__(new Line("source.currentPath().exit(oldPath);"));
             g.__(new Line("break;"));
         });
     }
 
     private static void setPropertyBySetter(Gen g, int i, StructDescriptor.Prop prop) {
-        g.__("obj."
+        g.__("struct."
         ).__(prop.method.getName()
         ).__("(("
         ).__(prop.method.getParameterTypes()[0].getCanonicalName()
@@ -115,7 +125,7 @@ public class StructDecoderGenerator implements Generator {
     }
 
     private static void setPropertyByField(Gen g, int i, StructDescriptor.Prop prop) {
-        g.__("obj."
+        g.__("struct."
         ).__(prop.field.getName()
         ).__(" = ("
         ).__(prop.field.getType().getCanonicalName()

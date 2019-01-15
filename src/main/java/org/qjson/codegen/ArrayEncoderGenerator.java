@@ -6,16 +6,14 @@ import org.qjson.codegen.gen.Line;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.QJsonSpi;
 
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Map;
 
-class ArrayEncoderGenerator implements Generator {
+class ArrayEncoderGenerator implements EncoderGenerator {
 
     @Override
-    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
-        return new HashMap<String, Object>(){{
+    public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz) {
+        return new HashMap<String, Object>() {{
             put("spi", spi);
         }};
     }
@@ -35,7 +33,7 @@ class ArrayEncoderGenerator implements Generator {
     }
 
     @Override
-    public void genMethod(Gen g, Map<String, Object> args, Class clazz) {
+    public void genEncode(Gen g, Map<String, Object> args, Class clazz) {
         // [
         g.__(new Line("sink.write('[');"));
         // cast to array
@@ -49,7 +47,7 @@ class ArrayEncoderGenerator implements Generator {
                     g.__(new Line("if (i > 0) { sink.write(','); }"));
                     g.__(new Line("int oldPath = sink.currentPath().enterListElement(i);"));
                     g.__(new Line("sink.encodeObject(arr[i], spi);"));
-            g.__(new Line("sink.currentPath().exit(oldPath);"));
+                    g.__(new Line("sink.currentPath().exit(oldPath);"));
                 })
         ).__(new Line("}"));
         // ]
