@@ -2,12 +2,13 @@ package org.qjson.codegen;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.qjson.spi.TypeVariables;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 
-public class CollectTypeVariablesTest {
+public class TypeVariablesTest {
 
     private static class BaseClass<T> {
         public T field1;
@@ -24,7 +25,7 @@ public class CollectTypeVariablesTest {
     @Test
     public void one_layer() {
         HashMap<TypeVariable, Type> typeArgs = new HashMap<>();
-        CollectTypeVariables.$(DerivedClass.class, typeArgs);
+        TypeVariables.collect(DerivedClass.class, typeArgs);
         TypeVariable typeParam = BaseClass.class.getTypeParameters()[0];
         Assert.assertEquals(String.class, typeArgs.get(typeParam));
         typeParam = BaseInf.class.getTypeParameters()[0];
@@ -40,7 +41,7 @@ public class CollectTypeVariablesTest {
     @Test
     public void two_layers() {
         HashMap<TypeVariable, Type> typeArgs = new HashMap<>();
-        CollectTypeVariables.$(FinalClass.class, typeArgs);
+        TypeVariables.collect(FinalClass.class, typeArgs);
         TypeVariable typeParam = BaseClass.class.getTypeParameters()[0];
         Assert.assertEquals(String.class, typeArgs.get(typeParam));
     }

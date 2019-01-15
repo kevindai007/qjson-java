@@ -3,7 +3,9 @@ package org.qjson;
 import org.qjson.any.Any;
 import org.qjson.any.AnyList;
 import org.qjson.any.AnyMap;
+import org.qjson.codegen.ArrayDecoderGenerator;
 import org.qjson.codegen.Codegen;
+import org.qjson.codegen.CollectionDecoderGenerator;
 import org.qjson.decode.BytesDecoderSource;
 import org.qjson.decode.QJsonDecodeException;
 import org.qjson.decode.StringDecoderSource;
@@ -14,9 +16,11 @@ import org.qjson.spi.Decoder;
 import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.Encoder;
 import org.mdkt.compiler.InMemoryJavaCompiler;
+import org.qjson.spi.TypeVariables;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -128,7 +132,16 @@ public class QJSON implements QJsonSpi {
         if (Any.class.equals(type)) {
             return new AnyDecoder(decoderOf(Object.class));
         }
-        return codegen.generateDecoder(type);
+        Map<TypeVariable, Type> typeArgs = new HashMap<>();
+        Class clazz = TypeVariables.collect(type, typeArgs);
+        if (clazz == null) {
+            throw new QJsonDecodeException("can not cast to class: " + type);
+        }
+        boolean isJavaUtil = Codegen.isJavaUtil(clazz);
+        if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
+            return MapDecoder.create(cfg, this, clazz, typeArgs);
+        }
+        return codegen.generateDecoder(clazz, typeArgs);
     }
 
     public String encode(Object val) {

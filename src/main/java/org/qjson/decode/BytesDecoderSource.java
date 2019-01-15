@@ -101,6 +101,16 @@ public class BytesDecoderSource implements DecoderSource {
     }
 
     @Override
+    public int mark() {
+        return offset;
+    }
+
+    @Override
+    public String sinceMark(int mark) {
+        return new String(buf, mark, offset - mark);
+    }
+
+    @Override
     public byte read() {
         byte b = peek();
         next();

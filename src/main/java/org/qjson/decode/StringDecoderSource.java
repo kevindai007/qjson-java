@@ -1,11 +1,8 @@
 package org.qjson.decode;
 
-import org.qjson.encode.BytesBuilder;
 import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
-
-import java.lang.reflect.Type;
 
 public class StringDecoderSource implements DecoderSource {
 
@@ -114,6 +111,16 @@ public class StringDecoderSource implements DecoderSource {
     @Override
     public <T> void setAttachment(AttachmentKey<T> key, T attachment) {
         attachments[key.val] = attachment;
+    }
+
+    @Override
+    public int mark() {
+        return offset;
+    }
+
+    @Override
+    public String sinceMark(int mark) {
+        return buf.substring(mark, offset);
     }
 
     @Override

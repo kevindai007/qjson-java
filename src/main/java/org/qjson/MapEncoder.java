@@ -1,18 +1,28 @@
 package org.qjson;
 
-import org.qjson.codegen.MapDecoderGenerator;
-import org.qjson.encode.BytesBuilder;
-import org.qjson.encode.BytesEncoderSink;
 import org.qjson.encode.CurrentPath;
 import org.qjson.encode.StringEncoderSink;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.EncoderSink;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 
 class MapEncoder implements Encoder {
+
+    final static Set<Class> VALID_KEY_CLASSES = new HashSet<Class>() {{
+        add(String.class);
+        add(Character.class);
+        add(byte[].class);
+        add(Byte.class);
+        add(Short.class);
+        add(Integer.class);
+        add(Long.class);
+        add(Float.class);
+        add(Double.class);
+    }};
 
     private final EncoderSink.AttachmentKey<StringEncoderSink> TEMP_KEY = EncoderSink.AttachmentKey.assign();
     private final Map<Class, Encoder> keyEncoderCache = new ConcurrentHashMap<>();
@@ -48,7 +58,7 @@ class MapEncoder implements Encoder {
             String encodedKey = sink.sinceMark(mark);
             sink.write(':');
             CurrentPath currentPath = sink.currentPath();
-            int oldPath = currentPath.enterMapValueWithQuotes(encodedKey);
+            int oldPath = currentPath.enterMapValue(encodedKey);
             sink.encodeObject(entry.getValue(), spi);
             currentPath.exit(oldPath);
         }
@@ -61,7 +71,7 @@ class MapEncoder implements Encoder {
 
     private Encoder generateKeyEncoder(Class clazz) {
         Encoder encoder = spi.encoderOf(clazz);
-        if (MapDecoderGenerator.VALID_KEY_CLASSES.contains(clazz)) {
+        if (VALID_KEY_CLASSES.contains(clazz)) {
             return encoder;
         }
         return (sink, val) -> {

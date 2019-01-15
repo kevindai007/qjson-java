@@ -3,6 +3,7 @@ package org.qjson.codegen;
 import org.qjson.TypeLiteral;
 import org.junit.Assert;
 import org.junit.Test;
+import org.qjson.spi.TypeVariables;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -19,7 +20,7 @@ public class SubstituteTypeVariableTest {
     @Test
     public void use_lower_bound_if_not_specified() {
         TypeVariable param = MyClass1.class.getTypeParameters()[0];
-        Type sub = SubstituteTypeVariable.$(param, Collections.emptyMap());
+        Type sub = TypeVariables.substitute(param, Collections.emptyMap());
         Assert.assertEquals(Date.class, sub);
     }
 
@@ -29,7 +30,7 @@ public class SubstituteTypeVariableTest {
     @Test
     public void no_bound_use_object() {
         TypeVariable param = MyClass2.class.getTypeParameters()[0];
-        Type sub = SubstituteTypeVariable.$(param, Collections.emptyMap());
+        Type sub = TypeVariables.substitute(param, Collections.emptyMap());
         Assert.assertEquals(Object.class, sub);
     }
 
@@ -37,9 +38,9 @@ public class SubstituteTypeVariableTest {
     public void wildcard_use_object() {
         TypeLiteral typeLiteral = new TypeLiteral<MyClass2<?>>(){};
         Map<TypeVariable, Type> typeArgs = new HashMap<>();
-        CollectTypeVariables.$(typeLiteral.$(), typeArgs);
+        TypeVariables.collect(typeLiteral.$(), typeArgs);
         TypeVariable param = MyClass2.class.getTypeParameters()[0];
-        Type sub = SubstituteTypeVariable.$(param, typeArgs);
+        Type sub = TypeVariables.substitute(param, typeArgs);
         Assert.assertEquals(Object.class, sub);
     }
 
@@ -47,9 +48,9 @@ public class SubstituteTypeVariableTest {
     public void wildcard_extends() {
         TypeLiteral typeLiteral = new TypeLiteral<MyClass2<? extends Date>>(){};
         Map<TypeVariable, Type> typeArgs = new HashMap<>();
-        CollectTypeVariables.$(typeLiteral.$(), typeArgs);
+        TypeVariables.collect(typeLiteral.$(), typeArgs);
         TypeVariable param = MyClass2.class.getTypeParameters()[0];
-        Type sub = SubstituteTypeVariable.$(param, typeArgs);
+        Type sub = TypeVariables.substitute(param, typeArgs);
         Assert.assertEquals(Date.class, sub);
     }
 
@@ -57,9 +58,9 @@ public class SubstituteTypeVariableTest {
     public void wildcard_super() {
         TypeLiteral typeLiteral = new TypeLiteral<MyClass2<? super Date>>(){};
         Map<TypeVariable, Type> typeArgs = new HashMap<>();
-        CollectTypeVariables.$(typeLiteral.$(), typeArgs);
+        TypeVariables.collect(typeLiteral.$(), typeArgs);
         TypeVariable param = MyClass2.class.getTypeParameters()[0];
-        Type sub = SubstituteTypeVariable.$(param, typeArgs);
+        Type sub = TypeVariables.substitute(param, typeArgs);
         Assert.assertEquals(Date.class, sub);
     }
 }

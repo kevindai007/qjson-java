@@ -34,15 +34,6 @@ public class Codegen {
         this.spi = spi;
     }
 
-    public synchronized Decoder generateDecoder(Type type) {
-        Map<TypeVariable, Type> typeArgs = new HashMap<>();
-        Class clazz = CollectTypeVariables.$(type, typeArgs);
-        if (clazz == null) {
-            throw new QJsonDecodeException("can not cast to class: " + type);
-        }
-        return generateDecoder(clazz, typeArgs);
-    }
-
     public synchronized Decoder generateDecoder(Class clazz, Map<TypeVariable, Type> typeArgs) {
         Generator generator = getDecoderGenerator(clazz);
         Map<String, Object> args = generator.args(cfg, spi, clazz, typeArgs);
@@ -155,8 +146,6 @@ public class Codegen {
             return new ArrayDecoderGenerator();
         } else if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
             return new CollectionDecoderGenerator();
-        } else if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
-            return new MapDecoderGenerator();
         }
         return new StructDecoderGenerator();
     }

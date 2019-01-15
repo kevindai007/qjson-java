@@ -60,6 +60,10 @@ public interface DecoderSource {
 
     <T> void setAttachment(AttachmentKey<T> key, T attachment);
 
+    int mark();
+
+    String sinceMark(int mark);
+
     byte read();
 
     byte peek();

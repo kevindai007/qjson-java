@@ -1,22 +1,23 @@
-package org.qjson.codegen;
+package org.qjson.spi;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.Map;
 
-interface CollectTypeVariables {
+public interface TypeVariables {
     
-    static Class $(Type type, Map<TypeVariable, Type> collector) {
+    static Class collect(Type type, Map<TypeVariable, Type> collector) {
         if (Object.class.equals(type)) {
             return null;
         }
         if (type instanceof Class) {
             Class clazz = (Class) type;
             for (Type inf : clazz.getGenericInterfaces()) {
-                CollectTypeVariables.$(inf, collector);
+                TypeVariables.collect(inf, collector);
             }
-            CollectTypeVariables.$(clazz.getGenericSuperclass(), collector);
+            TypeVariables.collect(clazz.getGenericSuperclass(), collector);
             return clazz;
         }
         if (!(type instanceof ParameterizedType)) {
@@ -39,9 +40,32 @@ interface CollectTypeVariables {
             }
         }
         for (Type inf : clazz.getGenericInterfaces()) {
-            CollectTypeVariables.$(inf, collector);
+            TypeVariables.collect(inf, collector);
         }
-        CollectTypeVariables.$(clazz.getGenericSuperclass(), collector);
+        TypeVariables.collect(clazz.getGenericSuperclass(), collector);
         return clazz;
+    }
+
+    static Type substitute(TypeVariable typeParam, Map<TypeVariable, Type> typeArgs) {
+        Type sub = typeArgs.get(typeParam);
+        if (sub instanceof Class || sub instanceof ParameterizedType) {
+            return sub;
+        }
+        if (sub == null) {
+            sub = typeParam;
+        }
+        if (sub instanceof TypeVariable) {
+            return ((TypeVariable) sub).getBounds()[0];
+        }
+        if (sub instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) sub;
+            if (wildcardType.getLowerBounds().length > 0) {
+                return wildcardType.getLowerBounds()[0];
+            }
+            if (wildcardType.getUpperBounds().length > 0) {
+                return wildcardType.getUpperBounds()[0];
+            }
+        }
+        return Object.class;
     }
 }

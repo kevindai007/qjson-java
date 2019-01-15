@@ -4,6 +4,7 @@ import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Indent;
 import org.qjson.codegen.gen.Line;
 import org.qjson.spi.Decoder;
+import org.qjson.spi.DecoderSource;
 import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.StructDescriptor;
 
@@ -59,7 +60,7 @@ public class StructDecoderGenerator implements Generator {
             return;
         }
         List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
-        g.__(MapDecoderGenerator.Helper.class.getCanonicalName()).__(new Line(".expectMapHead(source);"));
+        g.__(Helper.class.getCanonicalName()).__(new Line(".expectMapHead(source);"));
         g.__(clazz.getCanonicalName()
         ).__(" obj = new "
         ).__(clazz.getCanonicalName()
@@ -177,5 +178,16 @@ public class StructDecoderGenerator implements Generator {
             return null;
         }
         return null;
+    }
+
+    public interface Helper {
+
+        static void expectMapHead(DecoderSource source) {
+            byte b = source.peek();
+            if (b != '{') {
+                throw source.reportError("expect {");
+            }
+            source.next();
+        }
     }
 }
