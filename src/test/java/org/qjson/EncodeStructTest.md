@@ -146,7 +146,7 @@ public class MyClass {
 
 | value | encoded |
 | ---   | ---     |
-| `new MyClass().init("hello")` | `{"\/CC":"hello"}` |
+| `new MyClass().init("hello")` | `{"\\CC":"hello"}` |
 
 # multiple_fields
 

@@ -90,8 +90,8 @@ interface DecodeString {
             if (i + 4 >= source.size) {
                 throw source.reportError("missing double quote");
             }
-            if (source.buf[i + 1] != '/') {
-                throw source.reportError("escape \\/ is the only supported escape form");
+            if (source.buf[i + 1] != '\\') {
+                throw source.reportError("escape \\\\ is the only supported escape form");
             }
             b = (byte) (((source.buf[i + 2] - 'A') << 4) + source.buf[i + 3] - 'A');
             builder.append(b);
@@ -114,8 +114,8 @@ interface DecodeString {
             if (i + 4 >= source.buf.length()) {
                 throw source.reportError("missing double quote");
             }
-            if (source.buf.charAt(i + 1) != '/') {
-                throw source.reportError("escape \\/ is the only supported escape form");
+            if (source.buf.charAt(i + 1) != '\\') {
+                throw source.reportError("escape \\\\ is the only supported escape form");
             }
             byte b = (byte) (((source.buf.charAt(i + 2) - 'A') << 4) + source.buf.charAt(i + 3) - 'A');
             builder.append(b);
@@ -141,8 +141,8 @@ interface DecodeString {
             if (i + 4 >= source.buf.length()) {
                 throw source.reportError("missing double quote");
             }
-            if (source.buf.charAt(i + 1) != '/') {
-                throw source.reportError("escape \\/ is the only supported escape form");
+            if (source.buf.charAt(i + 1) != '\\') {
+                throw source.reportError("escape \\\\ is the only supported escape form");
             }
             byte b = (byte) (((source.buf.charAt(i + 2) - 'A') << 4) + source.buf.charAt(i + 3) - 'A');
             temp.append(b);

@@ -65,7 +65,7 @@ public final class BytesEncoderSink implements EncoderSink {
 
     @Override
     public void encodeRef(String ref) {
-        builder.append('"', '\\', '\\');
+        builder.append('"', '\\', '/');
         EncodeString.body(this, ref);
         builder.append('"');
     }

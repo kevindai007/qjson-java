@@ -92,11 +92,11 @@ public class EncodePrimitiveTest {
 
     @NotNull
     private StringEncoderSink newStringEncoderSink() {
-        return new StringEncoderSink(null);
+        return new StringEncoderSink();
     }
 
     @NotNull
     private BytesEncoderSink newBytesEncoderSink() {
-        return new BytesEncoderSink(null);
+        return new BytesEncoderSink();
     }
 }

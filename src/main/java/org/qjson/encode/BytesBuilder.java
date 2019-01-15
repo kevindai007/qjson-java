@@ -28,7 +28,7 @@ public class BytesBuilder {
     }
 
     void appendEscape(byte b) {
-        append((byte) '\\', (byte) '/', (byte) ('A' + (b >>> 4)), (byte) ('A' + (b & 0xF)));
+        append((byte) '\\', (byte) '\\', (byte) ('A' + (b >>> 4)), (byte) ('A' + (b & 0xF)));
     }
 
     public void append(char b) {

@@ -3,7 +3,7 @@ package org.qjson.decode;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class BytesDecoderSourceTest {
+public class DecoderSourceTest {
 
     @Test
     public void decode_boolean() {

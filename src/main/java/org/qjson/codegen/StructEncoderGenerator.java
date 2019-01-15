@@ -73,6 +73,7 @@ public class StructEncoderGenerator implements Generator {
         ).__(clazz.getCanonicalName()
         ).__(new Line(")val;"));
         // foreach properties
+        g.__(new Line("int oldPath;"));
         g.__(new Line("boolean isFirst = true;"));
         for (int i = 0; i < props.size(); i++) {
             StructDescriptor.Prop prop = props.get(i);
@@ -90,13 +91,13 @@ public class StructEncoderGenerator implements Generator {
             ).__(asStringLiteral(prop.name)
             ).__(new Line(");"));
             g.__(new Line("sink.write(':');"));
-            g.__("int oldPath = sink.currentPath().enterStructField("
+            g.__("oldPath = sink.currentPath().enterStructField("
             ).__(asStringLiteral(prop.name)
             ).__(new Line(");"));
             if (prop.encoder == null) {
                 g.__("sink.encodeObject(").__(expr).__(new Line(", spi);"));
             } else {
-                g.__("sink.encodeObject(").__(expr).__(", this.encoder").__(i).__(new Line(";"));
+                g.__("sink.encodeObject(").__(expr).__(", this.encoder").__(i).__(new Line(");"));
             }
             g.__(new Line("sink.currentPath().exit(oldPath);"));
             if (prop.shouldEncode != null) {

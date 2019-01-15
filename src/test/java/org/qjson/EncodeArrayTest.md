@@ -6,13 +6,13 @@
 | `new String[]{"a","b"}` | `["a","b"]` |
 | `new String[]{"a","b","c","d","e"}` | `["a","b","c","d","e"]` |
 | `new String[]{null}` | `[null]` |
-| `new byte[][]{new byte[]{1,2,3}}` | `["\/AB\/AC\/AD"]` |
+| `new byte[][]{new byte[]{1,2,3}}` | `["\\AB\\AC\\AD"]` |
 | `new byte[][]{null}` | `[null]` |
 | `new Byte[][]{null}` | `[null]` |
 | `new boolean[]{true}` | `[true]` |
 | `new Boolean[]{true}` | `[true]` |
-| `new byte[]{1,2,3}` | `"\/AB\/AC\/AD"` |
-| `new Byte[]{1,2,3}` | `"\/AB\/AC\/AD"` |
+| `new byte[]{1,2,3}` | `"\\AB\\AC\\AD"` |
+| `new Byte[]{1,2,3}` | `"\\AB\\AC\\AD"` |
 | `new short[]{1}` | `["\b;;;;;;<"]` |
 | `new Short[]{1}` | `["\b;;;;;;<"]` |
 | `new Short[]{null}` | `[null]` |

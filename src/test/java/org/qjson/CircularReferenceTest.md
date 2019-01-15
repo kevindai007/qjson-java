@@ -15,7 +15,7 @@ public class MyTestObject {
 
 | value | encoded |
 | ---   | ---     |
-| `MyTestObject.get()` | `{"a":[],"b":"\\['a']"}` |
+| `MyTestObject.get()` | `{"a":[],"b":"\/['a']"}` |
 
 # ref_list_value
 
@@ -34,7 +34,7 @@ public class MyTestObject {
 
 | value | encoded |
 | ---   | ---     |
-| `MyTestObject.get()` | `{"a":[{}],"b":["\\['a'][0]"]}` |
+| `MyTestObject.get()` | `{"a":[{}],"b":["\/['a'][0]"]}` |
 
 # ref_struct_field
 
@@ -63,4 +63,24 @@ public class MyTestObject {
 
 | value | encoded |
 | ---   | ---     |
-| `MyTestObject.get()` | `{"a":{"field":{}},"b":"\\['a'].field"}` |
+| `MyTestObject.get()` | `{"a":{"field":{}},"b":"\/['a'].field"}` |
+
+# ref_itself
+
+```java
+package testdata;
+import org.qjson.any.*;
+
+public class MyTestObject {
+    
+    public static Object get() {
+        AnyMap myself = new AnyMap();
+        myself.set("a", myself);
+        return myself;
+    }
+}
+```
+
+| value | encoded |
+| ---   | ---     |
+| `MyTestObject.get()` | `{"a":"\/"}` |

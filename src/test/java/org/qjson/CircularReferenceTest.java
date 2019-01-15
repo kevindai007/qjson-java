@@ -18,4 +18,9 @@ public class CircularReferenceTest {
     public void ref_struct_field() {
         TestEncode.$();
     }
+
+    @Test
+    public void ref_itself() {
+        TestEncode.$();
+    }
 }

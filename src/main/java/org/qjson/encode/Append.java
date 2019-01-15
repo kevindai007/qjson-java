@@ -21,7 +21,7 @@ public interface Append {
     }
 
     static void escape(StringBuilder builder, byte b) {
-        Append.$(builder, '\\', '/', (char) ('A' + (b >>> 4)), (char) ('A' + (b & 0xF)));
+        Append.$(builder, '\\', '\\', (char) ('A' + (b >>> 4)), (char) ('A' + (b & 0xF)));
     }
 
     static void escape(StringBuilder builder, byte[] val, int offset) {
