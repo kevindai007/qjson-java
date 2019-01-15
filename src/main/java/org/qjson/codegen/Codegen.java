@@ -141,11 +141,8 @@ public class Codegen {
     }
 
     private static Generator getDecoderGenerator(Class clazz) {
-        boolean isJavaUtil = isJavaUtil(clazz);
         if (clazz.isArray()) {
             return new ArrayDecoderGenerator();
-        } else if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
-            return new CollectionDecoderGenerator();
         }
         return new StructDecoderGenerator();
     }
@@ -167,15 +164,5 @@ public class Codegen {
             String line = lines[i];
             System.out.println((i + 1) + ":\t" + line);
         }
-    }
-
-    public static boolean isJavaUtil(Class clazz) {
-        if (clazz == null) {
-            return false;
-        }
-        if (clazz.getName().startsWith("java.util.")) {
-            return true;
-        }
-        return isJavaUtil(clazz.getSuperclass());
     }
 }

@@ -5,7 +5,7 @@
 | `AnyList<String>` | `null` | `null` |
 | `AnyList<String>` | `new AnyList()` | `[]` |
 | `AnyList<String>` | `new AnyList("hello")` | `["hello"]` |
-| `AnyList<String>` | `new AnyList(null)` | `[null]` |
+| `AnyList<String>` | `new AnyList((String)null)` | `[null]` |
 | `AnyList<Integer>` | `new AnyList(100)` | `["\b;;;;;>?"]` |
 
 # object_list

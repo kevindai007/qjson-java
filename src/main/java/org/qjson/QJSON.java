@@ -1,23 +1,19 @@
 package org.qjson;
 
+import org.mdkt.compiler.InMemoryJavaCompiler;
 import org.qjson.any.Any;
 import org.qjson.any.AnyList;
 import org.qjson.any.AnyMap;
-import org.qjson.codegen.ArrayDecoderGenerator;
 import org.qjson.codegen.Codegen;
-import org.qjson.codegen.CollectionDecoderGenerator;
 import org.qjson.decode.BytesDecoderSource;
 import org.qjson.decode.QJsonDecodeException;
 import org.qjson.decode.StringDecoderSource;
 import org.qjson.encode.BytesBuilder;
 import org.qjson.encode.BytesEncoderSink;
 import org.qjson.encode.StringEncoderSink;
-import org.qjson.spi.Decoder;
-import org.qjson.spi.QJsonSpi;
-import org.qjson.spi.Encoder;
-import org.mdkt.compiler.InMemoryJavaCompiler;
-import org.qjson.spi.TypeVariables;
+import org.qjson.spi.*;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -86,6 +82,35 @@ public class QJSON implements QJsonSpi {
         this(new Config());
     }
 
+    @Override
+    public Function<DecoderSource, Object> factoryOf(Class clazz) {
+        if (clazz.equals(AnyMap.class)) {
+            return source -> new AnyMap();
+        }
+        if (clazz.equals(HashMap.class)) {
+            return source -> new HashMap();
+        }
+        if (clazz.equals(AnyList.class)) {
+            return source -> new AnyList();
+        }
+        if (clazz.equals(ArrayList.class)) {
+            return source -> new ArrayList();
+        }
+        try {
+            Constructor ctor = clazz.getConstructor();
+            return source -> {
+                try {
+                    return (Map) ctor.newInstance();
+                } catch (Exception e) {
+                    throw source.reportError("create map failed", e);
+                }
+            };
+
+        } catch (NoSuchMethodException e) {
+            throw new QJsonDecodeException("no default constructor for: " + clazz, e);
+        }
+    }
+
     public Encoder encoderOf(Class clazz) {
         return encoderCache.computeIfAbsent(clazz, this::generateEncoder);
     }
@@ -95,7 +120,7 @@ public class QJSON implements QJsonSpi {
         if (encoder != null) {
             return encoder;
         }
-        boolean isJavaUtil = Codegen.isJavaUtil(clazz);
+        boolean isJavaUtil = isJavaUtil(clazz);
         if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
             return builtinEncoders.get(Map.class);
         }
@@ -137,11 +162,24 @@ public class QJSON implements QJsonSpi {
         if (clazz == null) {
             throw new QJsonDecodeException("can not cast to class: " + type);
         }
-        boolean isJavaUtil = Codegen.isJavaUtil(clazz);
+        boolean isJavaUtil = isJavaUtil(clazz);
+        if (Collection.class.isAssignableFrom(clazz) && isJavaUtil) {
+            return CollectionDecoder.create(this, clazz, typeArgs);
+        }
         if (Map.class.isAssignableFrom(clazz) && isJavaUtil) {
-            return MapDecoder.create(cfg, this, clazz, typeArgs);
+            return MapDecoder.create(this, clazz, typeArgs);
         }
         return codegen.generateDecoder(clazz, typeArgs);
+    }
+
+    private static boolean isJavaUtil(Class clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        if (clazz.getName().startsWith("java.util.")) {
+            return true;
+        }
+        return isJavaUtil(clazz.getSuperclass());
     }
 
     public String encode(Object val) {
@@ -163,7 +201,7 @@ public class QJSON implements QJsonSpi {
     }
 
     public <T> T decode(Class<T> clazz, String encoded) {
-        return (T) decode((Type)clazz, encoded);
+        return (T) decode((Type) clazz, encoded);
     }
 
     public <T> T decode(Class<T> clazz, byte[] encoded) {

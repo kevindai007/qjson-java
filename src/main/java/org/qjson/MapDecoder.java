@@ -1,60 +1,34 @@
 package org.qjson;
 
-import org.qjson.any.AnyMap;
-import org.qjson.codegen.Codegen;
 import org.qjson.decode.BytesDecoderSource;
-import org.qjson.decode.QJsonDecodeException;
 import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
+import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.TypeVariables;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 class MapDecoder implements Decoder {
 
-    private final Function<DecoderSource, Map> mapFactory;
+    private final Function<DecoderSource, Object> mapFactory;
     private final Decoder keyDecoder;
     private final Decoder valueDecoder;
 
-    public MapDecoder(Function<DecoderSource, Map> mapFactory, Decoder keyDecoder, Decoder valueDecoder) {
+    public MapDecoder(Function<DecoderSource, Object> mapFactory, Decoder keyDecoder, Decoder valueDecoder) {
         this.mapFactory = mapFactory;
         this.keyDecoder = keyDecoder;
         this.valueDecoder = valueDecoder;
     }
 
-    static MapDecoder create(Codegen.Config cfg, Decoder.Provider spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
-        Function<DecoderSource, Map> mapFactory = getMapFactory(clazz);
+    static MapDecoder create(QJsonSpi spi, Class clazz, Map<TypeVariable, Type> typeArgs) {
+        Function<DecoderSource, Object> mapFactory = spi.factoryOf(clazz);
         Decoder keyDecoder = getKeyDecoder(spi, typeArgs);
         Decoder valueDecoder = getValueDecoder(spi, typeArgs);
         return new MapDecoder(mapFactory, keyDecoder, valueDecoder);
-    }
-
-    private static Function<DecoderSource, Map> getMapFactory(Class clazz) {
-        if (clazz.equals(AnyMap.class)) {
-            return source -> new AnyMap();
-        }
-        if (clazz.equals(HashMap.class)) {
-            return source -> new HashMap();
-        }
-        try {
-            Constructor ctor = clazz.getConstructor();
-            return source -> {
-                try {
-                    return (Map) ctor.newInstance();
-                } catch (Exception e) {
-                    throw source.reportError("create map failed", e);
-                }
-            };
-
-        } catch (NoSuchMethodException e) {
-            throw new QJsonDecodeException("no default constructor for: " + clazz, e);
-        }
     }
 
     private static Decoder getKeyDecoder(Decoder.Provider spi, Map<TypeVariable, Type> typeArgs) {
@@ -88,7 +62,7 @@ class MapDecoder implements Decoder {
             throw source.reportError("expect {");
         }
         source.next();
-        Map map = mapFactory.apply(source);
+        Map map = (Map) mapFactory.apply(source);
         // if map is {}
         if (source.peek() == '}') {
             source.next();
