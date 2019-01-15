@@ -7,7 +7,9 @@ public final class CurrentPath {
     public int enterMapValue(String key) {
         int oldLength = path.length();
         path.append('[');
-        path.append(key);
+        path.append('\'');
+        path.append(key, 1, key.length() - 1);
+        path.append('\'');
         path.append(']');
         return oldLength;
     }
@@ -22,5 +24,10 @@ public final class CurrentPath {
 
     public void exit(int oldLength) {
         path.setLength(oldLength);
+    }
+
+    @Override
+    public String toString() {
+        return path.toString();
     }
 }
