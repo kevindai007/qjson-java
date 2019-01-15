@@ -6,13 +6,13 @@ import org.qjson.spi.EncoderSink;
 import java.util.HashMap;
 import java.util.Map;
 
-final class PathTracker {
+final class ObjectTracker {
 
-    private final Map<Integer, String> visited = new HashMap<>();
+    private final Map<Integer, String> tracking = new HashMap<>();
     private CurrentPath currentPath = new CurrentPath();
     private final EncoderSink sink;
 
-    PathTracker(EncoderSink sink) {
+    ObjectTracker(EncoderSink sink) {
         this.sink = sink;
     }
 
@@ -39,9 +39,9 @@ final class PathTracker {
 
     private void encode(Object val, Encoder encoder) {
         int id = System.identityHashCode(val);
-        String ref = visited.get(id);
+        String ref = tracking.get(id);
         if (ref == null) {
-            visited.put(id, currentPath.toString());
+            tracking.put(id, currentPath.toString());
             encoder.encode(sink, val);
         } else {
             encoder.encodeRef(sink, val, ref);
@@ -49,7 +49,7 @@ final class PathTracker {
     }
 
     public void reset() {
-        visited.clear();
+        tracking.clear();
         currentPath.exit(0);
     }
 }

@@ -10,8 +10,8 @@ import java.nio.charset.StandardCharsets;
 
 public final class BytesEncoderSink implements EncoderSink {
 
-    private final PathTracker pathTracker = new PathTracker(this);
-    private final TempHolder tempHolder = new TempHolder();
+    private final ObjectTracker objectTracker = new ObjectTracker(this);
+    private final Object[] attachments = new Object[EncoderSink.AttachmentKey.count()];
     private final BytesBuilder builder;
 
     public BytesEncoderSink(BytesBuilder builder) {
@@ -50,17 +50,27 @@ public final class BytesEncoderSink implements EncoderSink {
 
     @Override
     public void encodeObject(Object val, Encoder encoder) {
-        pathTracker.encodeObject(val, encoder);
+        objectTracker.encodeObject(val, encoder);
     }
 
     @Override
     public void encodeObject(Object val, Encoder.Provider spi) {
-        pathTracker.encodeObject(val, spi);
+        objectTracker.encodeObject(val, spi);
     }
 
     @Override
     public CurrentPath currentPath() {
         return null;
+    }
+
+    @Override
+    public <T> T getAttachment(AttachmentKey<T> key) {
+        return (T) attachments[key.val];
+    }
+
+    @Override
+    public <T> void setAttachment(AttachmentKey<T> key, T attachment) {
+        attachments[key.val] = attachment;
     }
 
     @Override
@@ -115,16 +125,6 @@ public final class BytesEncoderSink implements EncoderSink {
         throw new QJsonEncodeException(errMsg, cause);
     }
 
-    @Override
-    public <T> T borrowTemp(Class<T> clazz) {
-        return tempHolder.borrowTemp(clazz);
-    }
-
-    @Override
-    public void releaseTemp(Object temp) {
-        tempHolder.releaseTemp(temp);
-    }
-
     public BytesBuilder bytesBuilder() {
         return builder;
     }
@@ -132,9 +132,5 @@ public final class BytesEncoderSink implements EncoderSink {
     @Override
     public String toString() {
         return builder.toString();
-    }
-
-    public byte[] copyOfBytes() {
-        return builder.copyOfBytes();
     }
 }

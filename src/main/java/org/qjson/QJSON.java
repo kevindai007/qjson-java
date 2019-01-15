@@ -170,13 +170,13 @@ public class QJSON implements QJsonSpi {
     }
 
     private Object decode(Type type, byte[] encoded, int offset, int size) {
-        BytesDecoderSource source = new BytesDecoderSource(this::decoderOf, encoded, offset, size);
-        return source.decodeObject(type);
+        BytesDecoderSource source = new BytesDecoderSource(encoded, offset, size);
+        return source.decodeObject(decoderOf(type));
     }
 
     private Object decode(Type type, String encoded) {
-        StringDecoderSource source = new StringDecoderSource(this, encoded);
-        return source.decodeObject(type);
+        StringDecoderSource source = new StringDecoderSource(encoded);
+        return source.decodeObject(decoderOf(type));
     }
 
     // === static api ===

@@ -1,34 +1,31 @@
 package org.qjson.decode;
 
-import org.qjson.encode.BytesBuilder;
+import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
-import org.qjson.spi.QJsonSpi;
 
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 public class BytesDecoderSource implements DecoderSource {
 
-    private final Decoder.Provider spi;
+    private final PathTracker pathTracker = new PathTracker(this);
+    private final Object[] attachments = new Object[DecoderSource.AttachmentKey.count()];
     final byte[] buf;
     int offset;
     final int size;
-    private BytesBuilder temp;
 
-    public BytesDecoderSource(Decoder.Provider spi, byte[] buf, int offset, int size) {
-        this.spi = spi;
+    public BytesDecoderSource(byte[] buf, int offset, int size) {
         this.buf = buf;
         this.offset = offset;
         this.size = size;
     }
 
-    public BytesDecoderSource(QJsonSpi spi, String buf) {
-        this(spi, buf.getBytes(StandardCharsets.UTF_8));
+    public BytesDecoderSource(String buf) {
+        this(buf.getBytes(StandardCharsets.UTF_8));
     }
 
-    public BytesDecoderSource(QJsonSpi spi, byte[] buf) {
-        this(spi, buf, 0, buf.length);
+    public BytesDecoderSource(byte[] buf) {
+        this(buf, 0, buf.length);
     }
 
     @Override
@@ -49,7 +46,8 @@ public class BytesDecoderSource implements DecoderSource {
 
     @Override
     public String decodeString() {
-        return DecodeString.$(this);
+        expect('"');
+        return DecodeString.$(this, offset);
     }
 
     @Override
@@ -73,11 +71,33 @@ public class BytesDecoderSource implements DecoderSource {
     }
 
     @Override
-    public Object decodeObject(Type type) {
-        if (decodeNull()) {
-            return null;
+    public Object decodeRef(Decoder decoder) {
+        if (offset + 2 < size && buf[offset] == '"' && buf[offset + 1] == '\\' && buf[offset + 2] == '/') {
+            String path = DecodeString.$(this, offset + 3);
+            Object ref = pathTracker.lookup(path);
+            return decoder.decodeRef(this, path, ref);
         }
-        return spi.decoderOf(type).decode(this);
+        return null;
+    }
+
+    @Override
+    public Object decodeObject(Decoder decoder) {
+        return pathTracker.decodeObject(decoder);
+    }
+
+    @Override
+    public CurrentPath currentPath() {
+        return pathTracker.currentPath();
+    }
+
+    @Override
+    public <T> T getAttachment(AttachmentKey<T> key) {
+        return (T) attachments[key.val];
+    }
+
+    @Override
+    public <T> void setAttachment(AttachmentKey<T> key, T attachment) {
+        attachments[key.val] = attachment;
     }
 
     @Override
@@ -187,18 +207,5 @@ public class BytesDecoderSource implements DecoderSource {
     @Override
     public void skip() {
         Skip.$(this);
-    }
-
-    public BytesBuilder borrowTemp(int capacity) {
-        if (temp == null) {
-            return new BytesBuilder(new byte[capacity], 0);
-        }
-        temp.ensureCapacity(capacity);
-        return temp;
-    }
-
-    public void releaseTemp(BytesBuilder temp) {
-        temp.setLength(0);
-        this.temp = temp;
     }
 }

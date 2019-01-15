@@ -5,7 +5,8 @@ import org.qjson.spi.EncoderSink;
 
 public class StringEncoderSink implements EncoderSink {
 
-    private final PathTracker pathTracker = new PathTracker(this);
+    private final ObjectTracker objectTracker = new ObjectTracker(this);
+    private final Object[] attachments = new Object[EncoderSink.AttachmentKey.count()];
     private final StringBuilder builder;
 
     public StringEncoderSink() {
@@ -58,17 +59,27 @@ public class StringEncoderSink implements EncoderSink {
 
     @Override
     public void encodeObject(Object val, Encoder encoder) {
-        pathTracker.encodeObject(val, encoder);
+        objectTracker.encodeObject(val, encoder);
     }
 
     @Override
     public void encodeObject(Object val, Encoder.Provider spi) {
-        pathTracker.encodeObject(val, spi);
+        objectTracker.encodeObject(val, spi);
     }
 
     @Override
     public CurrentPath currentPath() {
-        return pathTracker.currentPath();
+        return objectTracker.currentPath();
+    }
+
+    @Override
+    public <T> T getAttachment(AttachmentKey<T> key) {
+        return (T) attachments[key.val];
+    }
+
+    @Override
+    public <T> void setAttachment(AttachmentKey<T> key, T attachment) {
+        attachments[key.val] = attachment;
     }
 
     @Override
@@ -98,16 +109,6 @@ public class StringEncoderSink implements EncoderSink {
         throw new QJsonEncodeException(errMsg, cause);
     }
 
-    @Override
-    public <T> T borrowTemp(Class<T> clazz) {
-        return null;
-    }
-
-    @Override
-    public void releaseTemp(Object temp) {
-
-    }
-
     public StringBuilder stringBuilder() {
         return builder;
     }
@@ -118,7 +119,7 @@ public class StringEncoderSink implements EncoderSink {
     }
 
     public void reset() {
-        pathTracker.reset();
+        objectTracker.reset();
         builder.setLength(0);
     }
 }

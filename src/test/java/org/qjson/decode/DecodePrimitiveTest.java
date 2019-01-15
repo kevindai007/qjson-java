@@ -14,8 +14,8 @@ public class DecodePrimitiveTest {
     public void type_int() {
         for (List<String> row : myTestData().table().body) {
             int expected = Integer.valueOf(stripQuote(row.get(0)));
-            int actual1 = new BytesDecoderSource(null, stripQuote(row.get(1)).getBytes()).decodeInt();
-            int actual2= new StringDecoderSource(null, stripQuote(row.get(1))).decodeInt();
+            int actual1 = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeInt();
+            int actual2 = new StringDecoderSource(stripQuote(row.get(1))).decodeInt();
             Assert.assertEquals(row.get(0), expected, actual1);
             Assert.assertEquals(row.get(0), expected, actual2);
         }
@@ -25,10 +25,8 @@ public class DecodePrimitiveTest {
     public void type_long() {
         for (List<String> row : myTestData().table().body) {
             long expected = Long.valueOf(stripQuote(row.get(0)));
-            long actual1 = (Long)new BytesDecoderSource(null,
-                    stripQuote(row.get(1)).getBytes()).decodeStringOrNumber();
-            long actual2 = (Long)new StringDecoderSource(null,
-                    stripQuote(row.get(1))).decodeStringOrNumber();
+            long actual1 = (Long) new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeStringOrNumber();
+            long actual2 = (Long) new StringDecoderSource(stripQuote(row.get(1))).decodeStringOrNumber();
             Assert.assertEquals(row.get(0), expected, actual1);
             Assert.assertEquals(row.get(0), expected, actual2);
         }
@@ -38,10 +36,8 @@ public class DecodePrimitiveTest {
     public void type_double() {
         for (List<String> row : myTestData().table().body) {
             String expected = stripQuote(row.get(0));
-            String actual1 = String.valueOf(new BytesDecoderSource(null,
-                    stripQuote(row.get(1)).getBytes()).decodeStringOrNumber());
-            String actual2 = String.valueOf(new StringDecoderSource(null,
-                    stripQuote(row.get(1))).decodeStringOrNumber());
+            String actual1 = String.valueOf(new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeStringOrNumber());
+            String actual2 = String.valueOf(new StringDecoderSource(stripQuote(row.get(1))).decodeStringOrNumber());
             Assert.assertEquals(row.get(0), expected, actual1);
             Assert.assertEquals(row.get(0), expected, actual2);
         }
@@ -55,10 +51,8 @@ public class DecodePrimitiveTest {
                 char c = (char) Long.parseLong(expected.substring(2), 16);
                 expected = new String(new char[]{c});
             }
-            String actual1 = new BytesDecoderSource(null,
-                    stripQuote(row.get(1)).getBytes()).decodeString();
-            String actual2 = new StringDecoderSource(null,
-                    stripQuote(row.get(1))).decodeString();
+            String actual1 = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeString();
+            String actual2 = new StringDecoderSource(stripQuote(row.get(1))).decodeString();
             Assert.assertEquals(row.get(0), expected, actual1);
             Assert.assertEquals(row.get(0), expected, actual2);
         }
@@ -78,10 +72,8 @@ public class DecodePrimitiveTest {
                 String elem = elems[i];
                 expected[i] = (byte) Long.parseLong(elem, 16);
             }
-            byte[] actual1 = new BytesDecoderSource(null,
-                    stripQuote(row.get(1)).getBytes()).decodeBytes();
-            byte[] actual2 = new StringDecoderSource(null,
-                    stripQuote(row.get(1))).decodeBytes();
+            byte[] actual1 = new BytesDecoderSource(stripQuote(row.get(1)).getBytes()).decodeBytes();
+            byte[] actual2 = new StringDecoderSource(stripQuote(row.get(1))).decodeBytes();
             Assert.assertArrayEquals(row.get(0), expected, actual1);
             Assert.assertArrayEquals(row.get(0), expected, actual2);
         }

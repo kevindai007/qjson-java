@@ -1,6 +1,7 @@
 package org.qjson.decode;
 
 import org.qjson.encode.BytesBuilder;
+import org.qjson.spi.DecoderSource;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -9,9 +10,9 @@ import java.nio.charset.StandardCharsets;
 
 interface DecodeString {
 
-    static String $(BytesDecoderSource source) {
-        source.expect('"');
-        int i = source.offset;
+    DecoderSource.AttachmentKey<BytesBuilder> TEMP_KEY = DecoderSource.AttachmentKey.assign();
+
+    static String $(BytesDecoderSource source, int i) {
         for (; i < source.size; i++) {
             byte b = source.buf[i];
             if (b == '"') {
@@ -27,7 +28,7 @@ interface DecodeString {
             throw source.reportError("missing double quote");
         }
         int noEscapeLen = i - source.offset;
-        BytesBuilder temp = source.borrowTemp(noEscapeLen + 16);
+        BytesBuilder temp = borrowTemp(source, noEscapeLen + 16);
         System.arraycopy(source.buf, source.offset, temp.buf(), 0, noEscapeLen);
         temp.setLength(noEscapeLen);
         source.offset = i;
@@ -40,13 +41,21 @@ interface DecodeString {
             }
         }
         String decoded = temp.toString();
-        source.releaseTemp(temp);
+        source.setAttachment(TEMP_KEY, temp);
         return decoded;
     }
 
-    static String $(StringDecoderSource source) {
-        source.expect('"');
-        int i = source.offset;
+    static BytesBuilder borrowTemp(DecoderSource source, int capacity) {
+        BytesBuilder temp = source.borrowAttachment(TEMP_KEY);
+        if (temp == null) {
+            temp = new BytesBuilder(new byte[capacity], 0);
+        } else {
+            temp.ensureCapacity(capacity);
+        }
+        return temp;
+    }
+
+    static String $(StringDecoderSource source, int i) {
         for (; i < source.buf.length(); i++) {
             char c = source.buf.charAt(i);
             if (c == '"') {
@@ -62,7 +71,7 @@ interface DecodeString {
             throw source.reportError("missing double quote");
         }
         StringBuilder builder = new StringBuilder(source.buf.substring(source.offset, i));
-        BytesBuilder temp = source.borrowTemp(0);
+        BytesBuilder temp = borrowTemp(source, 0);
         source.offset = i;
         while (true) {
             if (readEscaped(source, builder, temp)) {
@@ -72,7 +81,7 @@ interface DecodeString {
                 break;
             }
         }
-        source.releaseTemp(temp);
+        source.setAttachment(TEMP_KEY, temp);
         return builder.toString();
     }
 

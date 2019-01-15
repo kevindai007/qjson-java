@@ -1,6 +1,7 @@
 package org.qjson.decode;
 
 import org.qjson.encode.BytesBuilder;
+import org.qjson.spi.DecoderSource;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -8,6 +9,8 @@ import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 
 interface DecodeBytes {
+
+    DecoderSource.AttachmentKey<BytesBuilder> TEMP_KEY = DecoderSource.AttachmentKey.assign();
 
     static byte[] $(BytesDecoderSource source) {
         source.expect('"');
@@ -28,7 +31,7 @@ interface DecodeBytes {
             throw source.reportError("missing double quote");
         }
         int noEscapeLen = i - source.offset;
-        BytesBuilder temp = source.borrowTemp(noEscapeLen + 16);
+        BytesBuilder temp = borrowTemp(source, noEscapeLen + 16);
         System.arraycopy(source.buf, source.offset, temp.buf(), 0, noEscapeLen);
         temp.setLength(noEscapeLen);
         source.offset = i;
@@ -41,8 +44,18 @@ interface DecodeBytes {
             }
         }
         byte[] decoded = temp.copyOfBytes();
-        source.releaseTemp(temp);
+        source.setAttachment(TEMP_KEY, temp);
         return decoded;
+    }
+
+    static BytesBuilder borrowTemp(DecoderSource source, int capacity) {
+        BytesBuilder temp = source.borrowAttachment(TEMP_KEY);
+        if (temp == null) {
+            temp = new BytesBuilder(new byte[capacity], 0);
+        } else {
+            temp.ensureCapacity(capacity);
+        }
+        return temp;
     }
 
     static byte[] $(StringDecoderSource source) {
@@ -64,7 +77,7 @@ interface DecodeBytes {
             throw source.reportError("missing double quote");
         }
         int noEscapeLen = i - source.offset;
-        BytesBuilder temp = source.borrowTemp(noEscapeLen + 16);
+        BytesBuilder temp = borrowTemp(source, noEscapeLen + 16);
         CharBuffer charBuffer = CharBuffer.wrap(source.buf, source.offset, i);
         ByteBuffer byteBuffer = ByteBuffer.wrap(temp.buf());
         CoderResult result = StandardCharsets.UTF_8.newEncoder().encode(charBuffer, byteBuffer, true);
@@ -86,7 +99,7 @@ interface DecodeBytes {
             }
         }
         byte[] decoded = temp.copyOfBytes();
-        source.releaseTemp(temp);
+        source.setAttachment(TEMP_KEY, temp);
         return decoded;
     }
 }

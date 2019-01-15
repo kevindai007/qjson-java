@@ -1,6 +1,7 @@
 package org.qjson.decode;
 
 import org.qjson.encode.BytesBuilder;
+import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
 
@@ -8,13 +9,12 @@ import java.lang.reflect.Type;
 
 public class StringDecoderSource implements DecoderSource {
 
-    private final Decoder.Provider spi;
+    private final PathTracker pathTracker = new PathTracker(this);
+    private final Object[] attachments = new Object[DecoderSource.AttachmentKey.count()];
     final String buf;
     int offset;
-    private BytesBuilder temp;
 
-    public StringDecoderSource(Decoder.Provider spi, String buf) {
-        this.spi = spi;
+    public StringDecoderSource(String buf) {
         this.buf = buf;
     }
 
@@ -62,7 +62,8 @@ public class StringDecoderSource implements DecoderSource {
 
     @Override
     public String decodeString() {
-        return DecodeString.$(this);
+        expect('"');
+        return DecodeString.$(this, offset);
     }
 
     @Override
@@ -86,11 +87,33 @@ public class StringDecoderSource implements DecoderSource {
     }
 
     @Override
-    public Object decodeObject(Type type) {
-        if (decodeNull()) {
-            return null;
+    public Object decodeRef(Decoder decoder) {
+        if (offset + 2 < buf.length() && buf.charAt(offset) == '"' && buf.charAt(offset + 1) == '\\' && buf.charAt(offset + 2) == '/') {
+            String path = DecodeString.$(this, offset + 3);
+            Object ref = pathTracker.lookup(path);
+            return decoder.decodeRef(this, path, ref);
         }
-        return spi.decoderOf(type).decode(this);
+        return null;
+    }
+
+    @Override
+    public Object decodeObject(Decoder decoder) {
+        return pathTracker.decodeObject(decoder);
+    }
+
+    @Override
+    public CurrentPath currentPath() {
+        return pathTracker.currentPath();
+    }
+
+    @Override
+    public <T> T getAttachment(AttachmentKey<T> key) {
+        return (T) attachments[key.val];
+    }
+
+    @Override
+    public <T> void setAttachment(AttachmentKey<T> key, T attachment) {
+        attachments[key.val] = attachment;
     }
 
     @Override
@@ -182,18 +205,5 @@ public class StringDecoderSource implements DecoderSource {
             throw reportError("expect " + new String(new char[]{c}));
         }
         offset++;
-    }
-
-    public BytesBuilder borrowTemp(int capacity) {
-        if (temp == null) {
-            return new BytesBuilder(new byte[capacity], 0);
-        }
-        temp.ensureCapacity(capacity);
-        return temp;
-    }
-
-    public void releaseTemp(BytesBuilder temp) {
-        temp.setLength(0);
-        this.temp = temp;
     }
 }

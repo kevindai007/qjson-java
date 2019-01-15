@@ -9,4 +9,12 @@ public interface Decoder {
     }
 
     Object decode(DecoderSource source);
+
+    default Object decodeNull(DecoderSource source) {
+        return null;
+    }
+
+    default Object decodeRef(DecoderSource source, String path, Object ref) {
+        return ref;
+    }
 }

@@ -4,6 +4,7 @@ import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Indent;
 import org.qjson.codegen.gen.Line;
 import org.qjson.decode.BytesDecoderSource;
+import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
 import org.qjson.spi.QJsonSpi;
@@ -88,7 +89,7 @@ public class MapDecoderGenerator implements Generator {
         }
         return source -> {
             byte[] bytes = source.decodeBytes();
-            BytesDecoderSource newSource = new BytesDecoderSource(spi::decoderOf, bytes, 0, bytes.length);
+            BytesDecoderSource newSource = new BytesDecoderSource(bytes, 0, bytes.length);
             return keyDecoder.decode(newSource);
         };
     }
@@ -113,11 +114,15 @@ public class MapDecoderGenerator implements Generator {
         static void fill(DecoderSource source, Decoder keyDecoder, Decoder valueDecoder, Map map) {
             byte b;
             do {
-                Object key = keyDecoder.decode(source);
+                String keyStr = source.decodeString();
+                Object key = source.decodeObject(keyDecoder);
                 if (source.read() != ':') {
                     throw source.reportError("expect :");
                 }
-                Object value = valueDecoder.decode(source);
+                CurrentPath currentPath = source.currentPath();
+                int oldPath = currentPath.enterMapValue(keyStr);
+                Object value = source.decodeObject(valueDecoder);
+                currentPath.exit(oldPath);
                 map.put(key, value);
             } while ((b = source.read()) == ',');
             if (b != '}') {

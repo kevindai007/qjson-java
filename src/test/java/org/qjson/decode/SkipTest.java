@@ -10,12 +10,12 @@ public class SkipTest {
     @Test
     public void skip() {
         myTestData().assertTrue(code -> {
-            BytesDecoderSource source = new BytesDecoderSource(null, stripQuote(code) + "true");
+            BytesDecoderSource source = new BytesDecoderSource( stripQuote(code) + "true");
             source.skip();
             return source.decodeBoolean();
         });
         myTestData().assertTrue(code -> {
-            StringDecoderSource source = new StringDecoderSource(null, stripQuote(code) + "true");
+            StringDecoderSource source = new StringDecoderSource( stripQuote(code) + "true");
             source.skip();
             return source.decodeBoolean();
         });

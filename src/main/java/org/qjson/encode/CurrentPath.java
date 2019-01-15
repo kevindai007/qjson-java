@@ -4,11 +4,21 @@ public final class CurrentPath {
 
     private final StringBuilder path = new StringBuilder();
 
-    public int enterMapValue(String key) {
+    public int enterMapValueWithQuotes(String key) {
         int oldLength = path.length();
         path.append('[');
         path.append('\'');
         path.append(key, 1, key.length() - 1);
+        path.append('\'');
+        path.append(']');
+        return oldLength;
+    }
+
+    public int enterMapValue(String key) {
+        int oldLength = path.length();
+        path.append('[');
+        path.append('\'');
+        path.append(key);
         path.append('\'');
         path.append(']');
         return oldLength;

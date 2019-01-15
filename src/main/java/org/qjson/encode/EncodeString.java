@@ -1,11 +1,15 @@
 package org.qjson.encode;
 
+import org.qjson.spi.EncoderSink;
+
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
 
 interface EncodeString {
+
+    EncoderSink.AttachmentKey<byte[]> TEMP_KEY = EncoderSink.AttachmentKey.assign();
 
     static void $(BytesEncoderSink sink, String val) {
         BytesBuilder builder = sink.bytesBuilder();
@@ -40,7 +44,7 @@ interface EncodeString {
         }
         builder.setLength(escapePos);
         int toEscapeLen = end - escapePos;
-        byte[] temp = sink.borrowTemp(byte[].class);
+        byte[] temp = sink.borrowAttachment(TEMP_KEY);
         if (temp == null || temp.length < toEscapeLen) {
             temp = new byte[toEscapeLen];
         }
@@ -54,7 +58,7 @@ interface EncodeString {
                 builder.append(b);
             }
         }
-        sink.releaseTemp(temp);
+        sink.setAttachment(TEMP_KEY, temp);
     }
 
     static int shouldEscape(byte[] buf, int offset, int end) {

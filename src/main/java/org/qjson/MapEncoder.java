@@ -12,6 +12,7 @@ import java.util.function.BiFunction;
 
 class MapEncoder implements Encoder {
 
+    private final EncoderSink.AttachmentKey<StringEncoderSink> TEMP_KEY = EncoderSink.AttachmentKey.assign();
     private final Map<Class, BiFunction<EncoderSink, Object,String>> keyEncoderCache = new ConcurrentHashMap<>();
     private final Encoder.Provider spi;
 
@@ -45,7 +46,7 @@ class MapEncoder implements Encoder {
             sink.write(encodedKey);
             sink.write(':');
             CurrentPath currentPath = sink.currentPath();
-            int oldPath = currentPath.enterMapValue(encodedKey);
+            int oldPath = currentPath.enterMapValueWithQuotes(encodedKey);
             sink.encodeObject(entry.getValue(), spi);
             currentPath.exit(oldPath);
         }
@@ -60,11 +61,12 @@ class MapEncoder implements Encoder {
         Encoder encoder = spi.encoderOf(clazz);
         boolean isValidKeyClass = MapDecoderGenerator.VALID_KEY_CLASSES.contains(clazz);
         return (sink, val) -> {
-            StringEncoderSink newSink = sink.borrowTemp(StringEncoderSink.class);
+            StringEncoderSink newSink = sink.borrowAttachment(TEMP_KEY);
             if (newSink == null) {
                 newSink = new StringEncoderSink();
+            } else {
+                newSink.reset();
             }
-            newSink.reset();
             if (isValidKeyClass) {
                 encoder.encode(newSink, val);
             } else {
@@ -74,7 +76,7 @@ class MapEncoder implements Encoder {
             }
             String encodedKey = newSink.toString();
             newSink.reset();
-            sink.releaseTemp(newSink);
+            sink.setAttachment(TEMP_KEY, newSink);
             return encodedKey;
         };
     }
