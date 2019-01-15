@@ -13,6 +13,7 @@ interface DecodeString {
     DecoderSource.AttachmentKey<BytesBuilder> TEMP_KEY = DecoderSource.AttachmentKey.assign();
 
     static String $(BytesDecoderSource source, int i) {
+        source.offset = i;
         for (; i < source.size; i++) {
             byte b = source.buf[i];
             if (b == '"') {
@@ -56,6 +57,7 @@ interface DecodeString {
     }
 
     static String $(StringDecoderSource source, int i) {
+        source.offset = i;
         for (; i < source.buf.length(); i++) {
             char c = source.buf.charAt(i);
             if (c == '"') {

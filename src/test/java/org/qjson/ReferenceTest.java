@@ -7,11 +7,13 @@ public class ReferenceTest {
     @Test
     public void ref_map_value() {
         TestEncode.$();
+        TestDecode.$();
     }
 
     @Test
     public void ref_list_element() {
         TestEncode.$();
+        TestDecode.$();
     }
 
     @Test

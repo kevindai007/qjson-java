@@ -1,5 +1,6 @@
 package org.qjson;
 
+import org.qjson.encode.CurrentPath;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
 import org.qjson.spi.QJsonSpi;
@@ -41,8 +42,13 @@ class CollectionDecoder implements Decoder {
             source.next();
             return col;
         }
+        int i = 0;
         do {
+            CurrentPath currentPath = source.currentPath();
+            int oldPath = currentPath.enterListElement(i);
             col.add(source.decodeObject(elemDecoder));
+            currentPath.exit(oldPath);
+            i++;
         } while ((b = source.read()) == ',');
         if (b != ']') {
             throw source.reportError("expect ]");
