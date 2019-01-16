@@ -12,4 +12,4 @@ QJSON.parse(encoded) // decode as map/list
 
 # Format
 
-The format is a subset of JSON. [Details](/format/)
+The format is a subset of JSON. [Details](format/)

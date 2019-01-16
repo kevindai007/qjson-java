@@ -1,8 +1,8 @@
 # Format
 
-* [Array](/format/ArrayTest.md)
-* [List](/format/ListTest.md)
-* [Map](/format/MapTest.md)
-* [Object](/format/ObjectTest.md)
-* [Reference](/format/ReferenceTest.md)
-* [Struct](/format/StructTest.md)
+* [Array](ArrayTest.md)
+* [List](ListTest.md)
+* [Map](MapTest.md)
+* [Object](ObjectTest.md)
+* [Reference](ReferenceTest.md)
+* [Struct](StructTest.md)
