@@ -1,1 +1,1 @@
-Quicks JSON Format: [https://qjson.org](https://qjson.org)
+Quicks JSON Format: [https://qjson.org/java](https://qjson.org/java)
