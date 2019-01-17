@@ -19,6 +19,11 @@ public class source_and_sink {
         testDemos();
     }
 
+    @Test
+    public void encode_sink() {
+        testDemos();
+    }
+
     private void testDemos() {
         List<String> codes = myTestData().codes();
         List<String> demoCodes = codes.subList(0, codes.size() - 1);

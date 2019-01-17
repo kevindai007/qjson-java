@@ -5,6 +5,13 @@ But `InputStream` and `OutputStream` is not supported.
 Internally string and byte[] are handled in its own optimal implementation.
 Because string is encoded as utf-16 chars in JVM, but byte[] is UTF-8 (assumed by QJSON).
 
+The static methods of `QJSON` support string only. To use byte[] we need a instance of QJSON
+
+```java
+QJSON qjson = new QJSON();
+// use qjson.encode or qjson.decode
+```
+
 # decode_source
 
 We use built-in `Any.class` as an example here. You can decode into your own class.
@@ -37,7 +44,7 @@ Assert.assertEquals(
         qjson.decode(Any.class, bytes, 1, 4).get());
 ```
 
-test code
+<hide>
 
 ```java
 package demo;
@@ -54,3 +61,50 @@ public class Demo {
     }
 }
 ```
+
+</hide>
+
+# encode_sink
+
+encode to string
+
+```java
+Assert.assertEquals("true", qjson.encode(true));
+```
+
+encode to string builder
+
+```java
+StringBuilder stringBuilder = new StringBuilder();
+qjson.encode(true, stringBuilder);
+Assert.assertEquals("true", stringBuilder.toString());
+```
+
+encode to byte[]
+
+```java
+BytesBuilder bytesBuilder = new org.qjson.encode.BytesBuilder();
+qjson.encode(true, bytesBuilder);
+Assert.assertArrayEquals(new byte[]{'t','r','u','e'}, bytesBuilder.copyOfBytes());
+```
+
+<hide>
+
+```java
+package demo;
+import org.qjson.QJSON;
+import org.qjson.encode.BytesBuilder;
+import org.qjson.any.*;
+import org.junit.Assert;
+import java.nio.charset.StandardCharsets;
+
+public class Demo {
+    
+    public static void demo() {
+        QJSON qjson = new QJSON();
+        {{ CODE }}
+    }
+}
+```
+
+</hide>
