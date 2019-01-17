@@ -1,3 +1,9 @@
 module.exports = {
-    base: '/java/'
+    base: '/java/',
+    themeConfig: {
+        sidebar: [
+            '/',
+            '/source_and_sink',
+        ]
+    }
 };
