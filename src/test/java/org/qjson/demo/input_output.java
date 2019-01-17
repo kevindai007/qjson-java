@@ -2,15 +2,15 @@ package org.qjson.demo;
 
 import org.junit.Test;
 
-public class source_and_sink {
+public class input_output {
 
     @Test
-    public void decode_source() {
+    public void decode_input() {
         TestDemo.$();
     }
 
     @Test
-    public void encode_sink() {
+    public void encode_output() {
         TestDemo.$();
     }
 

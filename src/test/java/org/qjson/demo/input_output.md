@@ -1,4 +1,4 @@
-# Source & Sink
+# Input & Output
 
 QJSON can decode from string or byte[] and encode to string or byte[]. 
 But `InputStream` and `OutputStream` is not supported.
@@ -12,7 +12,7 @@ QJSON qjson = new QJSON();
 // use qjson.encode or qjson.decode
 ```
 
-# decode_source
+# decode_input
 
 We use built-in `Any.class` as an example here. You can decode into your own class.
 
@@ -64,7 +64,7 @@ public class Demo {
 
 </hide>
 
-# encode_sink
+# encode_output
 
 encode to string
 

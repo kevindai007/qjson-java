@@ -86,3 +86,53 @@ public class Demo {
 </hide>
 
 # user_defined_container
+
+If you container is inherited from containers in `java.util.*`, it is still considered as container automatically.
+However, if your container just implements `Iterable`, it will not be encoded as `[]` automatically.
+Given this class
+
+<<< @/docs/demo/MyObjects.java
+
+
+It will be encoded like this:
+
+```java
+Assert.assertEquals(
+        "{\"obj1\":\"a\",\"obj2\":\"b\"}", // {"obj1":"a","obj2":"b"}
+        QJSON.stringify(new MyObjects("a", "b")));
+```
+
+To encode it as `["a","b"]`, we need to register a function to choose encoder.
+Same applies to decoding.
+
+```java
+QJSON.Config cfg = new QJSON.Config();
+cfg.chooseEncoder = (qjson, clazz) -> {
+    if (MyObjects.class.equals(clazz)) {
+        return qjson.encoderOf(Iterable.class);
+    }
+    return null;
+};
+QJSON qjson = new QJSON(cfg);
+Assert.assertEquals(
+        "[\"a\",\"b\"]", // ["a","b"]
+        qjson.encode(new MyObjects("a", "b")));
+```
+
+<hide>
+
+```java
+package demo;
+import org.qjson.QJSON;
+import org.junit.Assert;
+import org.qjson.demo.MyObjects;
+
+public class Demo {
+    
+    public static void demo() {
+        {{ CODE }}
+    }
+}
+```
+
+</hide>

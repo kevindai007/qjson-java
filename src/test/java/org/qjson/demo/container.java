@@ -9,4 +9,8 @@ public class container {
         TestDemo.$();
     }
 
+    @Test
+    public void user_defined_container() {
+        TestDemo.$();
+    }
 }

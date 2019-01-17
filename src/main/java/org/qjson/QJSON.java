@@ -62,6 +62,12 @@ public class QJSON implements QJsonSpi {
             }
             return impl;
         };
+        if (cfg.chooseEncoder == null) {
+            cfg.chooseEncoder = (qjson, clazz) -> null;
+        }
+        if (cfg.chooseDecoder == null) {
+            cfg.chooseDecoder = (qjson, clazz) -> null;
+        }
         if (cfg.chooseImpl == null) {
             cfg.chooseImpl = defaultChooseImpl;
         } else {
@@ -116,7 +122,11 @@ public class QJSON implements QJsonSpi {
     }
 
     private Encoder generateEncoder(Class clazz) {
-        Encoder encoder = builtinEncoders.get(clazz);
+        Encoder encoder = cfg.chooseEncoder.apply(this, clazz);
+        if (encoder != null) {
+            return encoder;
+        }
+        encoder = builtinEncoders.get(clazz);
         if (encoder != null) {
             return encoder;
         }
@@ -162,7 +172,11 @@ public class QJSON implements QJsonSpi {
     }
 
     private Decoder generateDecoder(Type type) {
-        Decoder decoder = builtinDecoders.get(type);
+        Decoder decoder = cfg.chooseDecoder.apply(this, type);
+        if (decoder != null) {
+            return decoder;
+        }
+        decoder = builtinDecoders.get(type);
         if (decoder != null) {
             return decoder;
         }
