@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class StructDescriptor {
 
-    private final Class clazz;
+    public final Class clazz;
     public final Map<String, Prop> fields = new HashMap<>();
     public final Map<String, List<Prop>> methods = new HashMap<>();
     // sort the properties in order to encode
@@ -60,10 +61,10 @@ public class StructDescriptor {
 
     public static StructDescriptor create(
             Class clazz, QJsonSpi spi,
-            BiFunction<QJsonSpi, StructDescriptor, StructDescriptor> customizeStruct) {
+            BiConsumer<QJsonSpi, StructDescriptor> customizeStruct) {
         StructDescriptor struct = new StructDescriptor(clazz);
         if (customizeStruct != null) {
-            struct = customizeStruct.apply(spi, struct);
+            customizeStruct.accept(spi, struct);
         }
         for (Prop value : struct.fields.values()) {
             moveProperty(value);
@@ -79,8 +80,12 @@ public class StructDescriptor {
     private static void moveProperty(Prop prop) {
         QJsonProperty annotation = prop.getAnnotation(QJsonProperty.class);
         if (annotation == null) {
-            prop.name = "";
-            prop.ignore = false;
+            if (prop.name == null) {
+                prop.name = "";
+            }
+            if (prop.ignore == null) {
+                prop.ignore = false;
+            }
             return;
         }
         if (prop.ignore == null) {

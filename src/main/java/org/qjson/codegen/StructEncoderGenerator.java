@@ -114,6 +114,12 @@ public class StructEncoderGenerator implements EncoderGenerator {
     static List<StructDescriptor.Prop> getProperties(Codegen.Config cfg, QJsonSpi spi, Class clazz) {
         StructDescriptor struct = StructDescriptor.create(clazz, spi, cfg.customizeStruct);
         Map<String, StructDescriptor.Prop> props = new HashMap<>();
+        for (StructDescriptor.Prop field : struct.fields.values()) {
+            if (field.name.isEmpty()) {
+                field.name = field.field.getName();
+            }
+            props.put(field.name, field);
+        }
         for (List<StructDescriptor.Prop> methods : struct.methods.values()) {
             for (StructDescriptor.Prop method : methods) {
                 String propName = getterPropName(method.method);
@@ -125,12 +131,6 @@ public class StructEncoderGenerator implements EncoderGenerator {
                 }
                 props.put(method.name, method);
             }
-        }
-        for (StructDescriptor.Prop field : struct.fields.values()) {
-            if (field.name.isEmpty()) {
-                field.name = field.field.getName();
-            }
-            props.put(field.name, field);
         }
         Function<List<StructDescriptor.Prop>, List<StructDescriptor.Prop>> sortProperties = struct.sortProperties;
         if (sortProperties == null) {

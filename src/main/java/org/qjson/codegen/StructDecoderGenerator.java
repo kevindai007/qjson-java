@@ -8,10 +8,7 @@ import org.qjson.spi.DecoderSource;
 import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.StructDescriptor;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Function;
 
@@ -76,6 +73,7 @@ public class StructDecoderGenerator implements DecoderGenerator {
             g.__(new Line("return;"));
         })).__(new Line("}"));
 
+        g.__(new Line("int oldPath;"));
         g.__(clazz.getCanonicalName()
         ).__(" struct = ("
         ).__(clazz.getCanonicalName()
@@ -101,7 +99,7 @@ public class StructDecoderGenerator implements DecoderGenerator {
 
     public Indent propCase(Gen g, int i, StructDescriptor.Prop prop) {
         return new Indent(() -> {
-            g.__("int oldPath = source.currentPath().enterStructField("
+            g.__("oldPath = source.currentPath().enterStructField("
             ).__(StructEncoderGenerator.asStringLiteral(prop.name)
             ).__(new Line(");"));
             if (prop.field != null) {
@@ -137,6 +135,18 @@ public class StructDecoderGenerator implements DecoderGenerator {
     static List<StructDescriptor.Prop> getProperties(Codegen.Config cfg, QJsonSpi spi, Class clazz) {
         StructDescriptor struct = StructDescriptor.create(clazz, spi, cfg.customizeStruct);
         Map<String, StructDescriptor.Prop> props = new HashMap<>();
+        for (StructDescriptor.Prop field : struct.fields.values()) {
+            if (Modifier.isFinal(field.field.getModifiers())) {
+                continue;
+            }
+            if (field.name.isEmpty()) {
+                field.name = field.field.getName();
+            }
+            if (field.decoder == null) {
+                field.decoder = spi.decoderOf(field.field.getGenericType());
+            }
+            props.put(field.name, field);
+        }
         for (List<StructDescriptor.Prop> methods : struct.methods.values()) {
             for (StructDescriptor.Prop method : methods) {
                 String propName = setterPropName(method.method);
@@ -151,15 +161,6 @@ public class StructDecoderGenerator implements DecoderGenerator {
                 }
                 props.put(method.name, method);
             }
-        }
-        for (StructDescriptor.Prop field : struct.fields.values()) {
-            if (field.name.isEmpty()) {
-                field.name = field.field.getName();
-            }
-            if (field.decoder == null) {
-                field.decoder = spi.decoderOf(field.field.getGenericType());
-            }
-            props.put(field.name, field);
         }
         Function<List<StructDescriptor.Prop>, List<StructDescriptor.Prop>> sortProperties = struct.sortProperties;
         if (sortProperties == null) {

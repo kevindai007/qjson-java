@@ -1,12 +1,15 @@
 package org.qjson.demo;
 
+import org.junit.Assert;
 import org.qjson.junit.md.CompileClasses;
 import org.qjson.junit.md.LoadClass;
 import org.qjson.junit.md.Rmtree;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.qjson.test.md.TestInMarkdown.myTestData;
@@ -19,20 +22,11 @@ public interface TestDemo {
 
     static void testDemos() {
         List<String> codes = myTestData().codes();
-        int i = 0;
-        for (; i < codes.size(); i++) {
-            String code = codes.get(i);
-            if (!code.startsWith("package")) {
-                break;
-            }
-        }
-        List<String> demoCodes = codes.subList(i, codes.size() - 1);
+        List<String> demoCodes = codes.subList(0, codes.size() - 1);
         String template = codes.get(codes.size() - 1);
         for (String demoCode : demoCodes) {
-            ArrayList<String> sources = new ArrayList<>(codes.subList(0, i));
-            sources.add(template.replace("{{ CODE }}", demoCode));
             try {
-                testDemo(sources);
+                testDemo(template, demoCode);
             } catch (RuntimeException e) {
                 throw e;
             } catch (Exception e) {
@@ -41,14 +35,43 @@ public interface TestDemo {
         }
     }
 
-    static void testDemo(List<String> sources) throws Exception {
-        Path path = CompileClasses.$(sources);
+    static void testDemo(String template, String demoCode) throws Exception {
+        String expect = getExpect(demoCode);
+        String source = template.replace("{{ CODE }}", demoCode);
+        Path path = CompileClasses.$(Arrays.asList(source));
         try {
             Class demoClass = LoadClass.$(path, "demo.Demo");
             Method demoMethod = demoClass.getMethod("demo");
-            demoMethod.invoke(null);
+            if (expect != null) {
+                PrintStream oldOut = System.out;
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                PrintStream newOut = new PrintStream(baos);
+                System.setOut(newOut);
+                demoMethod.invoke(null);
+                System.setOut(oldOut);
+                newOut.flush();
+                Assert.assertEquals(expect, baos.toString());
+            } else {
+                demoMethod.invoke(null);
+            }
         } finally {
             Rmtree.$(path);
         }
+    }
+
+    static String getExpect(String demoCode) {
+        String lines[] = demoCode.split("\\r?\\n");
+        for (int i = lines.length - 1; i >= 0; i--) {
+            String line = lines[i];
+            if (line.startsWith("// Output:")) {
+                StringBuilder expect = new StringBuilder();
+                for (int j = i + 1; j < lines.length; j++) {
+                    expect.append(lines[j].replace("// ", ""));
+                    expect.append("\n");
+                }
+                return expect.toString();
+            }
+        }
+        return null;
     }
 }

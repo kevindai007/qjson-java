@@ -5,6 +5,7 @@ module.exports = {
             '/',
             '/demo/input_output',
             '/demo/container',
+            '/demo/struct/struct',
         ]
     }
 };

@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -24,7 +25,7 @@ public class Codegen {
     public static class Config {
         public InMemoryJavaCompiler compiler;
         public Function<Class, Class> chooseImpl;
-        public BiFunction<QJsonSpi, StructDescriptor, StructDescriptor> customizeStruct;
+        public BiConsumer<QJsonSpi, StructDescriptor> customizeStruct;
     }
 
     public Codegen(Config cfg, QJsonSpi spi) {
@@ -174,11 +175,11 @@ public class Codegen {
         if (!"true".equals(System.getenv("QJSON_DEBUG"))) {
             return;
         }
-        System.out.println("=== " + clazz.getCanonicalName() + " ===");
+        System.err.println("=== " + clazz.getCanonicalName() + " ===");
         String lines[] = src.split("\\r?\\n");
         for (int i = 0; i < lines.length; i++) {
             String line = lines[i];
-            System.out.println((i + 1) + ":\t" + line);
+            System.err.println((i + 1) + ":\t" + line);
         }
     }
 }

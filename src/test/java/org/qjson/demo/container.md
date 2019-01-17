@@ -14,22 +14,42 @@ built-in container is supported out of box. The mapping relationship is like thi
 | Map  | `{}` |
 
 ```java
-Assert.assertEquals("[true]", QJSON.stringify(
-        new ArrayList(){{ 
-            add(true); 
-        }}));
-Assert.assertEquals("[true]", QJSON.stringify(
-        new HashSet(){{ 
-            add(true);
-        }}));
-Assert.assertEquals("[true]", QJSON.stringify(
-        new boolean[]{true}));
-Assert.assertEquals("[true]", QJSON.stringify(
-        new Object[]{true}));
-Assert.assertEquals("{\"a\":true}", QJSON.stringify(
-        new HashMap(){{ 
-            put("a", true); 
-        }}));
+print(QJSON.stringify(
+  new ArrayList(){{ 
+      add(true); 
+  }}));
+// Output:
+// [true]
+```
+
+```java
+print(QJSON.stringify(
+  new HashSet(){{ 
+      add(true);
+  }}));
+// Output:
+// [true]
+```
+
+```java
+print(QJSON.stringify(new boolean[]{true}));
+// Output:
+// [true]
+```
+
+```java
+print(QJSON.stringify(new Object[]{true}));
+// Output:
+// [true]
+```
+
+```java
+print(QJSON.stringify(
+  new HashMap(){{ 
+      put("a", true); 
+  }}));
+// Output:
+// {"a":true}
 ```
 
 If decode back without specifying type, the default mapping is 
@@ -80,6 +100,10 @@ public class Demo {
     public static void demo() {
         {{ CODE }}
     }
+    
+    private static void print(Object obj) {
+        System.out.println(obj);
+    }
 }
 ```
 
@@ -89,6 +113,7 @@ public class Demo {
 
 If you container is inherited from containers in `java.util.*`, it is still considered as container automatically.
 However, if your container just implements `Iterable`, it will not be encoded as `[]` automatically.
+
 Given this class
 
 <<< @/docs/demo/MyObjects.java
@@ -97,9 +122,9 @@ Given this class
 It will be encoded like this:
 
 ```java
-Assert.assertEquals(
-        "{\"obj1\":\"a\",\"obj2\":\"b\"}", // {"obj1":"a","obj2":"b"}
-        QJSON.stringify(new MyObjects("a", "b")));
+print(QJSON.stringify(new MyObjects("a", "b")));
+// Output:
+// {"obj1":"a","obj2":"b"}
 ```
 
 To encode it as `["a","b"]`, we need to register a function to choose encoder.
@@ -114,9 +139,9 @@ cfg.chooseEncoder = (qjson, clazz) -> {
     return null;
 };
 QJSON qjson = new QJSON(cfg);
-Assert.assertEquals(
-        "[\"a\",\"b\"]", // ["a","b"]
-        qjson.encode(new MyObjects("a", "b")));
+print(qjson.encode(new MyObjects("a", "b")));
+// Output:
+// ["a","b"]
 ```
 
 <hide>
@@ -131,6 +156,10 @@ public class Demo {
     
     public static void demo() {
         {{ CODE }}
+    }
+    
+    private static void print(Object obj) {
+        System.out.println(obj);
     }
 }
 ```
