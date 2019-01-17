@@ -3,7 +3,8 @@ module.exports = {
     themeConfig: {
         sidebar: [
             '/',
-            '/source_and_sink',
+            '/demo/source_and_sink',
+            '/demo/container',
         ]
     }
 };
