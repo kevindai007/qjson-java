@@ -8,6 +8,7 @@ module.exports = {
             '/demo/container',
             '/demo/struct/struct',
             '/demo/inf/inf',
+            '/demo/encoder',
         ]
     }
 };

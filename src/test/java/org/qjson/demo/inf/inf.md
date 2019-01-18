@@ -14,13 +14,9 @@ In this case, we need to choose the type to encode.
 ```java
 Object obj = My.newObject();
 QJSON qjson = new QJSON();
-try {
-    print(qjson.encode(obj));
-} catch(Exception e) {
-    print("exception thrown");
-}
+print(qjson.encode(obj));
 // Output:
-// exception thrown
+// {}
 ```
 
 To use the public interface `My.Inf` to encode, we need to choose encoder.
@@ -77,8 +73,6 @@ Assert.assertEquals(0, list.size());
 ```
 
 For other interface, if no decoder specified, exception will be thrown:
-
-<<< @/docs/demo/inf/My.java
 
 ```java
 QJSON qjson = new QJSON();

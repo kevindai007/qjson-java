@@ -11,10 +11,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class StructEncoderGenerator implements EncoderGenerator {
+
+    public static Consumer<Class> ON_PRIVATE_CLASS = clazz -> {
+        if ("true".equals(System.getenv("QJSON_DEBUG"))) {
+            System.err.println(clazz + " is private, need to use config to specify encoder manually");
+        }
+    };
 
     @Override
     public Map<String, Object> args(Codegen.Config cfg, QJsonSpi spi, Class clazz) {
@@ -65,7 +72,10 @@ public class StructEncoderGenerator implements EncoderGenerator {
     @Override
     public void genEncode(Gen g, Map<String, Object> args, Class clazz) {
         if (Modifier.isPrivate(clazz.getModifiers())) {
-            throw new QJsonEncodeException(clazz + " is private, need to use config to specify encoder manually");
+            ON_PRIVATE_CLASS.accept(clazz);
+            g.__(new Line("sink.write('{');"));
+            g.__(new Line("sink.write('}');"));
+            return;
         }
         List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
         // {
