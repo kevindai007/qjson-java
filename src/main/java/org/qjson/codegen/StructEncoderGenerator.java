@@ -2,12 +2,14 @@ package org.qjson.codegen;
 
 import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Line;
+import org.qjson.encode.QJsonEncodeException;
 import org.qjson.spi.Encoder;
 import org.qjson.spi.QJsonSpi;
 import org.qjson.spi.StructDescriptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -62,6 +64,9 @@ public class StructEncoderGenerator implements EncoderGenerator {
 
     @Override
     public void genEncode(Gen g, Map<String, Object> args, Class clazz) {
+        if (Modifier.isPrivate(clazz.getModifiers())) {
+            throw new QJsonEncodeException(clazz + " is private, need to use config to specify encoder manually");
+        }
         List<StructDescriptor.Prop> props = (List<StructDescriptor.Prop>) args.get("props");
         // {
         g.__(new Line("sink.write('{');"));

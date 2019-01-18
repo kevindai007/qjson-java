@@ -6,10 +6,19 @@ public class My {
         String getField();
     }
 
-    // package scope
     private static class PrivateClass implements Inf {
 
         String field;
+
+        @Override
+        public String getField() {
+            return field;
+        }
+    }
+
+    public static class PublicClass implements Inf {
+
+        public String field;
 
         @Override
         public String getField() {

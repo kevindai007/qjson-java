@@ -13,10 +13,7 @@ import org.qjson.encode.BytesEncoderSink;
 import org.qjson.encode.StringEncoderSink;
 import org.qjson.spi.*;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
@@ -90,6 +87,7 @@ public class QJSON implements QJsonSpi {
 
     @Override
     public Function<DecoderSource, Object> factoryOf(Class clazz) {
+        clazz = cfg.chooseImpl.apply(clazz);
         if (clazz.equals(AnyMap.class)) {
             return source -> new AnyMap();
         }
@@ -278,5 +276,18 @@ public class QJSON implements QJsonSpi {
 
     public static String stringify(Object val) {
         return $.encode(val);
+    }
+
+    public static boolean isSubType(Class baseClass, Type subType) {
+        if (baseClass.equals(subType)) {
+            return false;
+        }
+        if (subType instanceof Class) {
+            return baseClass.isAssignableFrom((Class<?>) subType);
+        }
+        if (subType instanceof ParameterizedType) {
+            return baseClass.isAssignableFrom((Class<?>) ((ParameterizedType) subType).getRawType());
+        }
+        return false;
     }
 }

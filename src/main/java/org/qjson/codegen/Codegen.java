@@ -1,20 +1,18 @@
 package org.qjson.codegen;
 
+import org.mdkt.compiler.InMemoryJavaCompiler;
 import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Indent;
 import org.qjson.codegen.gen.Line;
 import org.qjson.decode.QJsonDecodeException;
 import org.qjson.encode.QJsonEncodeException;
-import org.mdkt.compiler.InMemoryJavaCompiler;
 import org.qjson.spi.*;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class Codegen {
@@ -106,9 +104,6 @@ public class Codegen {
     }
 
     public synchronized Encoder generateEncoder(Class clazz) {
-        if (Modifier.isPrivate(clazz.getModifiers())) {
-            throw new QJsonEncodeException(clazz + " is private, need to use config to specify encoder manually");
-        }
         EncoderGenerator generator = getEncoderGenerator(clazz);
         Map<String, Object> args = generator.args(cfg, spi, clazz);
         String encoderClassName = "GeneratedEncoder" + (counter++);

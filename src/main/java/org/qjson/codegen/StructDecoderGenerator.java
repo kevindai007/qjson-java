@@ -3,6 +3,7 @@ package org.qjson.codegen;
 import org.qjson.codegen.gen.Gen;
 import org.qjson.codegen.gen.Indent;
 import org.qjson.codegen.gen.Line;
+import org.qjson.decode.QJsonDecodeException;
 import org.qjson.spi.Decoder;
 import org.qjson.spi.DecoderSource;
 import org.qjson.spi.QJsonSpi;
@@ -52,9 +53,8 @@ public class StructDecoderGenerator implements DecoderGenerator {
         try {
             clazz.getConstructor();
         } catch (NoSuchMethodException e) {
-            // do not support constructor binding
-            g.__(new Line("return null;"));
-            return;
+            throw new QJsonDecodeException(clazz + " does not have default constructor, " +
+                    "need to use config to specify decoder manually");
         }
         g.__("return new "
         ).__(clazz.getCanonicalName()
